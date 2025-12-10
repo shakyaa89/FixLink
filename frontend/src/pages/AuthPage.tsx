@@ -1,0 +1,66 @@
+import React from "react";
+
+import LoginForm from "../components/Auth/LoginForm";
+import RegisterForm from "../components/Auth/RegisterForm";
+import { Zap } from "lucide-react";
+
+export default function AuthPage() {
+  const [showLogin, setShowLogin] = React.useState(true);
+
+  return (
+    <div className="min-h-screen bg-white flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        {/* Logo */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-linear-to-br from-blue-600 to-purple-600 rounded-2xl mb-4">
+            <Zap className="w-8 h-8 text-white" />
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900">FixLink</h1>
+        </div>
+
+        <div className="bg-white rounded-3xl shadow-xl p-8">
+          {/* Toggle Tabs */}
+          <div className="flex bg-gray-100 rounded-xl p-1 mb-8">
+            <button
+              onClick={() => setShowLogin(true)}
+              className={`flex-1 py-3 rounded-lg font-semibold transition-all ${
+                showLogin
+                  ? "bg-white text-blue-600 shadow-md"
+                  : "text-gray-600 hover:text-gray-900"
+              }`}
+            >
+              Login
+            </button>
+            <button
+              onClick={() => setShowLogin(false)}
+              className={`flex-1 py-3 rounded-lg font-semibold transition-all ${
+                !showLogin
+                  ? "bg-white text-blue-600 shadow-md"
+                  : "text-gray-600 hover:text-gray-900"
+              }`}
+            >
+              Register
+            </button>
+          </div>
+
+          {/* LOGIN FORM */}
+          {showLogin && <LoginForm />}
+
+          {/* REGISTER FORM */}
+          {!showLogin && <RegisterForm />}
+        </div>
+
+        {/* Footer */}
+        <p className="text-center text-sm text-gray-600 mt-6">
+          {showLogin ? "Don't have an account? " : "Already have an account? "}
+          <button
+            onClick={() => setShowLogin(!showLogin)}
+            className="text-blue-600 font-semibold"
+          >
+            {showLogin ? "Sign up" : "Sign in"}
+          </button>
+        </p>
+      </div>
+    </div>
+  );
+}

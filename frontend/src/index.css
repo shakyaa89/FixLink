@@ -1,0 +1,18 @@
+@import "tailwindcss";
+
+* {
+  font-family: Inter;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: "sans-serif", sans-serif;
+  overflow-y: scroll;
+}
+
+button {
+  cursor: pointer;
+}
