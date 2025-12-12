@@ -29,6 +29,8 @@ export const useAuthStore = create<AuthState>((set) => ({
     } catch (error: any) {
       if (error.response?.data?.message) {
         toast.error(error.response.data.message);
+      } else if (error.request) {
+        toast.error("Unable to reach server. Please try again later.");
       }
       set({ user: null });
     } finally {
@@ -45,6 +47,8 @@ export const useAuthStore = create<AuthState>((set) => ({
     } catch (error: any) {
       if (error.response?.data?.message) {
         toast.error(error.response.data.message);
+      } else if (error.request) {
+        toast.error("Unable to reach server. Please try again later.");
       }
     }
   },

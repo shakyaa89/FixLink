@@ -16,6 +16,7 @@ import CreateJobPage from "./pages/UserPages/CreateJobPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import UserDashboard from "./pages/UserPages/UserDashboard";
 import MyJobsPage from "./pages/UserPages/MyJobsPage";
+import Messages from "./pages/UserPages/Messages";
 
 function App() {
   const { user, checkAuth, checking } = useAuthStore();
@@ -74,6 +75,15 @@ function App() {
             element={
               <UserProtectedRoute>
                 <MyJobsPage />
+              </UserProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/user/messages"
+            element={
+              <UserProtectedRoute>
+                <Messages />
               </UserProtectedRoute>
             }
           />

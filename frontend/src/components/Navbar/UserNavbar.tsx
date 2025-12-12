@@ -131,19 +131,13 @@ export default function UserNavbar() {
               My Jobs
             </Link>
             <Link
-              to="#"
+              to="/user/messages"
               onClick={() => setIsOpen(false)}
               className="block pb-3 text-gray-700 hover:text-blue-600 border-b border-gray-300 transition"
             >
               Messages
             </Link>
-            <Link
-              to="#"
-              onClick={() => setIsOpen(false)}
-              className="block pb-3 text-gray-700 hover:text-blue-600 border-b border-gray-300 transition"
-            >
-              Offers
-            </Link>
+
             <Link
               to="#"
               onClick={() => setIsOpen(false)}

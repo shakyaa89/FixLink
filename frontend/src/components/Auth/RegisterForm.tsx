@@ -128,7 +128,7 @@ function RegisterForm() {
               type="text"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              placeholder="Full name"
+              placeholder="Enter your full name"
               className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-600"
             />
           </div>
@@ -137,7 +137,7 @@ function RegisterForm() {
         {/* Email */}
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Email Address<span className="text-red-500">*</span>
+            Email<span className="text-red-500">*</span>
           </label>
           <div className="relative">
             <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -145,7 +145,7 @@ function RegisterForm() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Email address"
+              placeholder="Enter your email"
               className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-600"
             />
           </div>
@@ -162,7 +162,7 @@ function RegisterForm() {
               type="tel"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
-              placeholder="Phone number"
+              placeholder="Enter your phone number"
               className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-600"
             />
           </div>
@@ -179,7 +179,7 @@ function RegisterForm() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password"
+              placeholder="Enter your password"
               className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-600"
             />
           </div>
@@ -196,7 +196,7 @@ function RegisterForm() {
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Confirm password"
+              placeholder="Confirm your password"
               className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-600"
             />
           </div>
@@ -239,7 +239,7 @@ function RegisterForm() {
               type="text"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
-              placeholder="Address"
+              placeholder="Enter your address"
               className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-600"
             />
           </div>
@@ -270,7 +270,7 @@ function RegisterForm() {
               type="url"
               value={addressUrl}
               onChange={(e) => setAddressUrl(e.target.value)}
-              placeholder="Paste Google Maps link"
+              placeholder="Enter address URL"
               className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-600"
             />
           </div>

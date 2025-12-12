@@ -2,20 +2,20 @@ import React from "react";
 
 import LoginForm from "../components/Auth/LoginForm";
 import RegisterForm from "../components/Auth/RegisterForm";
-import { Zap } from "lucide-react";
+import { User } from "lucide-react";
 
 export default function AuthPage() {
   const [showLogin, setShowLogin] = React.useState(true);
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center p-4">
+    <div className="min-h-screen bg-white flex  justify-center p-4 mt-20">
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-linear-to-br from-blue-600 to-purple-600 rounded-2xl mb-4">
-            <Zap className="w-8 h-8 text-white" />
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-linear-to-br from-blue-600 to-purple-600 rounded-full mb-4">
+            <User className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">FixLink</h1>
+          <h1 className="text-3xl font-bold text-gray-900">FixLink</h1>
         </div>
 
         <div className="bg-white rounded-3xl shadow-xl p-8">

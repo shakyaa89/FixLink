@@ -4,7 +4,6 @@ import {
   PlusCircle,
   Briefcase,
   MessageSquare,
-  FileText,
   Star,
   Flag,
   User,
@@ -15,7 +14,9 @@ export default function Sidebar() {
   const { user } = useAuthStore();
 
   return (
-    <aside className="w-64 min-h-screen border-r border-gray-300 p-4 hidden md:block">
+    <aside
+      className={`w-64 min-h-screen border-r border-gray-300 p-4 hidden md:block`}
+    >
       <div className="flex-col justify-center items-center w-full">
         <img
           src={user?.profilePicture}
@@ -65,7 +66,7 @@ export default function Sidebar() {
         </NavLink>
 
         <NavLink
-          to="/"
+          to="/user/messages"
           className={({ isActive }) =>
             `flex items-center gap-3 px-4 py-3 rounded-lg 
              ${
@@ -74,18 +75,6 @@ export default function Sidebar() {
           }
         >
           <MessageSquare className="w-5 h-5" /> Messages
-        </NavLink>
-
-        <NavLink
-          to="/"
-          className={({ isActive }) =>
-            `flex items-center gap-3 px-4 py-3 rounded-lg 
-             ${
-               isActive ? "bg-blue-600 text-white shadow" : "hover:bg-gray-100"
-             }`
-          }
-        >
-          <FileText className="w-5 h-5" /> Offers
         </NavLink>
 
         <NavLink

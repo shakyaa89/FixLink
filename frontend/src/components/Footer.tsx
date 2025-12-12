@@ -22,26 +22,12 @@ export default function Footer() {
           <div>
             <h3 className=" font-semibold mb-4">Services</h3>
             <ul className="space-y-2 text-sm">
-              <li>
-                <a href="#" className="hover:text-blue-400 transition">
-                  Cleaning
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-blue-400 transition">
-                  Plumbing
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-blue-400 transition">
-                  Electrical
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-blue-400 transition">
-                  Carpentry
-                </a>
-              </li>
+              <li>Plumbing</li>
+              <li>Electrical</li>
+              <li>Carpentry</li>
+              <li>Painting</li>
+              <li>Landscaping</li>
+              <li>General Repairs</li>
             </ul>
           </div>
 
