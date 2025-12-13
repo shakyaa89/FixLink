@@ -17,6 +17,9 @@ import NotFoundPage from "./pages/NotFoundPage";
 import UserDashboard from "./pages/UserPages/UserDashboard";
 import MyJobsPage from "./pages/UserPages/MyJobsPage";
 import Messages from "./pages/UserPages/Messages";
+import ReviewsPage from "./pages/UserPages/ReviewsPage";
+import ProfilePage from "./pages/UserPages/ProfilePage";
+import DisputesPage from "./pages/UserPages/DisputesPage";
 
 function App() {
   const { user, checkAuth, checking } = useAuthStore();
@@ -84,6 +87,33 @@ function App() {
             element={
               <UserProtectedRoute>
                 <Messages />
+              </UserProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/user/reviews"
+            element={
+              <UserProtectedRoute>
+                <ReviewsPage />
+              </UserProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/user/profile"
+            element={
+              <UserProtectedRoute>
+                <ProfilePage />
+              </UserProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/user/disputes"
+            element={
+              <UserProtectedRoute>
+                <DisputesPage />
               </UserProtectedRoute>
             }
           />

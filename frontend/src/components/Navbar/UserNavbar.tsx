@@ -139,21 +139,21 @@ export default function UserNavbar() {
             </Link>
 
             <Link
-              to="#"
+              to="/user/reviews"
               onClick={() => setIsOpen(false)}
               className="block pb-3 text-gray-700 hover:text-blue-600 border-b border-gray-300 transition"
             >
               Reviews
             </Link>
             <Link
-              to="#"
+              to="/user/disputes"
               onClick={() => setIsOpen(false)}
               className="block pb-3 text-gray-700 hover:text-blue-600 border-b border-gray-300 transition"
             >
               Disputes
             </Link>
             <Link
-              to="#"
+              to="/user/profile"
               onClick={() => setIsOpen(false)}
               className="block pb-3 text-gray-700 hover:text-blue-600 border-b border-gray-300 transition"
             >

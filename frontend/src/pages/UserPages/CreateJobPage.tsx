@@ -3,14 +3,13 @@ import Sidebar from "../../components/Navbar/Sidebar";
 
 export default function CreateJobPage() {
   return (
-    <div className="flex flex-col md:flex-row min-h-screen">
-      {/* Sidebar */}
+    <div className="flex min-h-screen">
       <Sidebar />
 
       {/* Main Content */}
-      <main className="flex-1 py-5 px-4 md:px-8">
-        <div className="p-4 md:p-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 md:mb-8 text-left">
+      <main className="flex-1 py-5 px-4 md:px-8 ">
+        <div className="max-w-6xl mx-auto my-10">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 md:mb-8 text-left">
             Create a New Job
           </h1>
 
