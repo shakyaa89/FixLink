@@ -1,4 +1,4 @@
-import { Mail, Lock, User, Phone, Upload } from "lucide-react";
+import { Mail, Lock, User, Phone, Upload, MapPin } from "lucide-react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -22,6 +22,7 @@ function ServiceProviderRegisterForm() {
   const [idProofURL, setIdProofURL] = useState<File | null>(null);
 
   const [providerCategory, setProviderCategory] = useState("");
+  const [address, setAddress] = useState("");
 
   const [agreeToTerms, setAgreeToTerms] = useState(false);
 
@@ -67,7 +68,8 @@ function ServiceProviderRegisterForm() {
       !password ||
       !profilePicture ||
       !verificationProofURL ||
-      !providerCategory
+      !providerCategory ||
+      !address
     ) {
       toast.error("Please fill in all required fields");
       return;
@@ -119,6 +121,7 @@ function ServiceProviderRegisterForm() {
         phoneNumber,
         password,
         role: "serviceProvider",
+        address,
         profilePicture: profileUrl,
         verificationProofURL: verificationURL,
         providerCategory: providerCategory,
@@ -134,6 +137,7 @@ function ServiceProviderRegisterForm() {
       setPassword("");
       setConfirmPassword("");
       setProfilePicture(null);
+      setAddress("");
 
       setAgreeToTerms(false);
 
@@ -265,6 +269,23 @@ function ServiceProviderRegisterForm() {
               General Repairs
             </option>
           </select>
+        </div>
+
+        {/* Address */}
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
+            Address<span className="text-red-500">*</span>
+          </label>
+          <div className="relative">
+            <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input
+              type="text"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              placeholder="Enter your address"
+              className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-600"
+            />
+          </div>
         </div>
 
         {/* Profile Picture */}

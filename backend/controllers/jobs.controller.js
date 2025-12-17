@@ -7,8 +7,8 @@ export const createJob = async (req, res) => {
     jobCategory,
     userId,
     userPrice,
-    address,
-    addressURL,
+    location,
+    locationURL,
   } = req.body;
 
   try {
@@ -18,8 +18,8 @@ export const createJob = async (req, res) => {
       description,
       jobCategory,
       userPrice,
-      address,
-      addressURL,
+      location,
+      locationURL,
     });
 
     await newJob.save();

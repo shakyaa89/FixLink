@@ -78,8 +78,8 @@ export interface JobData {
   description: string;
   jobCategory: string;
   userPrice: number;
-  address: string;
-  addressURL: string;
+  location: string;
+  locationURL: string;
   jobStatus?: string;
   offers?: string[];
   createdAt?: string;

@@ -44,7 +44,7 @@ export default function ProfilePage() {
                     <img
                       src={user.profilePicture}
                       alt="Profile Picture"
-                      className="rounded-2xl"
+                      className="rounded-2xl aspect-square object-cover"
                     />
                   </div>
 

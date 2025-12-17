@@ -12,13 +12,13 @@ export default function CreateJobPage() {
   const [description, setDescription] = useState("");
   const [jobCategory, setJobCategory] = useState("");
   const [userPrice, setUserPrice] = useState(0);
-  const [address, setAddress] = useState("");
-  const [addressURL, setAddressURL] = useState("");
+  const [location, setLocation] = useState("");
+  const [locationURL, setLocationURL] = useState("");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    if (!title || !description || !jobCategory || !userPrice || !address) {
+    if (!title || !description || !jobCategory || !userPrice || !location) {
       toast.error("Please fill in all required fields");
       return;
     }
@@ -30,8 +30,8 @@ export default function CreateJobPage() {
         description,
         jobCategory,
         userPrice,
-        address,
-        addressURL,
+        location,
+        locationURL,
       };
 
       const response = await JobApi.createJobApi(payload);
@@ -42,8 +42,8 @@ export default function CreateJobPage() {
       setDescription("");
       setJobCategory("");
       setUserPrice(0);
-      setAddress("");
-      setAddressURL("");
+      setLocation("");
+      setLocationURL("");
     } catch (error) {
       console.log(error);
       toast.error("Error creating job");
@@ -127,29 +127,29 @@ export default function CreateJobPage() {
               />
             </div>
 
-            {/* Address */}
+            {/* Location */}
             <div className="col-span-1">
               <label className="block text-gray-800 font-semibold mb-2">
-                Address<span className="text-red-500">*</span>
+                Location<span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
                 placeholder="Enter your location"
                 className="w-full p-3 md:p-4 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none"
               />
             </div>
 
-            {/* Address URL */}
+            {/* Location URL */}
             <div className="col-span-1 md:col-span-2">
               <label className="block text-gray-800 font-semibold mb-2">
-                Address URL (Optional)
+                Location URL (Optional)
               </label>
               <input
                 type="text"
-                value={addressURL}
-                onChange={(e) => setAddressURL(e.target.value)}
+                value={locationURL}
+                onChange={(e) => setLocationURL(e.target.value)}
                 placeholder="https://www.google.com/maps/@?api=1&map_action=map"
                 className="w-full p-3 md:p-4 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none"
               />

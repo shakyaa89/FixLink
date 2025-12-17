@@ -37,11 +37,11 @@ const jobSchema = mongoose.Schema(
       type: Number,
       default: "",
     },
-    address: {
+    location: {
       type: String,
       required: true,
     },
-    addressURL: {
+    locationURL: {
       type: String,
       default: "",
     },
