@@ -29,12 +29,33 @@ export default function Navbar() {
               Home
             </Link>
 
-            <Link
-              to={{ pathname: "/", hash: "#services" }}
-              className="text-gray-600 transition hover:text-blue-600"
-            >
-              Services
-            </Link>
+            {!user && (
+              <Link
+                to={{ pathname: "/", hash: "#services" }}
+                className="text-gray-600 transition hover:text-blue-600"
+              >
+                Services
+              </Link>
+            )}
+
+            {user?.role === "user" && (
+              <Link
+                to={{ pathname: "/user/dashboard" }}
+                className="text-gray-600 transition hover:text-blue-600"
+              >
+                Dashboard
+              </Link>
+            )}
+
+            {user?.role === "serviceProvider" && (
+              <Link
+                to={{ pathname: "/serviceprovider/dashboard" }}
+                className="text-gray-600 transition hover:text-blue-600"
+              >
+                Provider
+              </Link>
+            )}
+
             <Link
               to={{ pathname: "/", hash: "#about" }}
               className="text-gray-600 transition hover:text-blue-600"
@@ -63,7 +84,7 @@ export default function Navbar() {
                 <img
                   src={user.profilePicture}
                   alt="User Profile Picture"
-                  className="w-10 h-10 border rounded-full"
+                  className="w-10 h-10 object-cover border rounded-full"
                 />
                 <button
                   onClick={handleLogout}
@@ -109,27 +130,87 @@ export default function Navbar() {
               Home
             </Link>
 
-            <Link
-              to={{ pathname: "/", hash: "#services" }}
-              onClick={() => setIsOpen(false)}
-              className="block py-2 text-gray-600 transition hover:text-blue-600"
-            >
-              Services
-            </Link>
-            <Link
-              to={{ pathname: "/", hash: "#about" }}
-              onClick={() => setIsOpen(false)}
-              className="block py-2 text-gray-600 transition hover:text-blue-600"
-            >
-              About
-            </Link>
-            <Link
-              to={{ pathname: "/", hash: "#contact" }}
-              onClick={() => setIsOpen(false)}
-              className="block py-2 text-gray-600 transition hover:text-blue-600"
-            >
-              Contact
-            </Link>
+            {!user && (
+              <>
+                <Link
+                  to={{ pathname: "/", hash: "#services" }}
+                  onClick={() => setIsOpen(false)}
+                  className="block py-2 text-gray-600 transition hover:text-blue-600"
+                >
+                  Services
+                </Link>
+                <Link
+                  to={{ pathname: "/", hash: "#about" }}
+                  onClick={() => setIsOpen(false)}
+                  className="block py-2 text-gray-600 transition hover:text-blue-600"
+                >
+                  About
+                </Link>
+                <Link
+                  to={{ pathname: "/", hash: "#contact" }}
+                  onClick={() => setIsOpen(false)}
+                  className="block py-2 text-gray-600 transition hover:text-blue-600"
+                >
+                  Contact
+                </Link>
+              </>
+            )}
+
+            {user?.role === "user" && (
+              <>
+                <Link
+                  to="/user/dashboard"
+                  onClick={() => setIsOpen(false)}
+                  className="block text-gray-700 hover:text-blue-600 transition border-b border-gray-300 pb-3"
+                >
+                  Dashboard
+                </Link>
+                <Link
+                  to="/user/create-job"
+                  onClick={() => setIsOpen(false)}
+                  className="block text-gray-700 hover:text-blue-600 transition border-b border-gray-300 pb-3"
+                >
+                  Create Job
+                </Link>
+                <Link
+                  to="/user/jobs"
+                  onClick={() => setIsOpen(false)}
+                  className="block pb-3 text-gray-700 hover:text-blue-600 border-b border-gray-300 transition"
+                >
+                  My Jobs
+                </Link>
+                <Link
+                  to="/user/messages"
+                  onClick={() => setIsOpen(false)}
+                  className="block pb-3 text-gray-700 hover:text-blue-600 border-b border-gray-300 transition"
+                >
+                  Messages
+                </Link>
+
+                <Link
+                  to="/user/reviews"
+                  onClick={() => setIsOpen(false)}
+                  className="block pb-3 text-gray-700 hover:text-blue-600 border-b border-gray-300 transition"
+                >
+                  Reviews
+                </Link>
+                <Link
+                  to="/user/disputes"
+                  onClick={() => setIsOpen(false)}
+                  className="block pb-3 text-gray-700 hover:text-blue-600 border-b border-gray-300 transition"
+                >
+                  Disputes
+                </Link>
+                <Link
+                  to="/user/profile"
+                  onClick={() => setIsOpen(false)}
+                  className="block pb-3 text-gray-700 hover:text-blue-600 border-b border-gray-300 transition"
+                >
+                  Profile
+                </Link>
+              </>
+            )}
+
             <div className="flex flex-col gap-2 pt-2">
               {user ? (
                 <>
@@ -137,7 +218,7 @@ export default function Navbar() {
                     <img
                       src={user.profilePicture}
                       alt="User Profile Picture"
-                      className="w-10 h-10 border rounded-full"
+                      className="w-10 h-10 object-cover border rounded-full"
                     />
                     Hello,{" "}
                     <span className="font-semibold text-gray-900">

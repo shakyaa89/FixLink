@@ -1,50 +1,31 @@
 import { Link } from "react-router-dom";
-import { Briefcase, Edit, Trash2, Eye } from "lucide-react";
-import Sidebar from "../../components/Navbar/Sidebar";
+import { Briefcase, Edit, Trash2, Eye, Loader2 } from "lucide-react";
+import Sidebar from "../../components/Sidebar/Sidebar";
+import { useEffect, useState } from "react";
+import { JobApi } from "../../api/Apis";
+import type { JobData } from "../../api/Apis";
 
 export default function MyJobs() {
-  // Temporary sample data — replace with API data later
-  const jobs = [
-    {
-      id: 1,
-      title: "Fix Kitchen Sink",
-      description: "Leaking pipe under the sink.",
-      status: "Active",
-      offers: 4,
-      createdAt: "2025-01-10",
-    },
-    {
-      id: 2,
-      title: "Paint Living Room",
-      description: "Need a painter for a 20m² living room.",
-      status: "Pending",
-      offers: 2,
-      createdAt: "2025-01-05",
-    },
-    {
-      id: 3,
-      title: "Garden Cleanup",
-      description: "Remove weeds, mow the lawn, trim bushes.",
-      status: "Completed",
-      offers: 6,
-      createdAt: "2024-12-20",
-    },
-    {
-      id: 4,
-      title: "Garden Cleanup",
-      description: "Remove weeds, mow the lawn, trim bushes.",
-      status: "Cancelled",
-      offers: 6,
-      createdAt: "2024-12-20",
-    },
-  ];
+  const [loading, setLoading] = useState(true);
 
-  const statusClasses: any = {
-    Active: "bg-green-100 text-black",
-    Pending: "bg-yellow-100 text-black",
-    Completed: "bg-blue-100 text-black",
-    Cancelled: "bg-red-100 text-black",
+  const [jobs, setJobs] = useState<JobData[]>([]);
+
+  const fetchJobs = async () => {
+    try {
+      const response = await JobApi.fetchUserJobsApi();
+
+      setJobs(response.data.jobs);
+    } catch (error) {
+      console.log(error);
+      setJobs([]);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  useEffect(() => {
+    fetchJobs();
+  }, []);
 
   return (
     <div className="flex min-h-screen">
@@ -62,72 +43,77 @@ export default function MyJobs() {
             </p>
           </div>
 
+          {loading && (
+            <div className="flex items-center justify-center mt-40">
+              <Loader2 className="animate-spin" size={45} />
+            </div>
+          )}
+
           {/* Jobs List */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {jobs.map((job) => (
-              <div
-                key={job.id}
-                className="bg-white border border-gray-300 rounded-2xl p-6 shadow-sm"
-              >
-                {/* Title */}
-                <div className="flex items-center gap-3 mb-4">
-                  <Briefcase className="w-8 h-8 text-blue-600" />
-                  <h2 className="text-xl font-semibold text-gray-900">
-                    {job.title}
-                  </h2>
+            {!loading &&
+              jobs.map((job) => (
+                <div
+                  key={job._id}
+                  className="bg-white border border-gray-300 rounded-2xl p-6 shadow-sm"
+                >
+                  {/* Title */}
+                  <div className="flex items-center gap-3 mb-4">
+                    <Briefcase className="w-8 h-8 text-blue-600" />
+                    <h2 className="text-xl font-semibold text-gray-900">
+                      {job.title}
+                    </h2>
+                  </div>
+
+                  {/* Description */}
+                  <p className="text-gray-600 mb-4">{job.description}</p>
+
+                  {/* Info Row */}
+                  <div className="flex flex-wrap items-center justify-between mb-4">
+                    <span
+                      className={`px-3 py-1 text-gray-500 rounded-full text-sm font-medium capitalize `}
+                    >
+                      Status: {job.jobStatus}
+                    </span>
+
+                    <span className="text-sm text-gray-500">
+                      Offers: <strong>{job.offers?.length}</strong>
+                    </span>
+
+                    <span className="text-sm text-gray-500">
+                      Posted: {job.createdAt?.split("T")[0]}
+                    </span>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex items-center gap-3 mt-4">
+                    <Link
+                      to={`/my-jobs/${job._id}`}
+                      className="flex items-center gap-2 px-4 py-2 text-sm bg-gray-200 rounded-lg hover:bg-gray-300 transition"
+                    >
+                      <Eye className="w-4 h-4" />
+                      View
+                    </Link>
+
+                    <Link
+                      to={`/my-jobs/edit/${job._id}`}
+                      className="flex items-center gap-2 px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                    >
+                      <Edit className="w-4 h-4" />
+                      Edit
+                    </Link>
+
+                    <button className="flex items-center gap-2 px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
+                      <Trash2 className="w-4 h-4" />
+                      Delete
+                    </button>
+                  </div>
                 </div>
-
-                {/* Description */}
-                <p className="text-gray-600 mb-4">{job.description}</p>
-
-                {/* Info Row */}
-                <div className="flex flex-wrap items-center justify-between mb-4">
-                  <span
-                    className={`px-3 py-1 rounded-full text-sm font-medium ${
-                      statusClasses[job.status]
-                    }`}
-                  >
-                    {job.status}
-                  </span>
-
-                  <span className="text-sm text-gray-500">
-                    Offers: <strong>{job.offers}</strong>
-                  </span>
-
-                  <span className="text-sm text-gray-500">
-                    Posted: {job.createdAt}
-                  </span>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="flex items-center gap-3 mt-4">
-                  <Link
-                    to={`/my-jobs/${job.id}`}
-                    className="flex items-center gap-2 px-4 py-2 text-sm bg-gray-200 rounded-lg hover:bg-gray-300 transition"
-                  >
-                    <Eye className="w-4 h-4" />
-                    View
-                  </Link>
-
-                  <Link
-                    to={`/my-jobs/edit/${job.id}`}
-                    className="flex items-center gap-2 px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-                  >
-                    <Edit className="w-4 h-4" />
-                    Edit
-                  </Link>
-
-                  <button className="flex items-center gap-2 px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
-                    <Trash2 className="w-4 h-4" />
-                    Delete
-                  </button>
-                </div>
-              </div>
-            ))}
+              ))}
           </div>
 
           {/* If No Jobs Exist */}
-          {jobs.length === 0 && (
+          {jobs.length === 0 && !loading && (
             <div className="text-center mt-20">
               <p className="text-gray-600 text-lg">
                 You haven’t posted any jobs yet.

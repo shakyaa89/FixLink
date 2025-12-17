@@ -6,7 +6,7 @@ type Props = {
   children: ReactNode;
 };
 
-const UserProtectedRoute = ({ children }: Props) => {
+const ProtectedRoute = ({ children }: Props) => {
   const { user, checking } = useAuthStore();
 
   if (checking) return null;
@@ -15,11 +15,7 @@ const UserProtectedRoute = ({ children }: Props) => {
     return <Navigate to="/auth" replace />;
   }
 
-  if (user?.role !== "user") {
-    return <Navigate to="/auth" replace />;
-  }
-
   return <>{children}</>;
 };
 
-export default UserProtectedRoute;
+export default ProtectedRoute;

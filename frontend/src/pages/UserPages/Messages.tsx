@@ -1,4 +1,4 @@
-import Sidebar from "../../components/Navbar/Sidebar";
+import Sidebar from "../../components/Sidebar/Sidebar";
 import { Send, MessageCircle, User, Menu } from "lucide-react";
 import { useState } from "react";
 

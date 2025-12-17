@@ -1,6 +1,6 @@
 import { Mail, Phone, MapPin, Calendar, Edit2, Briefcase } from "lucide-react";
 import { useState } from "react";
-import Sidebar from "../../components/Navbar/Sidebar";
+import Sidebar from "../../components/Sidebar/Sidebar";
 import { useAuthStore } from "../../store/authStore";
 
 export default function ProfilePage() {

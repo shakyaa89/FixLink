@@ -14,6 +14,8 @@ export async function registerController(req, res) {
     addressURL,
     profilePicture,
     verificationProofURL,
+    providerCategory,
+    idURL,
   } = req.body;
 
   try {
@@ -27,11 +29,13 @@ export async function registerController(req, res) {
       addressDescription,
       addressURL,
       profilePicture,
-      verificationProofURL
+      verificationProofURL,
+      providerCategory,
+      idURL
     );
 
     // Required fields
-    if (!fullName || !email || !phoneNumber || !password) {
+    if (!fullName || !email || !phoneNumber || !password || !profilePicture) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -55,17 +59,17 @@ export async function registerController(req, res) {
       phoneNumber,
       password: hashedPassword,
       role: role || "user",
-
-      profilePicture: profilePicture || "",
-
       address,
       addressDescription,
       addressURL,
 
-      // Service provider fields (only used if role === "serviceProvider")
+      profilePicture: profilePicture || "",
+
       verificationStatus: role === "serviceProvider" ? "pending" : null,
       verificationProofURL:
         role === "serviceProvider" ? verificationProofURL : null,
+      providerCategory: role === "serviceProvider" ? providerCategory : "",
+      idProofURL: role === "serviceProvider" ? idURL : "",
     });
 
     await user.save();

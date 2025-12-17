@@ -5,7 +5,7 @@ import {
   FileText,
   TrendingDown,
 } from "lucide-react";
-import Sidebar from "../../components/Navbar/Sidebar";
+import Sidebar from "../../components/Sidebar/Sidebar";
 
 export default function DisputesPage() {
   const disputes = [

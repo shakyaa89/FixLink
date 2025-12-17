@@ -47,7 +47,7 @@ export default function Sidebar() {
           <img
             src={user?.profilePicture}
             alt=""
-            className="w-30 h-auto rounded-full mx-auto border border-gray-300"
+            className="w-30 h-auto aspect-square object-cover rounded-full mx-auto border border-gray-300"
           />
           <h1 className="text-3xl font-bold p-4 pb-6 text-center">
             {user?.fullName}
@@ -57,44 +57,86 @@ export default function Sidebar() {
 
       {/* Navigation */}
       <nav className="space-y-2">
-        <NavLink
-          to="/user/dashboard"
-          className={({ isActive }) =>
-            `flex items-center gap-3 px-4 py-3 rounded-lg ${
-              isActive ? "bg-blue-600 text-white shadow" : "hover:bg-gray-100"
-            } ${collapsed ? "justify-center" : ""}`
-          }
-        >
-          <Home className="w-5 h-5" />
-          {!collapsed && "Dashboard"}
-        </NavLink>
+        {user?.role === "user" && (
+          <>
+            <NavLink
+              to="/user/dashboard"
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-4 py-3 rounded-lg ${
+                  isActive
+                    ? "bg-blue-600 text-white shadow"
+                    : "hover:bg-gray-100"
+                } ${collapsed ? "justify-center" : ""}`
+              }
+            >
+              <Home className="w-5 h-5" />
+              {!collapsed && "Dashboard"}
+            </NavLink>
+
+            <NavLink
+              to="/user/create-job"
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-4 py-3 rounded-lg ${
+                  isActive
+                    ? "bg-blue-600 text-white shadow"
+                    : "hover:bg-gray-100"
+                } ${collapsed ? "justify-center" : ""}`
+              }
+            >
+              <PlusCircle className="w-5 h-5" />
+              {!collapsed && "Create Job"}
+            </NavLink>
+
+            <NavLink
+              to="/user/jobs"
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-4 py-3 rounded-lg ${
+                  isActive
+                    ? "bg-blue-600 text-white shadow"
+                    : "hover:bg-gray-100"
+                } ${collapsed ? "justify-center" : ""}`
+              }
+            >
+              <Briefcase className="w-5 h-5" />
+              {!collapsed && "My Jobs"}
+            </NavLink>
+          </>
+        )}
+
+        {user?.role === "serviceProvider" && (
+          <>
+            <NavLink
+              to="/serviceProvider/dashboard"
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-4 py-3 rounded-lg ${
+                  isActive
+                    ? "bg-blue-600 text-white shadow"
+                    : "hover:bg-gray-100"
+                } ${collapsed ? "justify-center" : ""}`
+              }
+            >
+              <Home className="w-5 h-5" />
+              {!collapsed && "Dashboard"}
+            </NavLink>
+
+            <NavLink
+              to="/"
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-4 py-3 rounded-lg ${
+                  isActive
+                    ? "bg-blue-600 text-white shadow"
+                    : "hover:bg-gray-100"
+                } ${collapsed ? "justify-center" : ""}`
+              }
+            >
+              <Briefcase className="w-5 h-5" />
+              {!collapsed && "View Jobs"}
+            </NavLink>
+          </>
+        )}
 
         <NavLink
-          to="/user/create-job"
-          className={({ isActive }) =>
-            `flex items-center gap-3 px-4 py-3 rounded-lg ${
-              isActive ? "bg-blue-600 text-white shadow" : "hover:bg-gray-100"
-            } ${collapsed ? "justify-center" : ""}`
-          }
-        >
-          <PlusCircle className="w-5 h-5" />
-          {!collapsed && "Create Job"}
-        </NavLink>
-
-        <NavLink
-          to="/user/jobs"
-          className={({ isActive }) =>
-            `flex items-center gap-3 px-4 py-3 rounded-lg ${
-              isActive ? "bg-blue-600 text-white shadow" : "hover:bg-gray-100"
-            } ${collapsed ? "justify-center" : ""}`
-          }
-        >
-          <Briefcase className="w-5 h-5" />
-          {!collapsed && "My Jobs"}
-        </NavLink>
-
-        <NavLink
-          to="/user/messages"
+          to="/messages"
           className={({ isActive }) =>
             `flex items-center gap-3 px-4 py-3 rounded-lg ${
               isActive ? "bg-blue-600 text-white shadow" : "hover:bg-gray-100"
@@ -106,7 +148,7 @@ export default function Sidebar() {
         </NavLink>
 
         <NavLink
-          to="/user/reviews"
+          to="/reviews"
           className={({ isActive }) =>
             `flex items-center gap-3 px-4 py-3 rounded-lg ${
               isActive ? "bg-blue-600 text-white shadow" : "hover:bg-gray-100"
@@ -118,7 +160,7 @@ export default function Sidebar() {
         </NavLink>
 
         <NavLink
-          to="/user/disputes"
+          to="/disputes"
           className={({ isActive }) =>
             `flex items-center gap-3 px-4 py-3 rounded-lg ${
               isActive ? "bg-blue-600 text-white shadow" : "hover:bg-gray-100"
@@ -130,7 +172,7 @@ export default function Sidebar() {
         </NavLink>
 
         <NavLink
-          to="/user/profile"
+          to="/profile"
           className={({ isActive }) =>
             `flex items-center gap-3 px-4 py-3 rounded-lg ${
               isActive ? "bg-blue-600 text-white shadow" : "hover:bg-gray-100"

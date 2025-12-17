@@ -1,31 +1,8 @@
 import { Briefcase, MessageSquare, FileText, PlusCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import Sidebar from "../../components/Sidebar/Sidebar";
-import { useEffect, useState } from "react";
-import { JobApi, type JobData } from "../../api/Apis";
 
-export default function UserDashboard() {
-  const [jobs, setJobs] = useState<JobData[]>([]);
-
-  useEffect(() => {
-    const fetchJobs = async () => {
-      try {
-        const response = await JobApi.fetchUserJobsApi();
-
-        setJobs(response.data.jobs);
-
-        console.log(response.data.jobs);
-      } catch (error) {
-        console.log(error);
-        return;
-      }
-    };
-
-    fetchJobs();
-  }, []);
-
-  const activeJobs = jobs.filter((job) => job.jobStatus === "pending");
-
+export default function ServiceProviderDashboard() {
   return (
     <div className="flex min-h-screen">
       <Sidebar />
@@ -95,9 +72,7 @@ export default function UserDashboard() {
               <h4 className="text-lg font-semibold text-gray-900 mb-2">
                 Active Jobs
               </h4>
-              <p className="text-4xl font-bold text-blue-600">
-                {activeJobs.length}
-              </p>
+              <p className="text-4xl font-bold text-blue-600">3</p>
             </div>
 
             <div className="bg-white p-6 rounded-2xl border border-gray-300 transition">

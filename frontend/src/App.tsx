@@ -3,14 +3,13 @@ import "./index.css";
 import "./App.css";
 import Footer from "./components/Footer";
 import { Route, Routes } from "react-router-dom";
-import AuthPage from "./pages/AuthPage";
+import AuthPage from "./pages/AuthPages/AuthPage";
 import { useEffect } from "react";
 import { useAuthStore } from "./store/authStore";
 import { Toaster } from "react-hot-toast";
 import UnprotectedRoute from "./routes/UnprotectedRoute";
 import Navbar from "./components/Navbar/Navbar";
 import { Loader2 } from "lucide-react";
-import UserNavbar from "./components/Navbar/UserNavbar";
 import UserProtectedRoute from "./routes/UserProtectedRoute";
 import CreateJobPage from "./pages/UserPages/CreateJobPage";
 import NotFoundPage from "./pages/NotFoundPage";
@@ -20,9 +19,13 @@ import Messages from "./pages/UserPages/Messages";
 import ReviewsPage from "./pages/UserPages/ReviewsPage";
 import ProfilePage from "./pages/UserPages/ProfilePage";
 import DisputesPage from "./pages/UserPages/DisputesPage";
+import ProtectedRoute from "./routes/ProtectedRoute";
+import ServiceProviderRoute from "./routes/ServiceProviderRoute";
+import Dashboard from "./pages/ServiceProviderPages/ServiceProviderDashboard";
+import ServiceProviderDashboard from "./pages/ServiceProviderPages/ServiceProviderDashboard";
 
 function App() {
-  const { user, checkAuth, checking } = useAuthStore();
+  const { checkAuth, checking } = useAuthStore();
 
   useEffect(() => {
     checkAuth();
@@ -41,7 +44,8 @@ function App() {
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Toaster position="top-center" />
-      {!user ? <Navbar /> : <UserNavbar />}
+      <Navbar />
+
       <main className="grow">
         <Routes>
           <Route path="/" element={<HomePage />} />
@@ -83,38 +87,47 @@ function App() {
           />
 
           <Route
-            path="/user/messages"
+            path="/serviceprovider/dashboard"
             element={
-              <UserProtectedRoute>
+              <ServiceProviderRoute>
+                <ServiceProviderDashboard />
+              </ServiceProviderRoute>
+            }
+          />
+
+          <Route
+            path="/messages"
+            element={
+              <ProtectedRoute>
                 <Messages />
-              </UserProtectedRoute>
+              </ProtectedRoute>
             }
           />
 
           <Route
-            path="/user/reviews"
+            path="/reviews"
             element={
-              <UserProtectedRoute>
+              <ProtectedRoute>
                 <ReviewsPage />
-              </UserProtectedRoute>
+              </ProtectedRoute>
             }
           />
 
           <Route
-            path="/user/profile"
+            path="/profile"
             element={
-              <UserProtectedRoute>
+              <ProtectedRoute>
                 <ProfilePage />
-              </UserProtectedRoute>
+              </ProtectedRoute>
             }
           />
 
           <Route
-            path="/user/disputes"
+            path="/disputes"
             element={
-              <UserProtectedRoute>
+              <ProtectedRoute>
                 <DisputesPage />
-              </UserProtectedRoute>
+              </ProtectedRoute>
             }
           />
 

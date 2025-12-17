@@ -19,25 +19,63 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
+      select: false,
     },
     role: {
       type: String,
-      enum: ["user", "provider", "admin"],
+      enum: ["user", "serviceProvider", "admin"],
       default: "user",
     },
-    profilePicture: { type: String, default: "" },
-    address: { type: String },
-    addressDescription: { type: String },
-    addressURL: { type: String },
-    reviewsReceived: [{ type: [String], default: [] }],
-    ratingsReceived: [{ type: [Number], default: [] }],
-    ratingAverage: { type: Number, default: 0 },
+    profilePicture: {
+      type: String,
+      default: "",
+    },
+    address: {
+      type: String,
+    },
+    addressDescription: {
+      type: String,
+    },
+    addressURL: {
+      type: String,
+    },
+    reviewsReceived: [
+      {
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: "Review",
+        default: [],
+      },
+    ],
+    ratingAverage: {
+      type: Number,
+      default: 0,
+    },
     verificationStatus: {
       type: String,
       enum: ["pending", "verified", "rejected", ""],
       default: "",
     },
-    verificationProofURL: { type: String, default: "" },
+    verificationProofURL: {
+      type: String,
+      default: "",
+    },
+    idProofURL: {
+      type: String,
+      default: "",
+    },
+    providerCategory: {
+      type: String,
+      enum: [
+        "Plumbing",
+        "Electrical",
+        "Carpentry",
+        "Painting",
+        "Landscaping",
+        "General Repairs",
+        "",
+      ],
+      default: "",
+    },
   },
   { timestamps: true }
 );

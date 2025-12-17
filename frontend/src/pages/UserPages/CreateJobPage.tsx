@@ -1,7 +1,55 @@
 import { Upload } from "lucide-react";
-import Sidebar from "../../components/Navbar/Sidebar";
+import Sidebar from "../../components/Sidebar/Sidebar";
+import { useAuthStore } from "../../store/authStore";
+import { useState } from "react";
+import { JobApi } from "../../api/Apis";
+import toast from "react-hot-toast";
 
 export default function CreateJobPage() {
+  const { user } = useAuthStore();
+
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [jobCategory, setJobCategory] = useState("");
+  const [userPrice, setUserPrice] = useState(0);
+  const [address, setAddress] = useState("");
+  const [addressURL, setAddressURL] = useState("");
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+
+    if (!title || !description || !jobCategory || !userPrice || !address) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
+    try {
+      const payload = {
+        userId: user?._id,
+        title,
+        description,
+        jobCategory,
+        userPrice,
+        address,
+        addressURL,
+      };
+
+      const response = await JobApi.createJobApi(payload);
+
+      toast.success(response?.data?.message);
+
+      setTitle("");
+      setDescription("");
+      setJobCategory("");
+      setUserPrice(0);
+      setAddress("");
+      setAddressURL("");
+    } catch (error) {
+      console.log(error);
+      toast.error("Error creating job");
+    }
+  }
+
   return (
     <div className="flex min-h-screen">
       <Sidebar />
@@ -13,7 +61,10 @@ export default function CreateJobPage() {
             Create a New Job
           </h1>
 
-          <form className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+          <form
+            onSubmit={handleSubmit}
+            className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6"
+          >
             {/* Job Title */}
             <div className="col-span-1">
               <label className="block text-gray-800 font-semibold mb-2">
@@ -21,6 +72,8 @@ export default function CreateJobPage() {
               </label>
               <input
                 type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
                 placeholder="Fix leaking sink"
                 className="w-full p-3 md:p-4 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none"
               />
@@ -31,7 +84,11 @@ export default function CreateJobPage() {
               <label className="block text-gray-800 font-semibold mb-2">
                 Service Category<span className="text-red-500">*</span>
               </label>
-              <select className="w-full p-3 md:p-4 rounded-lg border border-gray-300 text-gray-700 focus:ring-2 focus:ring-blue-500 outline-none">
+              <select
+                value={jobCategory}
+                onChange={(e) => setJobCategory(e.target.value)}
+                className="w-full p-3 md:p-4 rounded-lg border border-gray-300 text-gray-700 focus:ring-2 focus:ring-blue-500 outline-none"
+              >
                 <option>Select a Category</option>
                 <option>Plumbing</option>
                 <option>Electrical</option>
@@ -48,6 +105,8 @@ export default function CreateJobPage() {
                 Description<span className="text-red-500">*</span>
               </label>
               <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
                 placeholder="Describe your service needs..."
                 rows={5}
                 className="w-full p-3 md:p-4 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none resize-none"
@@ -61,6 +120,8 @@ export default function CreateJobPage() {
               </label>
               <input
                 type="number"
+                value={userPrice}
+                onChange={(e) => setUserPrice(parseInt(e.target.value))}
                 placeholder="Ex: 1200"
                 className="w-full p-3 md:p-4 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none"
               />
@@ -73,6 +134,8 @@ export default function CreateJobPage() {
               </label>
               <input
                 type="text"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
                 placeholder="Enter your location"
                 className="w-full p-3 md:p-4 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none"
               />
@@ -85,6 +148,8 @@ export default function CreateJobPage() {
               </label>
               <input
                 type="text"
+                value={addressURL}
+                onChange={(e) => setAddressURL(e.target.value)}
                 placeholder="https://www.google.com/maps/@?api=1&map_action=map"
                 className="w-full p-3 md:p-4 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none"
               />

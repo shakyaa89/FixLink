@@ -1,11 +1,13 @@
-import React from "react";
+import { useState } from "react";
 
-import LoginForm from "../components/Auth/LoginForm";
-import RegisterForm from "../components/Auth/RegisterForm";
+import LoginForm from "../../components/Auth/LoginForm";
+import RegisterForm from "../../components/Auth/RegisterForm";
 import { User } from "lucide-react";
+import ServiceProviderRegisterForm from "../../components/Auth/ServiceProviderRegisterForm";
 
 export default function AuthPage() {
-  const [showLogin, setShowLogin] = React.useState(true);
+  const [showLogin, setShowLogin] = useState(true);
+  const [serviceProviderRegister, setServiceProviderRegister] = useState(false);
 
   return (
     <div className="min-h-screen bg-white flex  justify-center p-4 mt-20">
@@ -22,7 +24,10 @@ export default function AuthPage() {
           {/* Toggle Tabs */}
           <div className="flex bg-gray-100 rounded-xl p-1 mb-8">
             <button
-              onClick={() => setShowLogin(true)}
+              onClick={() => {
+                setShowLogin(true);
+                setServiceProviderRegister(false);
+              }}
               className={`flex-1 py-3 rounded-lg font-semibold transition-all ${
                 showLogin
                   ? "bg-white text-blue-600 shadow-md"
@@ -47,7 +52,25 @@ export default function AuthPage() {
           {showLogin && <LoginForm />}
 
           {/* REGISTER FORM */}
-          {!showLogin && <RegisterForm />}
+          {!showLogin && !serviceProviderRegister && <RegisterForm />}
+
+          {!showLogin && serviceProviderRegister && (
+            <ServiceProviderRegisterForm />
+          )}
+        </div>
+
+        <div className="flex items-center justify-center w-full ">
+          <button
+            onClick={() => {
+              setServiceProviderRegister(!serviceProviderRegister);
+              setShowLogin(false);
+              window.scrollTo(0, 0);
+            }}
+            className="text-center text-md text-white mt-6 px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 transition duration-300 ease-in-out"
+          >
+            Register as a{" "}
+            {serviceProviderRegister ? "User" : "Service Provider"}
+          </button>
         </div>
 
         {/* Footer */}
