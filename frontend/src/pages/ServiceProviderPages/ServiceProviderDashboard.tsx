@@ -1,4 +1,10 @@
-import { Briefcase, MessageSquare, FileText, PlusCircle } from "lucide-react";
+import {
+  Briefcase,
+  MessageSquare,
+  FileText,
+  PlusCircle,
+  Star,
+} from "lucide-react";
 import { Link } from "react-router-dom";
 import Sidebar from "../../components/Sidebar/Sidebar";
 
@@ -68,25 +74,34 @@ export default function ServiceProviderDashboard() {
 
           {/* Stats Section */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white p-6 rounded-2xl border border-gray-300 transition">
-              <h4 className="text-lg font-semibold text-gray-900 mb-2">
-                Active Jobs
-              </h4>
-              <p className="text-4xl font-bold text-blue-600">3</p>
+            <div className="bg-white p-6 rounded-2xl border border-gray-300 transition flex items-center gap-4">
+              <Briefcase className="w-8 h-8 text-blue-600" />
+              <div>
+                <h4 className="text-lg font-semibold text-gray-900 mb-2">
+                  Active Jobs
+                </h4>
+                <p className="text-4xl font-bold text-blue-600">3</p>
+              </div>
             </div>
 
-            <div className="bg-white p-6 rounded-2xl border border-gray-300 transition">
-              <h4 className="text-lg font-semibold text-gray-900 mb-2">
-                Offers Received
-              </h4>
-              <p className="text-4xl font-bold text-purple-600">12</p>
+            <div className="bg-white p-6 rounded-2xl border border-gray-300 transition flex items-center gap-4">
+              <FileText className="w-8 h-8 text-purple-600" />
+              <div>
+                <h4 className="text-lg font-semibold text-gray-900 mb-2">
+                  Offers Received
+                </h4>
+                <p className="text-4xl font-bold text-purple-600">12</p>
+              </div>
             </div>
 
-            <div className="bg-white p-6 rounded-2xl border border-gray-300 transition">
-              <h4 className="text-lg font-semibold text-gray-900 mb-2">
-                Total Reviews
-              </h4>
-              <p className="text-4xl font-bold text-green-600">5</p>
+            <div className="bg-white p-6 rounded-2xl border border-gray-300 transition flex items-center gap-4">
+              <Star className="w-8 h-8 text-green-600" />
+              <div>
+                <h4 className="text-lg font-semibold text-gray-900 mb-2">
+                  Total Reviews
+                </h4>
+                <p className="text-4xl font-bold text-green-600">5</p>
+              </div>
             </div>
           </div>
 

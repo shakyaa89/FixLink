@@ -51,7 +51,7 @@ import axios from "axios";
 const baseURL = "http://192.168.1.70:3000/api";
 // const baseURL = "http://100.64.216.104:3000/api";
 
-interface UserRegisterData {
+interface User {
   fullName: string;
   email: string;
   phoneNumber: string;
@@ -73,7 +73,7 @@ interface UserLoginData {
 
 export interface JobData {
   _id?: string;
-  userId: string;
+  userId: User;
   title: string;
   description: string;
   jobCategory: string;
@@ -81,7 +81,17 @@ export interface JobData {
   location: string;
   locationURL: string;
   jobStatus?: string;
-  offers?: string[];
+  offers?: OfferData[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface OfferData {
+  _id?: string;
+  jobId: string;
+  serviceProviderId: User;
+  offeredPrice: number;
+  status?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -100,8 +110,7 @@ const Api = axios.create({
 });
 
 export const AuthApi = {
-  registerApi: (registerData: UserRegisterData) =>
-    Api.post("/auth/register", registerData),
+  registerApi: (registerData: User) => Api.post("/auth/register", registerData),
 
   loginApi: (loginData: UserLoginData) => Api.post("/auth/login", loginData),
 
@@ -119,4 +128,17 @@ export const JobApi = {
 
   fetchAllJobsApi: () =>
     Api.get("/job/fetch-all-jobs", { headers: getAuthHeader() }),
+
+  fetchJobByIdApi: (jobId: string) =>
+    Api.get(`/job/fetch/${jobId}`, { headers: getAuthHeader() }),
+
+  fetchProviderJobsApi: (category: string) =>
+    Api.get(`/job/provider?category=${category}`, {
+      headers: getAuthHeader(),
+    }),
+};
+
+export const OfferApi = {
+  createOffer: (data: { jobId: string; offeredPrice: number }) =>
+    Api.post("/offer/create", data, { headers: getAuthHeader() }),
 };

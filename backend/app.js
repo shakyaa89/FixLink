@@ -7,6 +7,7 @@ import cors from "cors";
 import indexRouter from "./routes/index.js";
 import authRouter from "./routes/auth.route.js";
 import jobRouter from "./routes/job.route.js";
+import offerRouter from "./routes/offer.route.js";
 import connectDB from "./lib/db.js";
 
 import dotenv from "dotenv";
@@ -40,6 +41,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/", indexRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/job", jobRouter);
+app.use("/api/offer", offerRouter);
 
 app.listen(process.env.PORT, "0.0.0.0", () => {
   console.log(`App listening on port ${process.env.PORT}`);

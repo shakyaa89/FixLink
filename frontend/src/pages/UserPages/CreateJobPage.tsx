@@ -1,4 +1,4 @@
-import { Upload } from "lucide-react";
+import { Upload, Loader2 } from "lucide-react";
 import Sidebar from "../../components/Sidebar/Sidebar";
 import { useAuthStore } from "../../store/authStore";
 import { useState } from "react";
@@ -14,6 +14,7 @@ export default function CreateJobPage() {
   const [userPrice, setUserPrice] = useState(0);
   const [location, setLocation] = useState("");
   const [locationURL, setLocationURL] = useState("");
+  const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -22,6 +23,8 @@ export default function CreateJobPage() {
       toast.error("Please fill in all required fields");
       return;
     }
+
+    setLoading(true);
 
     try {
       const payload = {
@@ -47,13 +50,14 @@ export default function CreateJobPage() {
     } catch (error) {
       console.log(error);
       toast.error("Error creating job");
+    } finally {
+      setLoading(false);
     }
   }
 
   return (
     <div className="flex min-h-screen">
       <Sidebar />
-
       {/* Main Content */}
       <main className="flex-1 py-5 px-4 md:px-8 ">
         <div className="max-w-6xl mx-auto my-10">
@@ -180,9 +184,17 @@ export default function CreateJobPage() {
             <div className="col-span-1 md:col-span-2">
               <button
                 type="submit"
-                className="w-full bg-linear-to-r from-blue-600 to-purple-600 text-white text-lg font-semibold py-3 md:py-4 rounded-lg hover:shadow-xl transition"
+                disabled={loading}
+                className="w-full bg-linear-to-r from-blue-600 to-purple-600 text-white text-lg font-semibold py-3 md:py-4 rounded-lg hover:shadow-xl transition disabled:opacity-60"
               >
-                Submit Job
+                {loading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <Loader2 className="animate-spin" size={18} />
+                    Submitting...
+                  </span>
+                ) : (
+                  "Submit Job"
+                )}
               </button>
             </div>
           </form>

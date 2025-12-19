@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Briefcase, Edit, Trash2, Eye, Loader2 } from "lucide-react";
+import { Briefcase, Eye, Loader2, Ban, MapPin, Calendar } from "lucide-react";
 import Sidebar from "../../components/Sidebar/Sidebar";
 import { useEffect, useState } from "react";
 import { JobApi } from "../../api/Apis";
@@ -76,36 +76,30 @@ export default function MyJobs() {
                       Status: {job.jobStatus}
                     </span>
 
-                    <span className="text-sm text-gray-500">
-                      Offers: <strong>{job.offers?.length}</strong>
+                    <span className="text-sm text-gray-500 flex items-center gap-2">
+                      <Calendar className="w-4 h-4" />
+                      Posted: {job.createdAt?.split("T")[0]}
                     </span>
 
-                    <span className="text-sm text-gray-500">
-                      Posted: {job.createdAt?.split("T")[0]}
+                    <span className="text-sm text-gray-500 flex items-center gap-2">
+                      <MapPin className="w-4 h-4" />
+                      {job.location || "—"}
                     </span>
                   </div>
 
                   {/* Action Buttons */}
                   <div className="flex items-center gap-3 mt-4">
                     <Link
-                      to={`/my-jobs/${job._id}`}
+                      to={`/user/job/${job._id}`}
                       className="flex items-center gap-2 px-4 py-2 text-sm bg-gray-200 rounded-lg hover:bg-gray-300 transition"
                     >
                       <Eye className="w-4 h-4" />
                       View
                     </Link>
 
-                    <Link
-                      to={`/my-jobs/edit/${job._id}`}
-                      className="flex items-center gap-2 px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-                    >
-                      <Edit className="w-4 h-4" />
-                      Edit
-                    </Link>
-
                     <button className="flex items-center gap-2 px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
-                      <Trash2 className="w-4 h-4" />
-                      Delete
+                      <Ban className="w-4 h-4" />
+                      Cancel
                     </button>
                   </div>
                 </div>

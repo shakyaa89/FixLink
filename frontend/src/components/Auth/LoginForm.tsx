@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Mail, Lock } from "lucide-react";
+import { Mail, Lock, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../store/authStore";
@@ -78,9 +78,16 @@ function LoginForm() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-linear-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-semibold"
+          className="w-full bg-linear-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-semibold disabled:opacity-60"
         >
-          {loading ? "Logging in..." : "Log In"}
+          {loading ? (
+            <span className="flex items-center justify-center gap-2">
+              <Loader2 className="animate-spin" size={16} />
+              Logging in...
+            </span>
+          ) : (
+            "Log In"
+          )}
         </button>
       </form>
     </>

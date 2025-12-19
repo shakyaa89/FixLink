@@ -1,4 +1,13 @@
-import { Mail, Lock, User, Phone, MapPin, Upload, Link2 } from "lucide-react";
+import {
+  Mail,
+  Lock,
+  User,
+  Phone,
+  MapPin,
+  Upload,
+  Link2,
+  Loader2,
+} from "lucide-react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -300,11 +309,14 @@ function RegisterForm() {
           disabled={loading}
           className={`w-full bg-linear-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-semibold disabled:opacity-50`}
         >
-          {loading
-            ? uploading
-              ? "Uploading Picture..."
-              : "Creating Account..."
-            : "Create Account"}
+          {loading ? (
+            <span className="flex items-center justify-center gap-2">
+              <Loader2 className="animate-spin" size={16} />
+              {uploading ? "Uploading Picture..." : "Creating Account..."}
+            </span>
+          ) : (
+            "Create Account"
+          )}
         </button>
       </form>
     </>

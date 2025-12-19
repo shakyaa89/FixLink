@@ -89,7 +89,7 @@ function App() {
           />
 
           <Route
-            path="/user/jobs/details"
+            path="/user/job/:jobId"
             element={
               <UserProtectedRoute>
                 <JobDetailsPage />
@@ -116,7 +116,7 @@ function App() {
           />
 
           <Route
-            path="/serviceprovider/jobs/details"
+            path="/serviceprovider/job/:jobId"
             element={
               <ServiceProviderRoute>
                 <JobDetailsProviderPage />

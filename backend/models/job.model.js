@@ -5,10 +5,12 @@ const jobSchema = mongoose.Schema(
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
+      ref: "User",
     },
     offers: {
       type: [mongoose.Schema.Types.ObjectId],
       default: [],
+      ref: "Offer",
     },
     title: {
       type: String,
