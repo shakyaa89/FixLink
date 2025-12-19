@@ -21,8 +21,10 @@ import ProfilePage from "./pages/UserPages/ProfilePage";
 import DisputesPage from "./pages/UserPages/DisputesPage";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import ServiceProviderRoute from "./routes/ServiceProviderRoute";
-import Dashboard from "./pages/ServiceProviderPages/ServiceProviderDashboard";
 import ServiceProviderDashboard from "./pages/ServiceProviderPages/ServiceProviderDashboard";
+import ViewJobsPage from "./pages/ServiceProviderPages/ViewJobsPage";
+import JobDetailsPage from "./pages/UserPages/JobDetailsPage";
+import JobDetailsProviderPage from "./pages/ServiceProviderPages/JobDetailsProviderPage";
 
 function App() {
   const { checkAuth, checking } = useAuthStore();
@@ -87,10 +89,37 @@ function App() {
           />
 
           <Route
+            path="/user/jobs/details"
+            element={
+              <UserProtectedRoute>
+                <JobDetailsPage />
+              </UserProtectedRoute>
+            }
+          />
+
+          <Route
             path="/serviceprovider/dashboard"
             element={
               <ServiceProviderRoute>
                 <ServiceProviderDashboard />
+              </ServiceProviderRoute>
+            }
+          />
+
+          <Route
+            path="/serviceprovider/jobs"
+            element={
+              <ServiceProviderRoute>
+                <ViewJobsPage />
+              </ServiceProviderRoute>
+            }
+          />
+
+          <Route
+            path="/serviceprovider/jobs/details"
+            element={
+              <ServiceProviderRoute>
+                <JobDetailsProviderPage />
               </ServiceProviderRoute>
             }
           />

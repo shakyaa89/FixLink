@@ -116,4 +116,7 @@ export const JobApi = {
 
   fetchUserJobsApi: () =>
     Api.get("/job/fetch-user-jobs", { headers: getAuthHeader() }),
+
+  fetchAllJobsApi: () =>
+    Api.get("/job/fetch-all-jobs", { headers: getAuthHeader() }),
 };

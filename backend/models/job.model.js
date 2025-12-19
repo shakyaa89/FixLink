@@ -51,8 +51,8 @@ const jobSchema = mongoose.Schema(
     },
     jobStatus: {
       type: String,
-      enum: ["pending", "accepted", "cancelled", "completed"],
-      default: "pending",
+      enum: ["open", "in-progress", "cancelled", "completed"],
+      default: "open",
     },
   },
   {

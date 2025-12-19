@@ -211,6 +211,25 @@ export default function Navbar() {
               </>
             )}
 
+            {user?.role === "serviceProvider" && (
+              <>
+                <Link
+                  to="/serviceprovider/dashboard"
+                  onClick={() => setIsOpen(false)}
+                  className="block text-gray-700 hover:text-blue-600 transition border-b border-gray-300 pb-3"
+                >
+                  Dashboard
+                </Link>
+                <Link
+                  to="/serviceprovider/jobs"
+                  onClick={() => setIsOpen(false)}
+                  className="block text-gray-700 hover:text-blue-600 transition border-b border-gray-300 pb-3"
+                >
+                  View Job
+                </Link>
+              </>
+            )}
+
             <div className="flex flex-col gap-2 pt-2">
               {user ? (
                 <>
