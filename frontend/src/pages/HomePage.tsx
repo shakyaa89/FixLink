@@ -12,10 +12,15 @@ import {
   MessageSquare,
 } from "lucide-react";
 import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useAuthStore } from "../store/authStore";
 
 export default function HomePage() {
   const location = useLocation();
+
+  const { user } = useAuthStore();
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (location.hash) {
@@ -110,7 +115,14 @@ export default function HomePage() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <button className="bg-linear-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:shadow-lg hover:scale-105 transition-all flex items-center justify-center space-x-2">
+              <button
+                onClick={() => {
+                  user == null
+                    ? navigate("/auth")
+                    : navigate("/user/dashboard");
+                }}
+                className="bg-linear-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:shadow-lg hover:scale-105 transition-all flex items-center justify-center space-x-2"
+              >
                 <span>Get Started</span>
                 <ChevronRight className="w-5 h-5" />
               </button>

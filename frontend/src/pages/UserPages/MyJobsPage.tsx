@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Briefcase, Eye, Loader2, Ban, MapPin, Calendar } from "lucide-react";
+import { Eye, Loader2, MapPin, Calendar } from "lucide-react";
 import Sidebar from "../../components/Sidebar/Sidebar";
 import { useEffect, useState } from "react";
 import { JobApi } from "../../api/Apis";
@@ -50,57 +50,76 @@ export default function MyJobs() {
           )}
 
           {/* Jobs List */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {!loading &&
               jobs.map((job) => (
                 <div
                   key={job._id}
                   className="bg-white border border-gray-300 rounded-2xl p-6 shadow-sm"
                 >
-                  {/* Title */}
-                  <div className="flex items-center gap-3 mb-4">
-                    <Briefcase className="w-8 h-8 text-blue-600" />
-                    <h2 className="text-xl font-semibold text-gray-900">
-                      {job.title}
-                    </h2>
-                  </div>
+                  <div className="flex flex-col md:flex-row gap-4">
+                    <div className="w-full md:w-1/3 lg:w-1/4 shrink-0">
+                      <img
+                        src={
+                          job.images && job.images.length > 0
+                            ? job.images[0]
+                            : "/"
+                        }
+                        alt={job.title || "job image"}
+                        className="w-full h-48 aspect-square md:h-36 lg:h-40 object-cover rounded-xl"
+                        loading="lazy"
+                      />
+                    </div>
 
-                  {/* Description */}
-                  <p className="text-gray-600 mb-4">{job.description}</p>
+                    <div className="flex-1">
+                      {/* Title */}
+                      <div className="flex items-center gap-3 mb-2">
+                        <h2 className="text-xl font-semibold text-gray-900">
+                          {job.title}
+                        </h2>
+                      </div>
 
-                  {/* Info Row */}
-                  <div className="flex flex-wrap items-center justify-between mb-4">
-                    <span
-                      className={`px-3 py-1 text-gray-500 rounded-full text-sm font-medium capitalize `}
-                    >
-                      Status: {job.jobStatus}
-                    </span>
+                      {/* Description */}
+                      <p className="text-gray-600 mb-4 line-clamp-3">
+                        {job.description}
+                      </p>
 
-                    <span className="text-sm text-gray-500 flex items-center gap-2">
-                      <Calendar className="w-4 h-4" />
-                      Posted: {job.createdAt?.split("T")[0]}
-                    </span>
+                      {/* Info Row */}
+                      <div className="flex flex-wrap items-center justify-between mb-4">
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-medium capitalize ${
+                            job.jobStatus === "open"
+                              ? "bg-green-100 text-green-700"
+                              : job.jobStatus === "closed"
+                              ? "bg-red-100 text-red-700"
+                              : "bg-gray-100 text-gray-700"
+                          }`}
+                        >
+                          {job.jobStatus}
+                        </span>
 
-                    <span className="text-sm text-gray-500 flex items-center gap-2">
-                      <MapPin className="w-4 h-4" />
-                      {job.location || "—"}
-                    </span>
-                  </div>
+                        <span className="text-sm text-gray-500 flex items-center gap-2">
+                          <Calendar className="w-4 h-4" />
+                          Posted: {job.createdAt?.split("T")[0]}
+                        </span>
+                      </div>
 
-                  {/* Action Buttons */}
-                  <div className="flex items-center gap-3 mt-4">
-                    <Link
-                      to={`/user/job/${job._id}`}
-                      className="flex items-center gap-2 px-4 py-2 text-sm bg-gray-200 rounded-lg hover:bg-gray-300 transition"
-                    >
-                      <Eye className="w-4 h-4" />
-                      View
-                    </Link>
+                      <span className="text-sm text-gray-500 flex items-center gap-1">
+                        <MapPin className="w-4 h-4" />
+                        {job.location || "—"}
+                      </span>
 
-                    <button className="flex items-center gap-2 px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
-                      <Ban className="w-4 h-4" />
-                      Cancel
-                    </button>
+                      {/* Action Buttons */}
+                      <div className="flex items-center gap-3 mt-4">
+                        <Link
+                          to={`/user/job/${job._id}`}
+                          className="flex items-center gap-2 px-4 py-2 text-sm bg-gray-200 rounded-lg hover:bg-gray-300 transition"
+                        >
+                          <Eye className="w-4 h-4" />
+                          View Details
+                        </Link>
+                      </div>
+                    </div>
                   </div>
                 </div>
               ))}

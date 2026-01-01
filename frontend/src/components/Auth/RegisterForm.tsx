@@ -84,14 +84,11 @@ function RegisterForm() {
     try {
       setLoading(true);
 
-      // Upload image to Cloudinary
       let profileUrl = "";
       if (profilePicture) {
-        console.log("Uploading profile picture...");
         profileUrl = await uploadToCloudinary(profilePicture);
       }
 
-      // Send everything to backend
       const response = await AuthApi.registerApi({
         fullName,
         email,
@@ -105,7 +102,6 @@ function RegisterForm() {
 
       toast.success(response?.data?.message);
 
-      // Reset form
       setFullName("");
       setEmail("");
       setPhoneNumber("");

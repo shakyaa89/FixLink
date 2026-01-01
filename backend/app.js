@@ -26,7 +26,7 @@ app.use(
       "http://localhost:5173",
       "http://192.168.1.70:3000",
       "http://localhost:3000",
-      "http://100.64.216.104:5173",
+      "http://100.64.200.45:5173",
     ],
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],

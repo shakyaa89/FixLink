@@ -1,9 +1,10 @@
-import { Upload, Loader2 } from "lucide-react";
+import { Upload, Loader2, Check } from "lucide-react";
 import Sidebar from "../../components/Sidebar/Sidebar";
 import { useAuthStore } from "../../store/authStore";
 import { useState } from "react";
 import { JobApi } from "../../api/Apis";
 import toast from "react-hot-toast";
+import axios from "axios";
 
 export default function CreateJobPage() {
   const { user } = useAuthStore();
@@ -15,18 +16,66 @@ export default function CreateJobPage() {
   const [location, setLocation] = useState("");
   const [locationURL, setLocationURL] = useState("");
   const [loading, setLoading] = useState(false);
+  const [images, setImages] = useState<File[]>([]);
+
+  const [uploading, setUploading] = useState(false);
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+
+    const files = Array.from(e.target.files);
+
+    setImages(files);
+  };
+
+  const uploadMultipleToCloudinary = async (files: File[]) => {
+    setUploading(true);
+    const urls: string[] = [];
+
+    try {
+      for (const file of files) {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("upload_preset", "job_image_upload");
+
+        const { data } = await axios.post(
+          "https://api.cloudinary.com/v1_1/diocl7ilu/image/upload",
+          formData
+        );
+
+        urls.push(data.secure_url);
+      }
+
+      console.log(urls);
+
+      return urls;
+    } catch (err) {
+      console.error("Cloudinary multiple upload failed:", err);
+      throw err;
+    } finally {
+      setUploading(false);
+    }
+  };
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    if (!title || !description || !jobCategory || !userPrice || !location) {
+    if (
+      !title ||
+      !description ||
+      !jobCategory ||
+      !userPrice ||
+      !location ||
+      images.length === 0
+    ) {
       toast.error("Please fill in all required fields");
       return;
     }
 
-    setLoading(true);
-
     try {
+      const imageUrls = await uploadMultipleToCloudinary(images);
+
+      setLoading(true);
       const payload = {
         userId: user?._id,
         title,
@@ -35,6 +84,7 @@ export default function CreateJobPage() {
         userPrice,
         location,
         locationURL,
+        images: imageUrls,
       };
 
       const response = await JobApi.createJobApi(payload);
@@ -47,6 +97,7 @@ export default function CreateJobPage() {
       setUserPrice(0);
       setLocation("");
       setLocationURL("");
+      setImages([]);
     } catch (error) {
       console.log(error);
       toast.error("Error creating job");
@@ -164,33 +215,60 @@ export default function CreateJobPage() {
               <label className="block text-gray-800 font-semibold mb-2">
                 Upload Images<span className="text-red-500">*</span>
               </label>
-              <div className="border-2 border-dashed border-gray-400 rounded-xl p-6 md:p-8 text-center hover:border-blue-500 transition cursor-pointer">
-                <div className="flex flex-col items-center space-y-2 md:space-y-3">
-                  <Upload className="w-8 h-8 md:w-10 md:h-10 text-blue-600" />
-                  <p className="text-gray-600 font-medium text-sm md:text-base">
-                    Click to upload images
-                  </p>
+              <label htmlFor="imageUpload">
+                <div className="border-2 border-dashed border-gray-400 rounded-xl p-6 md:p-8 text-center hover:border-blue-500 transition cursor-pointer">
+                  <div className="flex flex-col items-center space-y-2 md:space-y-3">
+                    <Upload className="w-8 h-8 md:w-10 md:h-10 text-blue-600" />
+                    <p className="text-gray-600 font-medium text-sm md:text-base">
+                      Click to upload images
+                    </p>
+                  </div>
+                  <input
+                    id="imageUpload"
+                    type="file"
+                    className="hidden"
+                    multiple
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                  />
                 </div>
-                <input
-                  type="file"
-                  className="hidden"
-                  multiple
-                  accept="image/*"
-                />
-              </div>
+              </label>
             </div>
+
+            <ul className=" space-y-1 text-sm text-gray-700">
+              {images.map((file, index) => (
+                <li key={index} className="flex items-center gap-2">
+                  <Check size={18} className="text-green-500" />{" "}
+                  <span>{file.name}</span>
+                </li>
+              ))}
+            </ul>
 
             {/* Submit */}
             <div className="col-span-1 md:col-span-2">
               <button
                 type="submit"
-                disabled={loading}
+                disabled={
+                  loading ||
+                  uploading ||
+                  !images.length ||
+                  !userPrice ||
+                  !location ||
+                  !title ||
+                  !description ||
+                  !jobCategory
+                }
                 className="w-full bg-linear-to-r from-blue-600 to-purple-600 text-white text-lg font-semibold py-3 md:py-4 rounded-lg hover:shadow-xl transition disabled:opacity-60"
               >
-                {loading ? (
+                {uploading ? (
                   <span className="flex items-center justify-center gap-2">
                     <Loader2 className="animate-spin" size={18} />
-                    Submitting...
+                    Uploading images...
+                  </span>
+                ) : loading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <Loader2 className="animate-spin" size={18} />
+                    Submitting job...
                   </span>
                 ) : (
                   "Submit Job"

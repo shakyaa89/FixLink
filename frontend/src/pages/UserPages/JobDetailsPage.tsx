@@ -19,6 +19,7 @@ import {
 export default function JobDetailsPage() {
   const [loading, setLoading] = useState(true);
   const [job, setJob] = useState<JobData>();
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const { jobId } = useParams();
 
   const fetchJob = async () => {
@@ -69,67 +70,109 @@ export default function JobDetailsPage() {
               </span>
             </div>
 
-            <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700">
-              <div className="flex items-center gap-2">
-                <Tag className="w-4 h-4 text-gray-600" />
-                <div>
-                  <p className="font-medium">Category</p>
-                  <p className="text-gray-600">{job?.jobCategory}</p>
-                </div>
+            <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="md:col-span-1">
+                {job?.images && job.images.length > 0 ? (
+                  <div>
+                    <img
+                      src={job.images[selectedImageIndex]}
+                      alt={job?.title || "Job image"}
+                      className="w-full h-80 object-cover rounded-2xl"
+                      loading="lazy"
+                    />
+
+                    {job.images.length > 1 && (
+                      <div className="mt-3 grid grid-cols-4 gap-2">
+                        {job.images.map((image, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => setSelectedImageIndex(idx)}
+                            className={`overflow-hidden rounded-md border transition focus:outline-none ${
+                              selectedImageIndex === idx
+                                ? "ring-2 ring-blue-500"
+                                : "border-transparent"
+                            }`}
+                          >
+                            <img
+                              src={image}
+                              alt={`${job.title || "Job"} ${idx + 1}`}
+                              className="w-full h-20 object-cover"
+                              loading="lazy"
+                            />
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="w-full h-80 bg-gray-100 rounded-2xl flex items-center justify-center text-gray-400">
+                    No image
+                  </div>
+                )}
               </div>
 
-              <div className="flex items-center gap-2">
-                <DollarSign className="w-4 h-4 text-gray-600" />
-                <div>
-                  <p className="font-medium">Budget</p>
-                  <p className="text-gray-600 text-2xl">Rs. {job?.userPrice}</p>
-                </div>
-              </div>
+              <div className="md:col-span-2 text-sm text-gray-700">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex items-center gap-2">
+                    <Tag className="w-4 h-4 text-gray-600" />
+                    <div>
+                      <p className="font-medium">Category</p>
+                      <p className="text-gray-600">{job?.jobCategory}</p>
+                    </div>
+                  </div>
 
-              <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-gray-600" />
-                <div>
-                  <p className="font-medium">Location</p>
-                  <p className="text-gray-600">
-                    <a
-                      href={job?.locationURL}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="underline"
-                    >
-                      {job?.location}
-                    </a>
+                  <div className="flex items-center gap-2">
+                    <DollarSign className="w-4 h-4 text-gray-600" />
+                    <div>
+                      <p className="font-medium">Your Price</p>
+                      <p className="text-gray-600 text-2xl">
+                        Rs. {job?.userPrice}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-gray-600" />
+                    <div>
+                      <p className="font-medium">Location</p>
+                      <p className="text-gray-600">
+                        <a
+                          href={job?.locationURL}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="underline"
+                        >
+                          {job?.location}
+                        </a>
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4 text-gray-600" />
+                    <div>
+                      <p className="font-medium">Posted</p>
+                      <p className="text-gray-600">
+                        {new Date(job?.createdAt!).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-6">
+                  <p className="font-medium flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-gray-600" /> Description
                   </p>
+                  <p className="text-gray-700 mt-2">{job?.description}</p>
+                </div>
+
+                <div className="mt-6 flex gap-3">
+                  <button className="flex items-center gap-2 px-4 py-2 text-md bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
+                    <Ban className="w-4 h-4" />
+                    Cancel Job
+                  </button>
                 </div>
               </div>
-
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-gray-600" />
-                <div>
-                  <p className="font-medium">Posted</p>
-                  <p className="text-gray-600">
-                    {new Date(job?.createdAt!).toLocaleDateString()}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-6">
-              <p className="font-medium flex items-center gap-2">
-                <FileText className="w-4 h-4 text-gray-600" /> Description
-              </p>
-              <p className="text-gray-700 mt-2">{job?.description}</p>
-            </div>
-
-            <div className="mt-6 flex gap-3">
-              {/* <button className="flex items-center gap-2 px-4 py-2 text-md bg-blue-600 text-white rounded-lg transition">
-                <Edit className="w-4 h-4" />
-                Edit Job
-              </button> */}
-              <button className="flex items-center gap-2 px-4 py-2 text-md bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
-                <Ban className="w-4 h-4" />
-                Cancel Job
-              </button>
             </div>
           </section>
 
@@ -209,10 +252,6 @@ export default function JobDetailsPage() {
               )}
             </div>
           </section>
-
-          <footer className="mt-8 text-center text-gray-500">
-            Last updated: {job?.updatedAt}
-          </footer>
         </div>
       </main>
     </div>

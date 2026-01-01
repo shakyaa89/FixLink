@@ -11,10 +11,12 @@ import {
   FileText,
   PlusCircle,
 } from "lucide-react";
+import toast from "react-hot-toast";
 
 export default function JobDetailsProviderPage() {
   const [job, setJob] = useState<JobData>();
   const [loading, setLoading] = useState(true);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const { jobId } = useParams();
 
   const [offerModal, setOfferModal] = useState(false);
@@ -38,16 +40,20 @@ export default function JobDetailsProviderPage() {
     fetchJob();
   }, []);
 
-  console.log(job);
-
   async function handleSendOffer() {
+    const offeredPriceNum = Number(offeredPrice);
+
+    const offerLowerLimit = job?.userPrice! - (job?.userPrice! * 20) / 100;
+
+    const offerUpperLimit = job?.userPrice! + (job?.userPrice! * 20) / 100;
+
     if (!offeredPrice) {
       setModalError("Please enter an offer price.");
       return;
-    } else if (Number(offeredPrice) <= job?.userPrice!) {
-      setModalError("Offer price must be higher than the current price.");
+    } else if (offeredPriceNum < offerLowerLimit) {
+      setModalError("Offer price too low.");
       return;
-    } else if (Number(offeredPrice) >= job?.userPrice! + 500) {
+    } else if (offeredPriceNum > offerUpperLimit) {
       setModalError("Offer price is too high.");
       return;
     }
@@ -58,13 +64,13 @@ export default function JobDetailsProviderPage() {
       setSendingOffer(true);
       await OfferApi.createOffer({
         jobId: job?._id!,
-        offeredPrice: Number(offeredPrice),
+        offeredPrice: offeredPriceNum,
       });
 
       // success
       setOfferModal(false);
       setOfferedPrice("");
-      alert("Offer submitted");
+      toast.success("Offer submitted");
     } catch (err: any) {
       console.error(err);
       setModalError(err?.response?.data?.message || "Failed to submit offer");
@@ -86,7 +92,7 @@ export default function JobDetailsProviderPage() {
       <Sidebar />
 
       {offerModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
           <div className="bg-white rounded-xl p-6 w-full max-w-md">
             <h3 className="text-xl font-semibold text-gray-900 mb-4">
               Send Offer
@@ -160,65 +166,111 @@ export default function JobDetailsProviderPage() {
               </span>
             </div>
 
-            <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700">
-              <div className="flex items-center gap-2">
-                <Tag className="w-4 h-4 text-gray-600" />
-                <div>
-                  <p className="font-medium">Category</p>
-                  <p className="text-gray-600">{job?.jobCategory}</p>
-                </div>
+            <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="md:col-span-1">
+                {job?.images && job.images.length > 0 ? (
+                  <div>
+                    <img
+                      src={job.images[selectedImageIndex]}
+                      alt={job?.title || "Job image"}
+                      className="w-full h-56 md:h-80 object-cover rounded-2xl"
+                      loading="lazy"
+                    />
+
+                    {job.images.length > 1 && (
+                      <div className="mt-3 flex gap-2 overflow-x-auto">
+                        {job.images.map((image, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => setSelectedImageIndex(idx)}
+                            className={`shrink-0 w-24 h-20 overflow-hidden rounded-md border transition focus:outline-none ${
+                              selectedImageIndex === idx
+                                ? "ring-2 ring-blue-500"
+                                : "border-transparent"
+                            }`}
+                          >
+                            <img
+                              src={image}
+                              alt={`${job.title || "Job"} ${idx + 1}`}
+                              className="w-full h-full object-cover"
+                              loading="lazy"
+                            />
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="w-full h-80 bg-gray-100 rounded-2xl flex items-center justify-center text-gray-400">
+                    No image
+                  </div>
+                )}
               </div>
 
-              <div className="flex items-center gap-2">
-                <DollarSign className="w-4 h-4 text-gray-600" />
-                <div>
-                  <p className="font-medium">Offered Price</p>
-                  <p className="text-gray-600 text-2xl">Rs. {job?.userPrice}</p>
-                </div>
-              </div>
+              <div className="md:col-span-2 text-sm text-gray-700">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex items-center gap-2">
+                    <Tag className="w-4 h-4 text-gray-600" />
+                    <div>
+                      <p className="font-medium">Category</p>
+                      <p className="text-gray-600">{job?.jobCategory}</p>
+                    </div>
+                  </div>
 
-              <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-gray-600" />
-                <div>
-                  <p className="font-medium">Location</p>
-                  <p className="text-gray-600">
-                    <a
-                      href={job?.locationURL ? job?.locationURL : "#"}
-                      rel="noreferrer"
-                      className="underline"
-                    >
-                      {job?.location}
-                    </a>
+                  <div className="flex items-center gap-2">
+                    <DollarSign className="w-4 h-4 text-gray-600" />
+                    <div>
+                      <p className="font-medium">Offered Price</p>
+                      <p className="text-gray-600 text-2xl">
+                        Rs. {job?.userPrice}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-gray-600" />
+                    <div>
+                      <p className="font-medium">Location</p>
+                      <p className="text-gray-600">
+                        <a
+                          href={job?.locationURL ? job?.locationURL : "#"}
+                          rel="noreferrer"
+                          className="underline"
+                        >
+                          {job?.location}
+                        </a>
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4 text-gray-600" />
+                    <div>
+                      <p className="font-medium">Posted Date</p>
+                      <p className="text-gray-600">
+                        {job?.createdAt?.split("T")[0]}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-6">
+                  <p className="font-medium flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-gray-600" /> Description
                   </p>
+                  <p className="text-gray-700 mt-2">{job?.description}</p>
+                </div>
+
+                <div className="mt-6 flex flex-col sm:flex-row gap-3">
+                  <button
+                    onClick={() => setOfferModal(true)}
+                    className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-lg flex items-center gap-2 justify-center"
+                  >
+                    <PlusCircle className="w-4 h-4" />
+                    Send Offer
+                  </button>
                 </div>
               </div>
-
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-gray-600" />
-                <div>
-                  <p className="font-medium">Posted Date</p>
-                  <p className="text-gray-600">
-                    {job?.createdAt?.split("T")[0]}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-6">
-              <p className="font-medium flex items-center gap-2">
-                <FileText className="w-4 h-4 text-gray-600" /> Description
-              </p>
-              <p className="text-gray-700 mt-2">{job?.description}</p>
-            </div>
-
-            <div className="mt-6 flex gap-3">
-              <button
-                onClick={() => setOfferModal(true)}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg flex items-center gap-2"
-              >
-                <PlusCircle className="w-4 h-4" />
-                Send Offer
-              </button>
             </div>
           </section>
 

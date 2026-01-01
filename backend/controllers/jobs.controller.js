@@ -9,6 +9,7 @@ export const createJob = async (req, res) => {
     userPrice,
     location,
     locationURL,
+    images,
   } = req.body;
 
   try {
@@ -20,6 +21,7 @@ export const createJob = async (req, res) => {
       userPrice,
       location,
       locationURL,
+      images,
     });
 
     await newJob.save();
