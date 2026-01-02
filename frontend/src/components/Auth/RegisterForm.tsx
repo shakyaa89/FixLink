@@ -128,100 +128,100 @@ function RegisterForm() {
       <form onSubmit={handleRegisterSubmit} className="space-y-5">
         {/* Full Name */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <label className="block text-sm font-semibold text-(--text) mb-2">
             Full Name<span className="text-red-500">*</span>
           </label>
           <div className="relative">
-            <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-(--muted)" />
             <input
               type="text"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               placeholder="Enter your full name"
-              className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-600"
+              className="w-full pl-12 pr-4 py-3 border-2 border-(--border) rounded-xl focus:border-blue-600"
             />
           </div>
         </div>
 
         {/* Email */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <label className="block text-sm font-semibold text-(--text) mb-2">
             Email<span className="text-red-500">*</span>
           </label>
           <div className="relative">
-            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-(--muted)" />
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
-              className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-600"
+              className="w-full pl-12 pr-4 py-3 border-2 border-(--border) rounded-xl focus:border-blue-600"
             />
           </div>
         </div>
 
         {/* Phone */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <label className="block text-sm font-semibold text-(--text) mb-2">
             Phone Number<span className="text-red-500">*</span>
           </label>
           <div className="relative">
-            <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-(--muted)" />
             <input
               type="tel"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
               placeholder="Enter your phone number"
-              className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-600"
+              className="w-full pl-12 pr-4 py-3 border-2 border-(--border) rounded-xl focus:border-blue-600"
             />
           </div>
         </div>
 
         {/* Password */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <label className="block text-sm font-semibold text-(--text) mb-2">
             Password<span className="text-red-500">*</span>
           </label>
           <div className="relative">
-            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-(--muted)" />
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
-              className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-600"
+              className="w-full pl-12 pr-4 py-3 border-2 border-(--border) rounded-xl focus:border-blue-600"
             />
           </div>
         </div>
 
         {/* Confirm Password */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <label className="block text-sm font-semibold text-(--text) mb-2">
             Confirm Password<span className="text-red-500">*</span>
           </label>
           <div className="relative">
-            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-(--muted)" />
             <input
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="Confirm your password"
-              className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-600"
+              className="w-full pl-12 pr-4 py-3 border-2 border-(--border) rounded-xl focus:border-blue-600"
             />
           </div>
         </div>
 
         {/* Profile Picture */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <label className="block text-sm font-semibold text-(--text) mb-2">
             Profile Picture<span className="text-red-500">*</span>
           </label>
           <div
-            className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center cursor-pointer"
+            className="border-2 border-dashed border-(--border) rounded-xl p-6 text-center cursor-pointer"
             onClick={() => document.getElementById("profile-input")?.click()}
           >
-            <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-            <p className="text-sm text-gray-600">Click to upload</p>
+            <Upload className="w-8 h-8 text-(--muted) mx-auto mb-2" />
+            <p className="text-sm text-(--text)">Click to upload</p>
             <input
               id="profile-input"
               type="file"
@@ -239,24 +239,24 @@ function RegisterForm() {
 
         {/* Address */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <label className="block text-sm font-semibold text-(--text) mb-2">
             Address<span className="text-red-500">*</span>
           </label>
           <div className="relative">
-            <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-(--muted)" />
             <input
               type="text"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
               placeholder="Enter your address"
-              className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-600"
+              className="w-full pl-12 pr-4 py-3 border-2 border-(--border) rounded-xl focus:border-blue-600"
             />
           </div>
         </div>
 
         {/* Address Description */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <label className="block text-sm font-semibold text-(--text) mb-2">
             Address Description<span className="text-red-500">*</span>
           </label>
           <textarea
@@ -264,23 +264,23 @@ function RegisterForm() {
             onChange={(e) => setAddressDescription(e.target.value)}
             placeholder="Additional details"
             rows={3}
-            className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-600 resize-none"
+            className="w-full p-4 border-2 border-(--border) rounded-xl focus:border-blue-600 resize-none"
           />
         </div>
 
         {/* Address URL */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <label className="block text-sm font-semibold text-(--text) mb-2">
             Address URL (Map Link)
           </label>
           <div className="relative">
-            <Link2 className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <Link2 className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-(--muted)" />
             <input
               type="url"
               value={addressUrl}
               onChange={(e) => setAddressUrl(e.target.value)}
               placeholder="Enter address URL"
-              className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-600"
+              className="w-full pl-12 pr-4 py-3 border-2 border-(--border) rounded-xl focus:border-blue-600"
             />
           </div>
         </div>
@@ -293,9 +293,10 @@ function RegisterForm() {
             onChange={(e) => setAgreeToTerms(e.target.checked)}
             className="w-4 h-4 mt-1"
           />
-          <span className="ml-2 text-sm text-gray-600">
-            I agree to the <a className="text-blue-600 font-semibold">Terms</a>{" "}
-            and <a className="text-blue-600 font-semibold">Privacy Policy</a>
+          <span className="ml-2 text-sm text-(--text)">
+            I agree to the{" "}
+            <a className="text-(--accent) font-semibold">Terms</a> and{" "}
+            <a className="text-(--accent) font-semibold">Privacy Policy</a>
             <span className="text-red-500">*</span>
           </span>
         </label>
@@ -303,7 +304,7 @@ function RegisterForm() {
         <button
           type="submit"
           disabled={loading}
-          className={`w-full bg-linear-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-semibold disabled:opacity-50`}
+          className={`w-full bg-(--accent) text-(--primary) py-3 rounded-xl font-semibold disabled:opacity-50`}
         >
           {loading ? (
             <span className="flex items-center justify-center gap-2">

@@ -52,75 +52,75 @@ export default function ReviewsPage() {
     <div className="flex min-h-screen ">
       <Sidebar />
 
-      <main className="flex-1 px-6 md:px-12 py-10">
+      <main className="flex-1 px-6 md:px-12 py-10 bg-(--primary)">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-3">
+            <h1 className="text-4xl md:text-5xl font-bold text-(--text) mb-3">
               Your Reviews and Ratings
             </h1>
-            <p className="text-gray-600 text-lg">
+            <p className="text-(--muted) text-lg">
               See what providers have to say
             </p>
           </div>
 
           {/* Stats Overview */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+            <div className="bg-(--primary) rounded-2xl p-6 shadow-sm border border-(--border)">
               <div className="flex items-center gap-3 mb-2">
                 <div className="p-3 bg-yellow-100 rounded-xl">
                   <Star className="w-6 h-6 text-yellow-600" />
                 </div>
                 <div>
-                  <div className="text-3xl font-bold text-gray-900">
+                  <div className="text-3xl font-bold text-(--text)">
                     {averageRating}
                   </div>
-                  <div className="text-sm text-gray-500">Average Rating</div>
+                  <div className="text-sm text-(--muted)">Average Rating</div>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+            <div className="bg-(--primary) rounded-2xl p-6 shadow-sm border border-(--border)">
               <div className="flex items-center gap-3 mb-2">
-                <div className="p-3 bg-blue-100 rounded-xl">
-                  <Users className="w-6 h-6 text-blue-600" />
+                <div className="p-3 bg-(--accent)/10 rounded-xl">
+                  <Users className="w-6 h-6 text-(--accent)" />
                 </div>
                 <div>
-                  <div className="text-3xl font-bold text-gray-900">
+                  <div className="text-3xl font-bold text-(--text)">
                     {totalReviews}
                   </div>
-                  <div className="text-sm text-gray-500">Total Reviews</div>
+                  <div className="text-sm text-(--muted)">Total Reviews</div>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+            <div className="bg-(--primary) rounded-2xl p-6 shadow-sm border border-(--border)">
               <div className="flex items-center gap-3 mb-2">
                 <div className="p-3 bg-green-100 rounded-xl">
                   <TrendingUp className="w-6 h-6 text-green-600" />
                 </div>
                 <div>
-                  <div className="text-3xl font-bold text-gray-900">
+                  <div className="text-3xl font-bold text-(--text)">
                     {Math.round((fiveStarCount / totalReviews) * 100)}%
                   </div>
-                  <div className="text-sm text-gray-500">5-Star Reviews</div>
+                  <div className="text-sm text-(--muted)">5-Star Reviews</div>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Rating Distribution */}
-          <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-200 mb-12">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">
+          <div className="bg-(--primary) rounded-2xl p-8 shadow-sm border border-(--border) mb-12">
+            <h2 className="text-xl font-bold text-(--text) mb-6">
               Rating Distribution
             </h2>
             <div className="space-y-3">
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-1 w-20">
-                  <span className="text-sm font-medium text-gray-700">5</span>
+                  <span className="text-sm font-medium text-(--text)">5</span>
                   <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                 </div>
-                <div className="flex-1 h-3 bg-gray-100 rounded-full overflow-hidden">
+                <div className="flex-1 h-3 bg-(--secondary) rounded-full overflow-hidden">
                   <div
                     className="h-full bg-yellow-400 rounded-full"
                     style={{
@@ -128,16 +128,16 @@ export default function ReviewsPage() {
                     }}
                   ></div>
                 </div>
-                <span className="text-sm text-gray-600 w-12 text-right">
+                <span className="text-sm text-(--muted) w-12 text-right">
                   {fiveStarCount}
                 </span>
               </div>
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-1 w-20">
-                  <span className="text-sm font-medium text-gray-700">4</span>
+                  <span className="text-sm font-medium text-(--text)">4</span>
                   <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                 </div>
-                <div className="flex-1 h-3 bg-gray-100 rounded-full overflow-hidden">
+                <div className="flex-1 h-3 bg-(--secondary) rounded-full overflow-hidden">
                   <div
                     className="h-full bg-yellow-400 rounded-full"
                     style={{
@@ -145,7 +145,7 @@ export default function ReviewsPage() {
                     }}
                   ></div>
                 </div>
-                <span className="text-sm text-gray-600 w-12 text-right">
+                <span className="text-sm text-(--muted) w-12 text-right">
                   {fourStarCount}
                 </span>
               </div>
@@ -154,12 +154,12 @@ export default function ReviewsPage() {
 
           {/* Reviews List */}
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-900">Reviews</h2>
+            <h2 className="text-2xl font-bold text-(--text)">Reviews</h2>
 
             {reviews.map((review) => (
               <div
                 key={review.id}
-                className="bg-white rounded-2xl p-8 shadow-sm border border-gray-200 hover:shadow-md transition-shadow"
+                className="bg-(--primary) rounded-2xl p-8 shadow-sm border border-(--border) hover:shadow-md transition-shadow"
               >
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-full bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-lg shrink-0">
@@ -168,10 +168,10 @@ export default function ReviewsPage() {
 
                   <div className="flex-1">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-3">
-                      <h3 className="text-lg font-semibold text-gray-900">
+                      <h3 className="text-lg font-semibold text-(--text)">
                         {review.name}
                       </h3>
-                      <span className="text-sm text-gray-500 mt-1 md:mt-0">
+                      <span className="text-sm text-(--muted) mt-1 md:mt-0">
                         {review.date}
                       </span>
                     </div>
@@ -183,13 +183,13 @@ export default function ReviewsPage() {
                           className={`w-5 h-5 ${
                             i < review.rating
                               ? "fill-yellow-400 text-yellow-400"
-                              : "text-gray-300"
+                              : "text-(--muted)"
                           }`}
                         />
                       ))}
                     </div>
 
-                    <p className="text-gray-700 leading-relaxed">
+                    <p className="text-(--text) leading-relaxed">
                       {review.comment}
                     </p>
                   </div>

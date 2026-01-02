@@ -39,36 +39,36 @@ function LoginForm() {
     <>
       <form onSubmit={handleLoginSubmit} className="space-y-5">
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <label className="block text-sm font-semibold text-(--text) mb-2">
             Email Address
           </label>
           <div className="relative">
-            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-(--muted)" />
             <input
               type="email"
               value={loginEmail}
               onChange={(e) => setLoginEmail(e.target.value)}
               placeholder="Enter your email"
-              className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-600"
+              className="w-full pl-12 pr-4 py-3 border-2 border-(--border) rounded-xl focus:border-(--accent)"
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <label className="block text-sm font-semibold text-(--text) mb-2">
             Password
           </label>
           <div className="relative">
-            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-(--muted)" />
             <input
               type="password"
               value={loginPassword}
               onChange={(e) => setLoginPassword(e.target.value)}
               placeholder="Password"
-              className="w-full pl-12 pr-12 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-600"
+              className="w-full pl-12 pr-12 py-3 border-2 border-(--border) rounded-xl focus:border-(--accent)"
             />
             {/* <button className="absolute right-4 top-1/2 -translate-y-1/2">
-              <EyeOff className="w-5 h-5 text-gray-400" />
+              <EyeOff className="w-5 h-5 text-(--muted)" />
             </button> */}
           </div>
         </div>
@@ -78,7 +78,7 @@ function LoginForm() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-linear-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-semibold disabled:opacity-60"
+          className="w-full bg-(--accent) text-(--primary) py-3 rounded-xl font-semibold disabled:opacity-60"
         >
           {loading ? (
             <span className="flex items-center justify-center gap-2">

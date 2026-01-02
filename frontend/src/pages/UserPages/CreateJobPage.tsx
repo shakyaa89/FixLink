@@ -110,9 +110,9 @@ export default function CreateJobPage() {
     <div className="flex min-h-screen">
       <Sidebar />
       {/* Main Content */}
-      <main className="flex-1 py-5 px-4 md:px-8 ">
+      <main className="flex-1 py-5 px-4 md:px-8 bg-(--primary)">
         <div className="max-w-6xl mx-auto my-10">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 md:mb-8 text-left">
+          <h1 className="text-4xl md:text-5xl font-bold text-(--text) mb-6 md:mb-8 text-left">
             Create a New Job
           </h1>
 
@@ -122,7 +122,7 @@ export default function CreateJobPage() {
           >
             {/* Job Title */}
             <div className="col-span-1">
-              <label className="block text-gray-800 font-semibold mb-2">
+              <label className="block text-(--text) font-semibold mb-2">
                 Job Title<span className="text-red-500">*</span>
               </label>
               <input
@@ -130,19 +130,19 @@ export default function CreateJobPage() {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Fix leaking sink"
-                className="w-full p-3 md:p-4 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none"
+                className="w-full p-3 md:p-4 rounded-lg border border-(--border) focus:ring-2 focus:ring-blue-500 outline-none"
               />
             </div>
 
             {/* Category */}
             <div className="col-span-1">
-              <label className="block text-gray-800 font-semibold mb-2">
+              <label className="block text-(--text) font-semibold mb-2">
                 Service Category<span className="text-red-500">*</span>
               </label>
               <select
                 value={jobCategory}
                 onChange={(e) => setJobCategory(e.target.value)}
-                className="w-full p-3 md:p-4 rounded-lg border border-gray-300 text-gray-700 focus:ring-2 focus:ring-blue-500 outline-none"
+                className="bg-(--primary) w-full p-3 md:p-4 rounded-lg border border-(--border) text-(--text) focus:ring-2 focus:ring-blue-500 outline-none"
               >
                 <option>Select a Category</option>
                 <option>Plumbing</option>
@@ -156,7 +156,7 @@ export default function CreateJobPage() {
 
             {/* Description */}
             <div className="col-span-1 md:col-span-2">
-              <label className="block text-gray-800 font-semibold mb-2">
+              <label className="block text-(--text) font-semibold mb-2">
                 Description<span className="text-red-500">*</span>
               </label>
               <textarea
@@ -164,13 +164,13 @@ export default function CreateJobPage() {
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Describe your service needs..."
                 rows={5}
-                className="w-full p-3 md:p-4 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none resize-none"
+                className="w-full p-3 md:p-4 rounded-lg border border-(--border) focus:ring-2 focus:ring-blue-500 outline-none resize-none"
               ></textarea>
             </div>
 
             {/* Budget */}
             <div className="col-span-1">
-              <label className="block text-gray-800 font-semibold mb-2">
+              <label className="block text-(--text) font-semibold mb-2">
                 Your Price (Rs)<span className="text-red-500">*</span>
               </label>
               <input
@@ -178,13 +178,13 @@ export default function CreateJobPage() {
                 value={userPrice}
                 onChange={(e) => setUserPrice(parseInt(e.target.value))}
                 placeholder="Ex: 1200"
-                className="w-full p-3 md:p-4 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none"
+                className="w-full p-3 md:p-4 rounded-lg border border-(--border) focus:ring-2 focus:ring-blue-500 outline-none"
               />
             </div>
 
             {/* Location */}
             <div className="col-span-1">
-              <label className="block text-gray-800 font-semibold mb-2">
+              <label className="block text-(--text) font-semibold mb-2">
                 Location<span className="text-red-500">*</span>
               </label>
               <input
@@ -192,13 +192,13 @@ export default function CreateJobPage() {
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 placeholder="Enter your location"
-                className="w-full p-3 md:p-4 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none"
+                className="w-full p-3 md:p-4 rounded-lg border border-(--border) focus:ring-2 focus:ring-blue-500 outline-none"
               />
             </div>
 
             {/* Location URL */}
             <div className="col-span-1 md:col-span-2">
-              <label className="block text-gray-800 font-semibold mb-2">
+              <label className="block text-(--text) font-semibold mb-2">
                 Location URL (Optional)
               </label>
               <input
@@ -206,20 +206,20 @@ export default function CreateJobPage() {
                 value={locationURL}
                 onChange={(e) => setLocationURL(e.target.value)}
                 placeholder="https://www.google.com/maps/@?api=1&map_action=map"
-                className="w-full p-3 md:p-4 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none"
+                className="w-full p-3 md:p-4 rounded-lg border border-(--border) focus:ring-2 focus:ring-blue-500 outline-none"
               />
             </div>
 
             {/* Image Upload */}
             <div className="col-span-1 md:col-span-2">
-              <label className="block text-gray-800 font-semibold mb-2">
+              <label className="block text-(--text) font-semibold mb-2">
                 Upload Images<span className="text-red-500">*</span>
               </label>
               <label htmlFor="imageUpload">
-                <div className="border-2 border-dashed border-gray-400 rounded-xl p-6 md:p-8 text-center hover:border-blue-500 transition cursor-pointer">
+                <div className="border-2 border-dashed border-(--border) rounded-xl p-6 md:p-8 text-center hover:border-blue-500 transition cursor-pointer">
                   <div className="flex flex-col items-center space-y-2 md:space-y-3">
-                    <Upload className="w-8 h-8 md:w-10 md:h-10 text-blue-600" />
-                    <p className="text-gray-600 font-medium text-sm md:text-base">
+                    <Upload className="w-8 h-8 md:w-10 md:h-10 text-(--accent)" />
+                    <p className="text-(--text) font-medium text-sm md:text-base">
                       Click to upload images
                     </p>
                   </div>
@@ -235,7 +235,7 @@ export default function CreateJobPage() {
               </label>
             </div>
 
-            <ul className=" space-y-1 text-sm text-gray-700">
+            <ul className=" space-y-1 text-sm text-(--text)">
               {images.map((file, index) => (
                 <li key={index} className="flex items-center gap-2">
                   <Check size={18} className="text-green-500" />{" "}
@@ -258,7 +258,7 @@ export default function CreateJobPage() {
                   !description ||
                   !jobCategory
                 }
-                className="w-full bg-linear-to-r from-blue-600 to-purple-600 text-white text-lg font-semibold py-3 md:py-4 rounded-lg hover:shadow-xl transition disabled:opacity-60"
+                className="w-full bg-(--accent) text-white text-lg font-semibold py-3 md:py-4 rounded-lg hover:shadow-xl transition disabled:opacity-60"
               >
                 {uploading ? (
                   <span className="flex items-center justify-center gap-2">

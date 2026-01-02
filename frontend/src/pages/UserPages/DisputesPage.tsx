@@ -55,64 +55,64 @@ export default function DisputesPage() {
     <div className="flex min-h-screen">
       <Sidebar />
 
-      <main className="flex-1 px-6 md:px-12 py-10">
+      <main className="flex-1 px-6 md:px-12 py-10 bg-(--primary)">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-3">
+            <h1 className="text-4xl md:text-5xl font-bold text-(--text) mb-3">
               Disputes
             </h1>
-            <p className="text-gray-600 text-lg">Track and resolve disputes</p>
+            <p className="text-(--text) text-lg">Track and resolve disputes</p>
           </div>
 
           {/* Stats Overview */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+            <div className="bg-(--primary) rounded-2xl p-6 shadow-sm border border-(--border)">
               <div className="flex items-center gap-3 mb-2">
-                <div className="p-3 bg-gray-100 rounded-xl">
-                  <FileText className="w-6 h-6 text-gray-600" />
+                <div className="p-3 bg-(--secondary) rounded-xl">
+                  <FileText className="w-6 h-6 text-(--text)" />
                 </div>
                 <div>
-                  <div className="text-3xl font-bold text-gray-900">
+                  <div className="text-3xl font-bold text-(--text)">
                     {disputes.length}
                   </div>
-                  <div className="text-sm text-gray-500">Total Disputes</div>
+                  <div className="text-sm text-(--muted)">Total Disputes</div>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+            <div className="bg-(--primary) rounded-2xl p-6 shadow-sm border border-(--border)">
               <div className="flex items-center gap-3 mb-2">
                 <div className="p-3 bg-orange-100 rounded-xl">
                   <AlertCircle className="w-6 h-6 text-orange-600" />
                 </div>
                 <div>
-                  <div className="text-3xl font-bold text-gray-900">0</div>
-                  <div className="text-sm text-gray-500">Open</div>
+                  <div className="text-3xl font-bold text-(--text)">0</div>
+                  <div className="text-sm text-(--muted)">Open</div>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+            <div className="bg-(--primary) rounded-2xl p-6 shadow-sm border border-(--border)">
               <div className="flex items-center gap-3 mb-2">
-                <div className="p-3 bg-blue-100 rounded-xl">
-                  <Clock className="w-6 h-6 text-blue-600" />
+                <div className="p-3 bg-(--accent)/10 rounded-xl">
+                  <Clock className="w-6 h-6 text-(--accent)" />
                 </div>
                 <div>
-                  <div className="text-3xl font-bold text-gray-900">0</div>
-                  <div className="text-sm text-gray-500">In Progress</div>
+                  <div className="text-3xl font-bold text-(--text)">0</div>
+                  <div className="text-sm text-(--muted)">In Progress</div>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+            <div className="bg-(--primary) rounded-2xl p-6 shadow-sm border border-(--border)">
               <div className="flex items-center gap-3 mb-2">
                 <div className="p-3 bg-green-100 rounded-xl">
                   <CheckCircle className="w-6 h-6 text-green-600" />
                 </div>
                 <div>
-                  <div className="text-3xl font-bold text-gray-900">0</div>
-                  <div className="text-sm text-gray-500">Resolved</div>
+                  <div className="text-3xl font-bold text-(--text)">0</div>
+                  <div className="text-sm text-(--muted)">Resolved</div>
                 </div>
               </div>
             </div>
@@ -121,8 +121,8 @@ export default function DisputesPage() {
           {/* Disputes List */}
           <div className="space-y-6">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">All Disputes</h2>
-              <button className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors">
+              <h2 className="text-2xl font-bold text-(--text)">All Disputes</h2>
+              <button className="px-4 py-2 bg-(--accent) text-(--primary) rounded-lg font-medium hover:bg-(--accent-hover) transition-colors">
                 + New Dispute
               </button>
             </div>
@@ -132,18 +132,18 @@ export default function DisputesPage() {
                 return (
                   <div
                     key={dispute.id}
-                    className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-all"
+                    className="bg-(--primary) rounded-2xl p-6 shadow-sm border border-(--border) hover:shadow-md transition-all"
                   >
                     <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                       <div className="flex-1">
                         <div className="flex items-start gap-3">
                           <div className="flex flex-col justify-center items-baseline">
                             <div className="flex flex-wrap items-center gap-3">
-                              <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                              <h3 className="text-lg font-semibold text-(--text) mb-3">
                                 {dispute.title}
                               </h3>
                             </div>
-                            <p className="text-gray-600 text-sm leading-relaxed">
+                            <p className="text-(--text) text-sm leading-relaxed">
                               {dispute.description}
                             </p>
                           </div>
@@ -151,7 +151,7 @@ export default function DisputesPage() {
                       </div>
 
                       <div className="flex flex-col items-end gap-2 min-w-fit">
-                        <span className="text-sm text-gray-500">
+                        <span className="text-sm text-(--muted)">
                           {dispute.date}
                         </span>
                       </div>
@@ -164,14 +164,14 @@ export default function DisputesPage() {
 
           {/* Empty State (hidden when there are disputes) */}
           {disputes.length === 0 && (
-            <div className="bg-white rounded-2xl p-12 shadow-sm border border-gray-200 text-center">
+            <div className="bg-(--primary) rounded-2xl p-12 shadow-sm border border-(--border) text-center">
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <TrendingDown className="w-8 h-8 text-green-600" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              <h3 className="text-xl font-semibold text-(--text) mb-2">
                 No disputes found
               </h3>
-              <p className="text-gray-600">
+              <p className="text-(--text)">
                 You're all caught up! No active disputes at the moment.
               </p>
             </div>

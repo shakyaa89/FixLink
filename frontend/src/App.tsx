@@ -25,9 +25,12 @@ import ServiceProviderDashboard from "./pages/ServiceProviderPages/ServiceProvid
 import ViewJobsPage from "./pages/ServiceProviderPages/ViewJobsPage";
 import JobDetailsPage from "./pages/UserPages/JobDetailsPage";
 import JobDetailsProviderPage from "./pages/ServiceProviderPages/JobDetailsProviderPage";
+import { useThemeStore } from "./store/themeStore";
 
 function App() {
   const { checkAuth, checking } = useAuthStore();
+
+  const { theme } = useThemeStore();
 
   useEffect(() => {
     checkAuth();
@@ -44,7 +47,11 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div
+      className={`min-h-screen flex flex-col bg-(--primary-bg) dark text-(--text) ${
+        theme == "dark" ? "dark" : ""
+      }`}
+    >
       <Toaster position="top-center" />
       <Navbar />
 

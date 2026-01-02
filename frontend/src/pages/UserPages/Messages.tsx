@@ -42,32 +42,32 @@ export default function Messages() {
         <Sidebar />
       </div>
 
-      <main className="flex-1 bg-white py-6 px-4 md:px-6 lg:px-10">
-        <div className="w-full mx-auto lg:h-[85vh] h-full flex flex-col lg:flex-row border border-gray-300 rounded-2xl overflow-hidden shadow">
+      <main className="flex-1 bg-(--primary) py-6 px-4 md:px-6 lg:px-10">
+        <div className="w-full mx-auto lg:h-[85vh] h-full flex flex-col lg:flex-row border border-(--border) rounded-2xl overflow-hidden shadow">
           {/* Mobile Toggle Button */}
           <button
-            className="lg:hidden flex items-center gap-2 p-4 border-b bg-gray-100"
+            className="lg:hidden flex items-center gap-2 p-4 border-b bg-(--secondary)"
             onClick={() => setShowSidebar(true)}
           >
-            <Menu className="w-6 h-6 text-blue-600" />
+            <Menu className="w-6 h-6 text-(--accent)" />
             <span className="font-semibold">Messages</span>
           </button>
 
           {/* Chat List (Sidebar) */}
           <aside
-            className={`border-r border-gray-300 bg-gray-50 overflow-y-auto ${
+            className={`border-r border-(--border) bg-(--secondary) overflow-y-auto ${
               showSidebar ? "block" : "hidden"
             } absolute inset-0 z-50 w-full h-full lg:static lg:block lg:w-72 lg:h-auto`}
           >
-            <div className="p-4 border-b border-gray-300 relative">
-              <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
-                <MessageCircle className="w-6 h-6 text-blue-600" />
+            <div className="p-4 border-b border-(--border) relative">
+              <h2 className="text-xl font-semibold text-(--text) flex items-center gap-2">
+                <MessageCircle className="w-6 h-6 text-(--accent)" />
                 Messages
               </h2>
 
               {/* Close button on mobile */}
               <button
-                className="lg:hidden absolute right-4 top-4 text-gray-600 text-xl"
+                className="lg:hidden absolute right-4 top-4 text-(--muted)text-xl"
                 onClick={() => setShowSidebar(false)}
               >
                 ✕
@@ -81,31 +81,31 @@ export default function Messages() {
                   setSelectedChat(chat.id);
                   setShowSidebar(false); // close on mobile
                 }}
-                className={`p-4 cursor-pointer border-b border-gray-200 hover:bg-gray-100 ${
-                  selectedChat === chat.id ? "bg-gray-200" : ""
+                className={`p-4 cursor-pointer border-b border-(--border) hover:bg-(--secondary) ${
+                  selectedChat === chat.id ? "bg-(--secondary)" : ""
                 }`}
               >
-                <h3 className="font-medium text-gray-900">{chat.name}</h3>
-                <p className="text-sm text-gray-600 truncate">
+                <h3 className="font-medium text-(--text)">{chat.name}</h3>
+                <p className="text-sm text-(--muted)truncate">
                   {chat.lastMessage}
                 </p>
-                <span className="text-xs text-gray-400">{chat.time}</span>
+                <span className="text-xs text-(--muted)">{chat.time}</span>
               </div>
             ))}
           </aside>
 
           {/* Chat Window */}
-          <section className="flex-1 flex flex-col bg-white h-full">
+          <section className="flex-1 flex flex-col bg-(--primary) h-full">
             {/* Chat Header */}
-            <div className="p-4 border-b border-gray-300 flex items-center gap-3">
-              <User className="w-8 h-8 text-blue-600" />
-              <h2 className="text-lg font-semibold text-gray-900">
+            <div className="p-4 border-b border-(--border) flex items-center gap-3">
+              <User className="w-8 h-8 text-(--accent)" />
+              <h2 className="text-lg font-semibold text-(--text)">
                 {conversations.find((c) => c.id === selectedChat)?.name}
               </h2>
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 bg-gray-50">
+            <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 bg-(--secondary)">
               {sampleMessages.map((msg) => (
                 <div
                   key={msg.id}
@@ -116,8 +116,8 @@ export default function Messages() {
                   <div
                     className={`inline-flex w-fit max-w-[80%] flex-col p-3 rounded-xl text-sm wrap-break-word ${
                       msg.sender === "me"
-                        ? "bg-blue-600 text-white"
-                        : "bg-white border border-gray-300 text-gray-800"
+                        ? "bg-(--accent) text-white"
+                        : "bg-(--primary) border border-(--border) text-(--text)"
                     }`}
                   >
                     {msg.text}
@@ -127,17 +127,17 @@ export default function Messages() {
             </div>
 
             {/* Input Box */}
-            <div className="p-3 md:p-4 border-t border-gray-300 flex items-center gap-3 bg-white">
+            <div className="p-3 md:p-4 border-t border-(--border) flex items-center gap-3 bg-(--primary)">
               <input
                 type="text"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Type your message..."
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-600"
+                className="flex-1 px-4 py-2 border border-(--border) rounded-lg focus:outline-none focus:border-(--accent)"
               />
               <button
                 onClick={handleSend}
-                className="p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                className="p-3 bg-(--accent) text-white rounded-lg hover:bg-(--accent-hover) transition"
               >
                 <Send className="w-5 h-5" />
               </button>

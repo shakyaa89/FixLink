@@ -1,4 +1,27 @@
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap");
+@import "tailwindcss";
+
+:root {
+  --primary: #fff; /* Primary Background */
+  --secondary: #f9fafb; /* Secondary Background */
+  --border: #e5e7eb; /* Border Color */
+  --text: #101828; /* Text Color */
+  --muted: #4a5565; /* Muted Text Color */
+  --accent: #155dfc; /* Accent Color */
+  --accent-hover: #1447e6; /* Accent Hover Color */
+}
+
+.dark {
+  /* Dark Mode */
+  --primary: #303030; /* Primary Background */
+  --secondary: #505050; /* Secondary Background */
+  --border: #3f3f3f; /* Border Color */
+  --text: #fff; /* Text Color */
+  --muted: #ddd; /* Muted Text Color */
+  --accent: #a5c9ff; /* Accent Color */
+  --accent-hover: #5b6379; /* Accent Hover Color */
+}
+
 * {
   font-family: "Nunito";
 }
@@ -15,3 +38,9 @@ body {
 button {
   cursor: pointer;
 }
+
+/*
+Source - https://stackoverflow.com/a
+Posted by Tyron, modified by community. See post 'Timeline' for change history
+Retrieved 2026-01-02, License - CC BY-SA 4.0
+*/

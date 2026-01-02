@@ -2,9 +2,12 @@ import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuthStore } from "../../store/authStore";
+import { useThemeStore } from "../../store/themeStore";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+
+  const { toggleTheme } = useThemeStore();
 
   const { user, logout } = useAuthStore();
 
@@ -12,19 +15,23 @@ export default function Navbar() {
     logout();
   };
 
+  const handleThemeChange = () => {
+    toggleTheme();
+  };
+
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200">
+    <header className="bg-(--primary) shadow-sm border-b border-(--border)">
       <nav className="px-4 py-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-3xl font-bold text-gray-900">FixLink</span>
+            <span className="text-3xl font-bold text-(--text)">FixLink</span>
           </div>
 
           {/* Desktop Menu */}
           <div className="hidden gap-8 md:flex">
             <Link
               to={{ pathname: "/", hash: "#home" }}
-              className="text-gray-600 transition hover:text-blue-600"
+              className="text-(--muted) transition hover:text-(--accent)"
             >
               Home
             </Link>
@@ -32,7 +39,7 @@ export default function Navbar() {
             {!user && (
               <Link
                 to={{ pathname: "/", hash: "#services" }}
-                className="text-gray-600 transition hover:text-blue-600"
+                className="text-(--muted) transition hover:text-(--accent)"
               >
                 Services
               </Link>
@@ -41,7 +48,7 @@ export default function Navbar() {
             {user?.role === "user" && (
               <Link
                 to={{ pathname: "/user/dashboard" }}
-                className="text-gray-600 transition hover:text-blue-600"
+                className="text-(--muted) transition hover:text-(--accent)"
               >
                 Dashboard
               </Link>
@@ -50,7 +57,7 @@ export default function Navbar() {
             {user?.role === "serviceProvider" && (
               <Link
                 to={{ pathname: "/serviceprovider/dashboard" }}
-                className="text-gray-600 transition hover:text-blue-600"
+                className="text-(--muted) transition hover:text-(--accent)"
               >
                 Provider
               </Link>
@@ -58,13 +65,13 @@ export default function Navbar() {
 
             <Link
               to={{ pathname: "/", hash: "#about" }}
-              className="text-gray-600 transition hover:text-blue-600"
+              className="text-(--muted) transition hover:text-(--accent)"
             >
               About
             </Link>
             <Link
               to={{ pathname: "/", hash: "#contact" }}
-              className="text-gray-600 transition hover:text-blue-600"
+              className="text-(--muted) transition hover:text-(--accent)"
             >
               Contact
             </Link>
@@ -76,7 +83,7 @@ export default function Navbar() {
               <div className="flex items-center gap-4">
                 <p>
                   Hello,{" "}
-                  <span className="font-semibold text-gray-900">
+                  <span className="font-semibold text-(--text)">
                     {" "}
                     {user.fullName}
                   </span>
@@ -88,16 +95,19 @@ export default function Navbar() {
                 />
                 <button
                   onClick={handleLogout}
-                  className="px-6 py-2 font-medium text-white transition bg-blue-600 rounded-lg hover:bg-blue-700"
+                  className="px-6 py-2 font-medium text-(--primary) transition bg-(--accent) rounded-lg hover:bg-(--accent-hover)"
                 >
                   Logout
                 </button>
               </div>
             ) : (
               <>
+                {/* <button onClick={() => handleThemeChange()}>
+                  theme change
+                </button> */}
                 <Link
                   to="/auth"
-                  className="px-6 py-2 font-medium text-white transition bg-blue-600 rounded-lg hover:bg-blue-700"
+                  className="px-6 py-2 font-medium text-(--primary) transition bg-(--accent) rounded-lg hover:bg-(--accent-hover)"
                 >
                   Sign In
                 </Link>
@@ -112,9 +122,9 @@ export default function Navbar() {
             aria-label="Toggle menu"
           >
             {isOpen ? (
-              <X className="w-6 h-6 text-gray-900" />
+              <X className="w-6 h-6 text-(--text)" />
             ) : (
-              <Menu className="w-6 h-6 text-gray-900" />
+              <Menu className="w-6 h-6 text-(--text)" />
             )}
           </button>
         </div>
@@ -125,7 +135,7 @@ export default function Navbar() {
             <Link
               to="/"
               onClick={() => setIsOpen(false)}
-              className="block py-2 text-gray-600 transition hover:text-blue-600"
+              className="block py-2 text-(--muted) transition hover:text-(--accent)"
             >
               Home
             </Link>
@@ -135,21 +145,21 @@ export default function Navbar() {
                 <Link
                   to={{ pathname: "/", hash: "#services" }}
                   onClick={() => setIsOpen(false)}
-                  className="block py-2 text-gray-600 transition hover:text-blue-600"
+                  className="block py-2 text-(--muted) transition hover:text-(--accent)"
                 >
                   Services
                 </Link>
                 <Link
                   to={{ pathname: "/", hash: "#about" }}
                   onClick={() => setIsOpen(false)}
-                  className="block py-2 text-gray-600 transition hover:text-blue-600"
+                  className="block py-2 text-(--muted) transition hover:text-(--accent)"
                 >
                   About
                 </Link>
                 <Link
                   to={{ pathname: "/", hash: "#contact" }}
                   onClick={() => setIsOpen(false)}
-                  className="block py-2 text-gray-600 transition hover:text-blue-600"
+                  className="block py-2 text-(--muted) transition hover:text-(--accent)"
                 >
                   Contact
                 </Link>
@@ -161,28 +171,28 @@ export default function Navbar() {
                 <Link
                   to="/user/dashboard"
                   onClick={() => setIsOpen(false)}
-                  className="block text-gray-700 hover:text-blue-600 transition border-b border-gray-300 pb-3"
+                  className="block text-(--text) hover:text-(--accent) transition border-b border-(--border) pb-3"
                 >
                   Dashboard
                 </Link>
                 <Link
                   to="/user/create-job"
                   onClick={() => setIsOpen(false)}
-                  className="block text-gray-700 hover:text-blue-600 transition border-b border-gray-300 pb-3"
+                  className="block text-(--text) hover:text-(--accent) transition border-b border-(--border) pb-3"
                 >
                   Create Job
                 </Link>
                 <Link
                   to="/user/jobs"
                   onClick={() => setIsOpen(false)}
-                  className="block pb-3 text-gray-700 hover:text-blue-600 border-b border-gray-300 transition"
+                  className="block pb-3 text-(--text) hover:text-(--accent) border-b border-(--border) transition"
                 >
                   My Jobs
                 </Link>
                 <Link
                   to="/user/messages"
                   onClick={() => setIsOpen(false)}
-                  className="block pb-3 text-gray-700 hover:text-blue-600 border-b border-gray-300 transition"
+                  className="block pb-3 text-(--text) hover:text-(--accent) border-b border-(--border) transition"
                 >
                   Messages
                 </Link>
@@ -190,21 +200,21 @@ export default function Navbar() {
                 <Link
                   to="/user/reviews"
                   onClick={() => setIsOpen(false)}
-                  className="block pb-3 text-gray-700 hover:text-blue-600 border-b border-gray-300 transition"
+                  className="block pb-3 text-(--text) hover:text-(--accent) border-b border-(--border) transition"
                 >
                   Reviews
                 </Link>
                 <Link
                   to="/user/disputes"
                   onClick={() => setIsOpen(false)}
-                  className="block pb-3 text-gray-700 hover:text-blue-600 border-b border-gray-300 transition"
+                  className="block pb-3 text-(--text) hover:text-(--accent) border-b border-(--border) transition"
                 >
                   Disputes
                 </Link>
                 <Link
                   to="/user/profile"
                   onClick={() => setIsOpen(false)}
-                  className="block pb-3 text-gray-700 hover:text-blue-600 border-b border-gray-300 transition"
+                  className="block pb-3 text-(--text) hover:text-(--accent) border-b border-(--border) transition"
                 >
                   Profile
                 </Link>
@@ -216,14 +226,14 @@ export default function Navbar() {
                 <Link
                   to="/serviceprovider/dashboard"
                   onClick={() => setIsOpen(false)}
-                  className="block text-gray-700 hover:text-blue-600 transition border-b border-gray-300 pb-3"
+                  className="block text-(--text) hover:text-(--accent) transition border-b border-(--border) pb-3"
                 >
                   Dashboard
                 </Link>
                 <Link
                   to="/serviceprovider/jobs"
                   onClick={() => setIsOpen(false)}
-                  className="block text-gray-700 hover:text-blue-600 transition border-b border-gray-300 pb-3"
+                  className="block text-(--text) hover:text-(--accent) transition border-b border-(--border) pb-3"
                 >
                   View Job
                 </Link>
@@ -240,7 +250,7 @@ export default function Navbar() {
                       className="w-10 h-10 object-cover border rounded-full"
                     />
                     Hello,{" "}
-                    <span className="font-semibold text-gray-900">
+                    <span className="font-semibold text-(--text)">
                       {" "}
                       {user.fullName}
                     </span>
@@ -248,7 +258,7 @@ export default function Navbar() {
 
                   <button
                     onClick={handleLogout}
-                    className="w-full px-4 py-2 font-medium text-white transition bg-blue-600 rounded-lg hover:bg-blue-700"
+                    className="w-full px-4 py-2 font-medium text-(--primary) transition bg-(--accent) rounded-lg hover:bg-(--accent-hover)"
                   >
                     Logout
                   </button>

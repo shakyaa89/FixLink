@@ -27,15 +27,15 @@ export default function Sidebar() {
 
   return (
     <aside
-      className={`min-h-screen border-r border-gray-300 p-4 transition-all duration-300 ${
+      className={`min-h-screen border-r border-(--border) p-4 transition-all duration-300 ${
         collapsed ? "w-21" : "w-64"
-      } hidden md:block`}
+      } hidden md:block bg-(--primary)`}
     >
       {/* Collapse toggle */}
       <div className="flex justify-end mb-4">
         <button
           onClick={toggleSidebar}
-          className="p-1 rounded hover:bg-gray-100"
+          className="p-1 rounded hover:bg-(--secondary)"
         >
           <Menu className="w-5 h-5" />
         </button>
@@ -47,7 +47,7 @@ export default function Sidebar() {
           <img
             src={user?.profilePicture}
             alt=""
-            className="w-30 h-auto aspect-square object-cover rounded-full mx-auto border border-gray-300"
+            className="w-30 h-auto aspect-square object-cover rounded-full mx-auto border border-(--border)"
           />
           <h1 className="text-3xl font-bold p-4 pb-6 text-center">
             {user?.fullName}
@@ -64,8 +64,8 @@ export default function Sidebar() {
               className={({ isActive }) =>
                 `flex items-center gap-3 px-4 py-3 rounded-lg ${
                   isActive
-                    ? "bg-blue-600 text-white shadow"
-                    : "hover:bg-gray-100"
+                    ? "bg-(--accent) text-white shadow"
+                    : "hover:bg-(--secondary)"
                 } ${collapsed ? "justify-center" : ""}`
               }
             >
@@ -78,8 +78,8 @@ export default function Sidebar() {
               className={({ isActive }) =>
                 `flex items-center gap-3 px-4 py-3 rounded-lg ${
                   isActive
-                    ? "bg-blue-600 text-white shadow"
-                    : "hover:bg-gray-100"
+                    ? "bg-(--accent) text-white shadow"
+                    : "hover:bg-(--secondary)"
                 } ${collapsed ? "justify-center" : ""}`
               }
             >
@@ -92,8 +92,8 @@ export default function Sidebar() {
               className={({ isActive }) =>
                 `flex items-center gap-3 px-4 py-3 rounded-lg ${
                   isActive
-                    ? "bg-blue-600 text-white shadow"
-                    : "hover:bg-gray-100"
+                    ? "bg-(--accent) text-white shadow"
+                    : "hover:bg-(--secondary)"
                 } ${collapsed ? "justify-center" : ""}`
               }
             >
@@ -110,8 +110,8 @@ export default function Sidebar() {
               className={({ isActive }) =>
                 `flex items-center gap-3 px-4 py-3 rounded-lg ${
                   isActive
-                    ? "bg-blue-600 text-white shadow"
-                    : "hover:bg-gray-100"
+                    ? "bg-(--accent) text-white shadow"
+                    : "hover:bg-(--secondary)"
                 } ${collapsed ? "justify-center" : ""}`
               }
             >
@@ -124,8 +124,8 @@ export default function Sidebar() {
               className={({ isActive }) =>
                 `flex items-center gap-3 px-4 py-3 rounded-lg ${
                   isActive
-                    ? "bg-blue-600 text-white shadow"
-                    : "hover:bg-gray-100"
+                    ? "bg-(--accent) text-white shadow"
+                    : "hover:bg-(--secondary)"
                 } ${collapsed ? "justify-center" : ""}`
               }
             >
@@ -139,7 +139,9 @@ export default function Sidebar() {
           to="/messages"
           className={({ isActive }) =>
             `flex items-center gap-3 px-4 py-3 rounded-lg ${
-              isActive ? "bg-blue-600 text-white shadow" : "hover:bg-gray-100"
+              isActive
+                ? "bg-(--accent) text-white shadow"
+                : "hover:bg-(--secondary)"
             } ${collapsed ? "justify-center" : ""}`
           }
         >
@@ -151,7 +153,9 @@ export default function Sidebar() {
           to="/reviews"
           className={({ isActive }) =>
             `flex items-center gap-3 px-4 py-3 rounded-lg ${
-              isActive ? "bg-blue-600 text-white shadow" : "hover:bg-gray-100"
+              isActive
+                ? "bg-(--accent) text-white shadow"
+                : "hover:bg-(--secondary)"
             } ${collapsed ? "justify-center" : ""}`
           }
         >
@@ -163,7 +167,9 @@ export default function Sidebar() {
           to="/disputes"
           className={({ isActive }) =>
             `flex items-center gap-3 px-4 py-3 rounded-lg ${
-              isActive ? "bg-blue-600 text-white shadow" : "hover:bg-gray-100"
+              isActive
+                ? "bg-(--accent) text-white shadow"
+                : "hover:bg-(--secondary)"
             } ${collapsed ? "justify-center" : ""}`
           }
         >
@@ -175,7 +181,9 @@ export default function Sidebar() {
           to="/profile"
           className={({ isActive }) =>
             `flex items-center gap-3 px-4 py-3 rounded-lg ${
-              isActive ? "bg-blue-600 text-white shadow" : "hover:bg-gray-100"
+              isActive
+                ? "bg-(--accent) text-white shadow"
+                : "hover:bg-(--secondary)"
             } ${collapsed ? "justify-center" : ""}`
           }
         >

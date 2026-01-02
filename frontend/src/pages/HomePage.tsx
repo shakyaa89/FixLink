@@ -85,7 +85,7 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="bg-white">
+    <div className="bg-(--primary)">
       {/* Hero Section */}
       <section
         id="home"
@@ -94,21 +94,21 @@ export default function HomePage() {
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left Content */}
           <div className="space-y-8">
-            <div className="inline-flex items-center space-x-2 bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-medium">
+            <div className="inline-flex items-center space-x-2 bg-(--accent)/10 text-(--text) px-4 py-2 rounded-full text-sm font-medium">
               <Sparkles className="w-4 h-4" />
               <span>AI-Powered Service Matching</span>
             </div>
 
-            <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
+            <h1 className="text-5xl lg:text-6xl font-bold text-(--text) leading-tight">
               Connect With
-              <span className="bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="bg-(--accent) bg-clip-text text-transparent">
                 {" "}
                 Verified{" "}
               </span>
               Service Providers
             </h1>
 
-            <p className="text-xl text-gray-600 leading-relaxed">
+            <p className="text-xl text-(--muted) leading-relaxed">
               Post your service needs, receive competitive offers, and choose
               the best provider. Track progress in real-time with secure
               payments and ratings.
@@ -121,7 +121,7 @@ export default function HomePage() {
                     ? navigate("/auth")
                     : navigate("/user/dashboard");
                 }}
-                className="bg-linear-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:shadow-lg hover:scale-105 transition-all flex items-center justify-center space-x-2"
+                className="bg-(--accent) text-(--primary) px-8 py-4 rounded-xl font-semibold text-lg hover:bg-(--accent-hover) transition-all flex items-center justify-center space-x-2"
               >
                 <span>Get Started</span>
                 <ChevronRight className="w-5 h-5" />
@@ -131,77 +131,77 @@ export default function HomePage() {
             {/* Stats */}
             <div className="grid grid-cols-3 gap-6 pt-8">
               <div>
-                <div className="text-3xl font-bold text-gray-900">10K+</div>
-                <div className="text-sm text-gray-600">Active Users</div>
+                <div className="text-3xl font-bold text-(--text)">10K+</div>
+                <div className="text-sm text-(--muted)">Active Users</div>
               </div>
               <div>
-                <div className="text-3xl font-bold text-gray-900">5K+</div>
-                <div className="text-sm text-gray-600">Verified Providers</div>
+                <div className="text-3xl font-bold text-(--text)">5K+</div>
+                <div className="text-sm text-(--muted)">Verified Providers</div>
               </div>
               <div>
-                <div className="text-3xl font-bold text-gray-900">50K+</div>
-                <div className="text-sm text-gray-600">Jobs Completed</div>
+                <div className="text-3xl font-bold text-(--text)">50K+</div>
+                <div className="text-sm text-(--muted)">Jobs Completed</div>
               </div>
             </div>
           </div>
 
           <div className="relative">
-            <div className="bg-linear-to-br from-blue-600 to-purple-600 rounded-3xl p-8 shadow-2xl">
-              <div className="bg-white rounded-2xl p-6 space-y-4">
+            <div className="bg-(--accent) rounded-3xl p-8 shadow-2xl">
+              <div className="bg-(--primary) rounded-2xl p-6 space-y-4">
                 {/* Mock Job Card */}
                 <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <Zap className="w-6 h-6 text-blue-600" />
+                  <div className="w-12 h-12 bg-(--accent)/10 rounded-lg flex items-center justify-center">
+                    <Zap className="w-6 h-6 text-(--accent)" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900">
+                    <h3 className="font-semibold text-(--text)">
                       Plumbing Repair
                     </h3>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-(--muted)">
                       Kitchen sink leaking issue
                     </p>
                   </div>
                 </div>
 
                 <div className="space-y-3">
-                  <div className="bg-gray-50 rounded-lg p-4 border-2 border-blue-600">
+                  <div className="bg-(--secondary) rounded-lg p-4 border-2 border-(--accent)">
                     <div className="flex justify-between items-center">
                       <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-linear-to-br from-blue-600 to-blue-400 rounded-full"></div>
+                        <div className="w-10 h-10 bg-(--accent) rounded-full"></div>
                         <div>
-                          <div className="font-semibold text-gray-900">
-                            John's Plumbing
+                          <div className="font-semibold text-(--text)">
+                            Shashwat
                           </div>
                           <div className="flex items-center space-x-1 text-sm">
                             <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                            <span className="text-gray-600">4.9 (127)</span>
+                            <span className="text-(--muted)">4.9 (127)</span>
                           </div>
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-xl font-bold text-blue-600">
+                        <div className="text-xl font-bold text-(--accent)">
                           Rs. 800
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="bg-(--secondary) rounded-lg p-4">
                     <div className="flex justify-between items-center">
                       <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-linear-to-br from-purple-600 to-purple-400 rounded-full"></div>
+                        <div className="w-10 h-10 bg-(--accent) rounded-full"></div>
                         <div>
-                          <div className="font-semibold text-gray-900">
-                            Quick Fix Pro
+                          <div className="font-semibold text-(--text)">
+                            Shakya
                           </div>
                           <div className="flex items-center space-x-1 text-sm">
                             <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                            <span className="text-gray-600">4.7 (89)</span>
+                            <span className="text-(--muted)">4.7 (89)</span>
                           </div>
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-xl font-bold text-gray-900">
+                        <div className="text-xl font-bold text-(--text)">
                           Rs. 300
                         </div>
                       </div>
@@ -209,30 +209,30 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                <button className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+                <button className="w-full bg-(--accent) text-(--primary) py-3 rounded-lg font-semibold hover:bg-(--accent-hover) transition-colors">
                   Accept Best Offer
                 </button>
               </div>
             </div>
 
             {/* Floating Elements */}
-            <div className="absolute -top-6 -right-2 bg-white rounded-2xl shadow-xl p-4 flex items-center space-x-3">
+            <div className="absolute -top-6 -right-2 bg-(--primary) rounded-2xl shadow-xl p-4 flex items-center space-x-3">
               <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
                 <CheckCircle className="w-6 h-6 text-green-600" />
               </div>
               <div>
-                <div className="font-semibold text-gray-900">Verified</div>
-                <div className="text-sm text-gray-600">100% Safe</div>
+                <div className="font-semibold text-(--text)">Verified</div>
+                <div className="text-sm text-(--muted)">100% Safe</div>
               </div>
             </div>
 
-            <div className="absolute -bottom-6 -left-2 bg-white rounded-2xl shadow-xl p-4 flex items-center space-x-3">
-              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+            <div className="absolute -bottom-6 -left-2 bg-(--primary) rounded-2xl shadow-xl p-4 flex items-center space-x-3">
+              <div className="w-10 h-10 bg-(--accent)/20 rounded-lg flex items-center justify-center">
                 <MessageSquare className="w-6 h-6 text-purple-600" />
               </div>
               <div>
-                <div className="font-semibold text-gray-900">AI Chat</div>
-                <div className="text-sm text-gray-600">24/7 Support</div>
+                <div className="font-semibold text-(--text)">AI Chat</div>
+                <div className="text-sm text-(--muted)">24/7 Support</div>
               </div>
             </div>
           </div>
@@ -240,19 +240,19 @@ export default function HomePage() {
       </section>
 
       {/* Why Choose Us */}
-      <section className="bg-gray-50 py-16">
+      <section className="bg-(--secondary) py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-4xl font-bold text-center text-gray-900 mb-12">
+          <h2 className="text-4xl font-bold text-center text-(--text) mb-12">
             Why Choose FixLink?
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {features.map((feature, index) => (
               <div key={index} className="text-center">
-                <div className="bg-blue-600 text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                <div className="bg-(--accent) text-(--primary) rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                   <CheckCircle className="w-8 h-8" />
                 </div>
-                <p className="text-gray-900 font-semibold">{feature}</p>
+                <p className="text-(--text) font-semibold">{feature}</p>
               </div>
             ))}
           </div>
@@ -263,10 +263,10 @@ export default function HomePage() {
       <section id="services" className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-4xl font-bold text-(--text) mb-4">
               Our Services
             </h2>
-            <p className="text-xl text-gray-600">
+            <p className="text-xl text-(--muted)">
               Comprehensive solutions for all your home service needs
             </p>
           </div>
@@ -277,17 +277,17 @@ export default function HomePage() {
               return (
                 <div
                   key={index}
-                  className="bg-white rounded-lg shadow-md hover:shadow-xl transition duration-300 p-8 text-center group"
+                  className="bg-(--primary) rounded-lg shadow-md hover:shadow-xl transition duration-300 p-8 text-center group"
                 >
                   <div
                     className={`inline-block p-4 rounded-full ${service.color} mb-4 group-hover:scale-110 transition`}
                   >
-                    <Icon className="w-8 h-8 text-white" />
+                    <Icon className="w-8 h-8 text-(--primary)" />
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  <h3 className="text-xl font-semibold text-(--text) mb-2">
                     {service.title}
                   </h3>
-                  <p className="text-gray-600 leading-relaxed">
+                  <p className="text-(--muted) leading-relaxed">
                     {service.description}
                   </p>
                 </div>
@@ -298,13 +298,13 @@ export default function HomePage() {
       </section>
 
       {/* How It Works Section */}
-      <section id="about" className="bg-white py-16">
+      <section id="about" className="bg-(--primary) py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl lg:text-4xl font-bold text-(--text) mb-4">
               How It Works
             </h2>
-            <p className="text-lg text-gray-600">
+            <p className="text-lg text-(--muted)">
               Get started in three simple steps
             </p>
           </div>
@@ -312,36 +312,36 @@ export default function HomePage() {
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
               <div className="w-16 h-16 bg-linear-to-br from-blue-600 to-blue-400 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-white">1</span>
+                <span className="text-2xl font-bold text-(--primary)">1</span>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              <h3 className="text-xl font-semibold text-(--text) mb-2">
                 Post Your Job
               </h3>
-              <p className="text-gray-600">
+              <p className="text-(--muted)">
                 Describe your service needs with details and photos
               </p>
             </div>
 
             <div className="text-center">
               <div className="w-16 h-16 bg-linear-to-br from-purple-600 to-purple-400 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-white">2</span>
+                <span className="text-2xl font-bold text-(--primary)">2</span>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              <h3 className="text-xl font-semibold text-(--text) mb-2">
                 Compare Offers
               </h3>
-              <p className="text-gray-600">
+              <p className="text-(--muted)">
                 Review proposals from verified providers nearby
               </p>
             </div>
 
             <div className="text-center">
               <div className="w-16 h-16 bg-linear-to-br from-green-600 to-green-400 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-white">3</span>
+                <span className="text-2xl font-bold text-(--primary)">3</span>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              <h3 className="text-xl font-semibold text-(--text) mb-2">
                 Get It Done
               </h3>
-              <p className="text-gray-600">
+              <p className="text-(--muted)">
                 Track progress and pay securely upon completion
               </p>
             </div>
@@ -352,14 +352,14 @@ export default function HomePage() {
       {/* CTA Section */}
       <section
         id="contact"
-        className="bg-linear-to-r from-blue-600 to-blue-800 text-white py-16"
+        className="bg-linear-to-r from-(--accent) to-(--accent-hover) text-(--primary) py-16"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl font-bold mb-4">Ready to Get Started?</h2>
-          <p className="text-xl text-blue-100 mb-8">
+          <p className="text-xl text-(--primary)/80 mb-8">
             Find the perfect professional for your home service needs today
           </p>
-          <button className="font-medium rounded-lg duration-300 bg-gray-200 text-gray-900 hover:bg-gray-300 px-8 py-4 text-lg transition hover:scale-105">
+          <button className="font-medium rounded-lg duration-300 bg-(--secondary) text-(--text) hover:bg-(--primary) px-8 py-4 text-lg transition hover:scale-105">
             Register Now!
           </button>
         </div>
