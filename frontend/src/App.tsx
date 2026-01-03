@@ -39,7 +39,7 @@ function App() {
   if (checking) {
     return (
       <>
-        <div className="h-screen flex items-center justify-center">
+        <div className="h-screen flex items-center justify-center bg-(--primary)">
           <Loader2 className="animate-spin" size={40} />
         </div>
       </>
@@ -48,7 +48,7 @@ function App() {
 
   return (
     <div
-      className={`min-h-screen flex flex-col bg-(--primary-bg) dark text-(--text) ${
+      className={`min-h-screen flex flex-col bg-(--primary-bg) text-(--text) ${
         theme == "dark" ? "dark" : ""
       }`}
     >

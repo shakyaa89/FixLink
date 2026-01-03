@@ -82,7 +82,7 @@ export default function JobDetailsProviderPage() {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-gray-600" />
+        <Loader2 className="h-8 w-8 animate-spin text-(--text)" />
       </div>
     );
   }
@@ -93,12 +93,12 @@ export default function JobDetailsProviderPage() {
 
       {offerModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
-          <div className="bg-white rounded-xl p-6 w-full max-w-md">
-            <h3 className="text-xl font-semibold text-gray-900 mb-4">
+          <div className="bg-(--primary) rounded-xl p-6 w-full max-w-md">
+            <h3 className="text-xl font-semibold text-(--text) mb-4">
               Send Offer
             </h3>
 
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-(--text) mb-1">
               Offer Price
             </label>
 
@@ -110,7 +110,7 @@ export default function JobDetailsProviderPage() {
                 setModalError("");
               }}
               placeholder={`Current offer: Rs. ${job?.userPrice}`}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-(--border) rounded-lg px-3 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
 
             {modalError && <p className="text-red-500">{modalError}</p>}
@@ -126,7 +126,7 @@ export default function JobDetailsProviderPage() {
               <button
                 onClick={() => handleSendOffer()}
                 disabled={sendingOffer}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg disabled:opacity-60 flex items-center gap-2"
+                className="px-4 py-2 bg-(--accent) text-(--primary) rounded-lg disabled:opacity-60 flex items-center gap-2"
               >
                 {sendingOffer ? (
                   <>
@@ -142,21 +142,21 @@ export default function JobDetailsProviderPage() {
         </div>
       )}
 
-      <main className="flex-1 bg-white py-10 px-6">
+      <main className="flex-1 bg-(--primary) py-10 px-6">
         <div className="max-w-6xl mx-auto">
           <div className="mb-6">
-            <h1 className="text-3xl font-bold text-gray-900">Job Details</h1>
-            <p className="text-gray-600 mt-1">Details for service providers</p>
+            <h1 className="text-3xl font-bold text-(--text)">Job Details</h1>
+            <p className="text-(--text) mt-1">Details for service providers</p>
           </div>
 
-          <section className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+          <section className="bg-(--primary) border border-(--border) rounded-2xl p-6 shadow-sm">
             <div className="flex items-start justify-between">
               <div>
-                <h2 className="text-2xl font-semibold text-gray-900">
+                <h2 className="text-2xl font-semibold text-(--text)">
                   {job?.title}
                 </h2>
 
-                <p className="text-gray-700 mt-2">
+                <p className="text-(--text) mt-2">
                   Posted By: {job?.userId.fullName}
                 </p>
               </div>
@@ -201,37 +201,37 @@ export default function JobDetailsProviderPage() {
                     )}
                   </div>
                 ) : (
-                  <div className="w-full h-80 bg-gray-100 rounded-2xl flex items-center justify-center text-gray-400">
+                  <div className="w-full h-80 bg-(--secondary) rounded-2xl flex items-center justify-center text-(--muted)">
                     No image
                   </div>
                 )}
               </div>
 
-              <div className="md:col-span-2 text-sm text-gray-700">
+              <div className="md:col-span-2 text-sm text-(--text)">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="flex items-center gap-2">
-                    <Tag className="w-4 h-4 text-gray-600" />
+                    <Tag className="w-4 h-4 text-(--text)" />
                     <div>
                       <p className="font-medium">Category</p>
-                      <p className="text-gray-600">{job?.jobCategory}</p>
+                      <p className="text-(--text)">{job?.jobCategory}</p>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <DollarSign className="w-4 h-4 text-gray-600" />
+                    <DollarSign className="w-4 h-4 text-(--text)" />
                     <div>
                       <p className="font-medium">Offered Price</p>
-                      <p className="text-gray-600 text-2xl">
+                      <p className="text-(--text) text-2xl">
                         Rs. {job?.userPrice}
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <MapPin className="w-4 h-4 text-gray-600" />
+                    <MapPin className="w-4 h-4 text-(--text)" />
                     <div>
                       <p className="font-medium">Location</p>
-                      <p className="text-gray-600">
+                      <p className="text-(--text)">
                         <a
                           href={job?.locationURL ? job?.locationURL : "#"}
                           rel="noreferrer"
@@ -244,10 +244,10 @@ export default function JobDetailsProviderPage() {
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-gray-600" />
+                    <Calendar className="w-4 h-4 text-(--text)" />
                     <div>
                       <p className="font-medium">Posted Date</p>
-                      <p className="text-gray-600">
+                      <p className="text-(--text)">
                         {job?.createdAt?.split("T")[0]}
                       </p>
                     </div>
@@ -256,15 +256,15 @@ export default function JobDetailsProviderPage() {
 
                 <div className="mt-6">
                   <p className="font-medium flex items-center gap-2">
-                    <FileText className="w-4 h-4 text-gray-600" /> Description
+                    <FileText className="w-4 h-4 text-(--text)" /> Description
                   </p>
-                  <p className="text-gray-700 mt-2">{job?.description}</p>
+                  <p className="text-(--text) mt-2">{job?.description}</p>
                 </div>
 
                 <div className="mt-6 flex flex-col sm:flex-row gap-3">
                   <button
                     onClick={() => setOfferModal(true)}
-                    className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-lg flex items-center gap-2 justify-center"
+                    className="w-full sm:w-auto px-4 py-2 bg-(--accent) text-(--primary) rounded-lg flex items-center gap-2 justify-center"
                   >
                     <PlusCircle className="w-4 h-4" />
                     Send Offer
@@ -274,7 +274,7 @@ export default function JobDetailsProviderPage() {
             </div>
           </section>
 
-          <footer className="mt-8 text-center text-gray-500">
+          <footer className="mt-8 text-center text-(--muted)">
             Last updated: {new Date(job?.updatedAt!).toLocaleDateString()}
           </footer>
         </div>

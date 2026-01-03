@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, Moon, Sun, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuthStore } from "../../store/authStore";
 import { useThemeStore } from "../../store/themeStore";
@@ -7,7 +7,7 @@ import { useThemeStore } from "../../store/themeStore";
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
-  const { toggleTheme } = useThemeStore();
+  const { theme, toggleTheme } = useThemeStore();
 
   const { user, logout } = useAuthStore();
 
@@ -93,6 +93,13 @@ export default function Navbar() {
                   alt="User Profile Picture"
                   className="w-10 h-10 object-cover border rounded-full"
                 />
+                <button onClick={() => handleThemeChange()}>
+                  {theme === "light" ? (
+                    <Moon className="w-6 h-6 text-(--text)" />
+                  ) : (
+                    <Sun className="w-6 h-6 text-(--text)" />
+                  )}
+                </button>
                 <button
                   onClick={handleLogout}
                   className="px-6 py-2 font-medium text-(--primary) transition bg-(--accent) rounded-lg hover:bg-(--accent-hover)"
@@ -102,9 +109,13 @@ export default function Navbar() {
               </div>
             ) : (
               <>
-                {/* <button onClick={() => handleThemeChange()}>
-                  theme change
-                </button> */}
+                <button onClick={() => handleThemeChange()}>
+                  {theme === "light" ? (
+                    <Moon className="w-6 h-6 text-(--text)" />
+                  ) : (
+                    <Sun className="w-6 h-6 text-(--text)" />
+                  )}
+                </button>
                 <Link
                   to="/auth"
                   className="px-6 py-2 font-medium text-(--primary) transition bg-(--accent) rounded-lg hover:bg-(--accent-hover)"
@@ -190,7 +201,7 @@ export default function Navbar() {
                   My Jobs
                 </Link>
                 <Link
-                  to="/user/messages"
+                  to="/messages"
                   onClick={() => setIsOpen(false)}
                   className="block pb-3 text-(--text) hover:text-(--accent) border-b border-(--border) transition"
                 >
@@ -198,26 +209,42 @@ export default function Navbar() {
                 </Link>
 
                 <Link
-                  to="/user/reviews"
+                  to="/reviews"
                   onClick={() => setIsOpen(false)}
                   className="block pb-3 text-(--text) hover:text-(--accent) border-b border-(--border) transition"
                 >
                   Reviews
                 </Link>
                 <Link
-                  to="/user/disputes"
+                  to="/disputes"
                   onClick={() => setIsOpen(false)}
                   className="block pb-3 text-(--text) hover:text-(--accent) border-b border-(--border) transition"
                 >
                   Disputes
                 </Link>
                 <Link
-                  to="/user/profile"
+                  to="/profile"
                   onClick={() => setIsOpen(false)}
                   className="block pb-3 text-(--text) hover:text-(--accent) border-b border-(--border) transition"
                 >
                   Profile
                 </Link>
+                <button
+                  onClick={() => handleThemeChange()}
+                  className="block pb-3 text-(--text) hover:text-(--accent) border-b border-(--border) transition w-full"
+                >
+                  {theme === "light" ? (
+                    <span className="flex gap-2 w-full">
+                      <Moon className="w-6 h-6 text-(--text)" /> Set to Dark
+                      Mode
+                    </span>
+                  ) : (
+                    <span className="flex gap-2 w-full">
+                      <Sun className="w-6 h-6 text-(--text)" /> Set to Light
+                      Mode
+                    </span>
+                  )}
+                </button>
               </>
             )}
 
