@@ -50,3 +50,33 @@ export const createOffer = async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 };
+
+export const acceptOffer = async (req, res) => {
+  try {
+    const { offerId } = req.body;
+
+    if (!offerId) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    const offer = await Offer.findById(offerId);
+    if (!offer) return res.status(404).json({ message: "Offer not found" });
+
+    if (offer.status !== "pending") {
+      return res.status(400).json({ message: "Offer is not pending" });
+    }
+
+    offer.status = "accepted";
+    await offer.save();
+
+    const job = await Job.findById(offer.jobId);
+    job.jobStatus = "in-progress";
+    job.finalPrice = offer.offeredPrice;
+    await job.save();
+
+    return res.status(200).json({ message: "Offer accepted", offer: offer });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Server error" });
+  }
+};

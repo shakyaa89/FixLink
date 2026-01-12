@@ -13,12 +13,12 @@
 
 .dark {
   /* Dark Mode */
-  --primary: #303030; /* Primary Background */
-  --secondary: #505050; /* Secondary Background */
+  --primary: #0c1014; /* Primary Background */
+  --secondary: #25292e; /* Secondary Background */
   --border: #3f3f3f; /* Border Color */
   --text: #fff; /* Text Color */
   --muted: #ddd; /* Muted Text Color */
-  --accent: #a5c9ff; /* Accent Color */
+  --accent: #155dfc; /* Accent Color */
   --accent-hover: #5b6379; /* Accent Hover Color */
 }
 

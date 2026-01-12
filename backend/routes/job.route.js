@@ -3,6 +3,7 @@ var router = express.Router();
 
 import { protectRoute } from "../middleware/auth.middleware.js";
 import {
+  cancelJob,
   createJob,
   getJobById,
   getJobs,
@@ -20,5 +21,7 @@ router.get("/fetch-all-jobs", protectRoute, getJobs);
 router.get("/fetch/:id", protectRoute, getJobById);
 
 router.get("/provider", protectServiceProviderRoute, getJobsForProvider);
+
+router.put("/cancel/:id", protectRoute, cancelJob);
 
 export default router;

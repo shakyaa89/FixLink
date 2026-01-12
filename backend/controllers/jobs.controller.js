@@ -103,3 +103,28 @@ export const getJobsForProvider = async (req, res) => {
     });
   }
 };
+
+export const cancelJob = async (req, res) => {
+  try {
+    const jobId = req.params.id;
+
+    const job = await Job.findById(jobId);
+
+    if (!job) {
+      return res.status(404).json({ message: "Job not found" });
+    }
+    if (job.jobStatus === "cancelled") {
+      console.log(job.jobStatus);
+
+      return res
+        .status(400)
+        .json({ message: "Job is not open for cancellation" });
+    }
+    job.jobStatus = "cancelled";
+    await job.save();
+    return res.status(200).json({ message: "Job cancelled successfully" });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "Server error" });
+  }
+};

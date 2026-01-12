@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const baseURL = "http://192.168.1.70:3000/api";
-// const baseURL = "http://100.64.200.45:3000/api";
+// const baseURL = "http://100.64.234.28:3000/api";
 
 interface User {
   fullName: string;
@@ -30,6 +30,7 @@ export interface JobData {
   description: string;
   jobCategory: string;
   userPrice: number;
+  finalPrice?: number;
   location: string;
   locationURL: string;
   jobStatus?: string;
@@ -47,6 +48,20 @@ export interface OfferData {
   status?: string;
   createdAt?: string;
   updatedAt?: string;
+}
+
+export interface MessageData {
+  _id?: string;
+  senderId: string;
+  receiverId: string;
+  content: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface SendMessagePayload {
+  receiverId: string;
+  content: string;
 }
 
 // Helper to get Authorization header
@@ -89,9 +104,26 @@ export const JobApi = {
     Api.get(`/job/provider?category=${category}`, {
       headers: getAuthHeader(),
     }),
+
+  cancelJobApi: (jobId: string) =>
+    Api.put(`/job/cancel/${jobId}`, {}, { headers: getAuthHeader() }),
 };
 
 export const OfferApi = {
   createOffer: (data: { jobId: string; offeredPrice: number }) =>
     Api.post("/offer/create", data, { headers: getAuthHeader() }),
+
+  acceptOffer: (data: { offerId: string }) =>
+    Api.put("/offer/accept", data, { headers: getAuthHeader() }),
+};
+
+export const MessageApi = {
+  fetchContacts: () =>
+    Api.get("/messages/contacts", { headers: getAuthHeader() }),
+
+  sendMessage: (data: SendMessagePayload) =>
+    Api.post("/messages", data, { headers: getAuthHeader() }),
+
+  fetchMessages: (userId: string) =>
+    Api.get(`/messages/user/${userId}`, { headers: getAuthHeader() }),
 };

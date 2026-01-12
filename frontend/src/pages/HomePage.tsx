@@ -93,7 +93,7 @@ export default function HomePage() {
       >
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left Content */}
-          <div className="space-y-8">
+          <div className="space-y-8 pb-10">
             <div className="inline-flex items-center space-x-2 bg-(--accent)/10 text-(--text) px-4 py-2 rounded-full text-sm font-medium">
               <Sparkles className="w-4 h-4" />
               <span>AI-Powered Service Matching</span>
@@ -126,22 +126,6 @@ export default function HomePage() {
                 <span>Get Started</span>
                 <ChevronRight className="w-5 h-5" />
               </button>
-            </div>
-
-            {/* Stats */}
-            <div className="grid grid-cols-3 gap-6 pt-8">
-              <div>
-                <div className="text-3xl font-bold text-(--text)">10K+</div>
-                <div className="text-sm text-(--muted)">Active Users</div>
-              </div>
-              <div>
-                <div className="text-3xl font-bold text-(--text)">5K+</div>
-                <div className="text-sm text-(--muted)">Verified Providers</div>
-              </div>
-              <div>
-                <div className="text-3xl font-bold text-(--text)">50K+</div>
-                <div className="text-sm text-(--muted)">Jobs Completed</div>
-              </div>
             </div>
           </div>
 
@@ -298,52 +282,79 @@ export default function HomePage() {
       </section>
 
       {/* How It Works Section */}
-      <section id="about" className="bg-(--primary) py-16">
+      <section id="about" className="bg-gray-50 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl lg:text-4xl font-bold text-(--text) mb-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
               How It Works
             </h2>
-            <p className="text-lg text-(--muted)">
+            <p className="text-lg text-gray-600">
               Get started in three simple steps
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-linear-to-br from-blue-600 to-blue-400 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-(--primary)">1</span>
-              </div>
-              <h3 className="text-xl font-semibold text-(--text) mb-2">
-                Post Your Job
-              </h3>
-              <p className="text-(--muted)">
-                Describe your service needs with details and photos
-              </p>
-            </div>
+          <div className="max-w-4xl mx-auto">
+            {/* Progress Steps Container */}
+            <div className="relative">
+              {/* Progress Bar Background */}
+              <div
+                className="absolute top-8 left-0 right-0 h-1 bg-gray-200 hidden md:block"
+                style={{ left: "10%", right: "10%" }}
+              />
 
-            <div className="text-center">
-              <div className="w-16 h-16 bg-linear-to-br from-purple-600 to-purple-400 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-(--primary)">2</span>
-              </div>
-              <h3 className="text-xl font-semibold text-(--text) mb-2">
-                Compare Offers
-              </h3>
-              <p className="text-(--muted)">
-                Review proposals from verified providers nearby
-              </p>
-            </div>
+              {/* Active Progress Bar */}
+              <div
+                className="absolute top-8 left-0 h-1 bg-gradient-to-r from-blue-600 via-purple-600 to-green-600 hidden md:block transition-all duration-500"
+                style={{ left: "10%", width: "80%" }}
+              />
 
-            <div className="text-center">
-              <div className="w-16 h-16 bg-linear-to-br from-green-600 to-green-400 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-(--primary)">3</span>
+              {/* Steps Grid */}
+              <div className="relative grid md:grid-cols-3 gap-8 md:gap-4">
+                {/* Step 1 */}
+                <div className="flex flex-col items-center text-center">
+                  <div className="relative z-10 w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-400 rounded-full flex items-center justify-center mb-4 shadow-lg ring-4 ring-white">
+                    <span className="text-2xl font-bold text-white">1</span>
+                  </div>
+                  <div className="bg-white rounded-lg p-6 shadow-md hover:shadow-xl transition-shadow duration-300 w-full">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                      Post Your Job
+                    </h3>
+                    <p className="text-gray-600">
+                      Describe your service needs with details and photos
+                    </p>
+                  </div>
+                </div>
+
+                {/* Step 2 */}
+                <div className="flex flex-col items-center text-center">
+                  <div className="relative z-10 w-16 h-16 bg-gradient-to-br from-purple-600 to-purple-400 rounded-full flex items-center justify-center mb-4 shadow-lg ring-4 ring-white">
+                    <span className="text-2xl font-bold text-white">2</span>
+                  </div>
+                  <div className="bg-white rounded-lg p-6 shadow-md hover:shadow-xl transition-shadow duration-300 w-full">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                      Compare Offers
+                    </h3>
+                    <p className="text-gray-600">
+                      Review proposals from verified providers nearby
+                    </p>
+                  </div>
+                </div>
+
+                {/* Step 3 */}
+                <div className="flex flex-col items-center text-center">
+                  <div className="relative z-10 w-16 h-16 bg-gradient-to-br from-green-600 to-green-400 rounded-full flex items-center justify-center mb-4 shadow-lg ring-4 ring-white">
+                    <span className="text-2xl font-bold text-white">3</span>
+                  </div>
+                  <div className="bg-white rounded-lg p-6 shadow-md hover:shadow-xl transition-shadow duration-300 w-full">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                      Get It Done
+                    </h3>
+                    <p className="text-gray-600">
+                      Track progress and pay securely upon completion
+                    </p>
+                  </div>
+                </div>
               </div>
-              <h3 className="text-xl font-semibold text-(--text) mb-2">
-                Get It Done
-              </h3>
-              <p className="text-(--muted)">
-                Track progress and pay securely upon completion
-              </p>
             </div>
           </div>
         </div>

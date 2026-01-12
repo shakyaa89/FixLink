@@ -8,6 +8,7 @@ import indexRouter from "./routes/index.js";
 import authRouter from "./routes/auth.route.js";
 import jobRouter from "./routes/job.route.js";
 import offerRouter from "./routes/offer.route.js";
+import messageRouter from "./routes/message.route.js";
 import connectDB from "./lib/db.js";
 
 import dotenv from "dotenv";
@@ -26,7 +27,7 @@ app.use(
       "http://localhost:5173",
       "http://192.168.1.70:3000",
       "http://localhost:3000",
-      "http://100.64.200.45:5173",
+      "http://100.64.234.28:5173",
     ],
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -42,6 +43,7 @@ app.use("/", indexRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/job", jobRouter);
 app.use("/api/offer", offerRouter);
+app.use("/api/messages", messageRouter);
 
 app.listen(process.env.PORT, "0.0.0.0", () => {
   console.log(`App listening on port ${process.env.PORT}`);
