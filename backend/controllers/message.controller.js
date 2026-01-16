@@ -2,6 +2,7 @@ import Message from "../models/message.model.js";
 import User from "../models/user.model.js";
 import Job from "../models/job.model.js";
 import Offer from "../models/offer.model.js";
+import { getIO } from "../lib/socket.js";
 
 export const sendMessage = async (req, res) => {
   try {
@@ -35,6 +36,20 @@ export const sendMessage = async (req, res) => {
       receiverId,
       content: content.trim(),
     });
+
+    const payload = message.toObject();
+    payload._id = String(message._id);
+    payload.senderId = String(message.senderId);
+    payload.receiverId = String(message.receiverId);
+
+    try {
+      const io = getIO();
+      io.to(String(receiverId))
+        .to(String(senderId))
+        .emit("message:new", payload);
+    } catch (socketError) {
+      console.log("Socket emit failed", socketError);
+    }
 
     return res.status(201).json({ message: "Message sent", data: message });
   } catch (error) {

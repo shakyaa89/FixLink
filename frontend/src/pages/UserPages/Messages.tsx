@@ -15,6 +15,8 @@ export default function Messages() {
     openChat,
     loadContacts,
     sendMessage,
+    connectSocket,
+    disconnectSocket,
   } = useMessageStore();
 
   const { user } = useAuthStore();
@@ -28,6 +30,14 @@ export default function Messages() {
     if (!loggedInId) return;
     loadContacts();
   }, [loggedInId, loadContacts]);
+
+  useEffect(() => {
+    if (!loggedInId) return;
+    connectSocket(String(loggedInId));
+    return () => {
+      disconnectSocket();
+    };
+  }, [loggedInId, connectSocket, disconnectSocket]);
 
   // const formatTimestamp = (value?: string) => {
   //   if (!value) return "";
@@ -201,6 +211,12 @@ export default function Messages() {
                 type="text"
                 value={message}
                 disabled={!activeChatUser}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSend();
+                  }
+                }}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder={
                   activeChatUser
@@ -211,6 +227,7 @@ export default function Messages() {
               />
               <button
                 onClick={handleSend}
+                type="button"
                 disabled={!activeChatUser || sending || !message.trim()}
                 className="p-3 bg-(--accent) text-white rounded-lg hover:bg-(--accent-hover) transition disabled:opacity-60"
               >

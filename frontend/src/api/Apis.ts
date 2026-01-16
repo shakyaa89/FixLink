@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const baseURL = "http://192.168.1.70:3000/api";
+export const API_BASE_URL = "http://192.168.1.70:3005";
+const baseURL = `${API_BASE_URL}/api`;
 // const baseURL = "http://100.64.234.28:3000/api";
 
 interface User {

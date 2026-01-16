@@ -28,7 +28,7 @@ export default function JobDetailsPage() {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [showOfferAcceptDialog, setShowOfferAcceptDialog] = useState(false);
-  const [acceptOfferId, setAcceptOfferId] = useState("");
+  const [acceptOfferId, setAcceptOfferId] = useState<string>("");
   const { jobId } = useParams();
   const navigate = useNavigate();
 
@@ -437,7 +437,10 @@ export default function JobDetailsPage() {
 
                           {/* Action Button */}
                           <button
-                            onClick={() => setShowOfferAcceptDialog(true)}
+                            onClick={() => {
+                              setShowOfferAcceptDialog(true);
+                              setAcceptOfferId(offer?._id || "");
+                            }}
                             className="w-full sm:w-auto px-5 py-2.5 bg-green-600 text-white rounded-lg text-sm font-medium flex items-center justify-center gap-2 hover:bg-green-700 transition shadow-sm"
                           >
                             <Check className="w-4 h-4" />
@@ -472,7 +475,7 @@ export default function JobDetailsPage() {
                                   </button>
                                   <button
                                     onClick={() =>
-                                      handleOfferAccept(offer._id ?? "")
+                                      handleOfferAccept(acceptOfferId)
                                     }
                                     className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
                                   >

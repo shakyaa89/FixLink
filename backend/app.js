@@ -1,4 +1,5 @@
 import express from "express";
+import http from "http";
 import path from "path";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
@@ -10,6 +11,7 @@ import jobRouter from "./routes/job.route.js";
 import offerRouter from "./routes/offer.route.js";
 import messageRouter from "./routes/message.route.js";
 import connectDB from "./lib/db.js";
+import { initSocket } from "./lib/socket.js";
 
 import dotenv from "dotenv";
 dotenv.config();
@@ -45,7 +47,10 @@ app.use("/api/job", jobRouter);
 app.use("/api/offer", offerRouter);
 app.use("/api/messages", messageRouter);
 
-app.listen(process.env.PORT, "0.0.0.0", () => {
+const server = http.createServer(app);
+initSocket(server);
+
+server.listen(process.env.PORT, "0.0.0.0", () => {
   console.log(`App listening on port ${process.env.PORT}`);
 });
 

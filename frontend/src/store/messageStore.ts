@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import toast from "react-hot-toast";
-import { MessageApi, type MessageData } from "../api/Apis.ts";
+import { io, type Socket } from "socket.io-client";
+import { API_BASE_URL, MessageApi, type MessageData } from "../api/Apis.ts";
 
 export interface ChatUserMeta {
   _id: string;
@@ -16,10 +17,15 @@ interface MessageState {
   messages: MessageData[];
   loading: boolean;
   sending: boolean;
+  socket: Socket | null;
+  socketUserId: string | null;
+  socketConnected: boolean;
   loadContacts: () => Promise<void>;
   openChat: (user: ChatUserMeta) => Promise<void>;
   fetchMessages: (userId: string) => Promise<void>;
   sendMessage: (content: string) => Promise<void>;
+  connectSocket: (userId: string) => void;
+  disconnectSocket: () => void;
 }
 
 export const useMessageStore = create<MessageState>((set, get) => ({
@@ -29,6 +35,9 @@ export const useMessageStore = create<MessageState>((set, get) => ({
   messages: [],
   loading: false,
   sending: false,
+  socket: null,
+  socketUserId: null,
+  socketConnected: false,
 
   loadContacts: async () => {
     set({ contactsLoading: true });
@@ -42,6 +51,76 @@ export const useMessageStore = create<MessageState>((set, get) => ({
     } finally {
       set({ contactsLoading: false });
     }
+  },
+
+  connectSocket: (userId) => {
+    const { socket, socketUserId } = get();
+
+    if (!userId) return;
+
+    if (socket && socketUserId === userId) return;
+
+    if (socket) {
+      socket.disconnect();
+    }
+
+    const newSocket = io(API_BASE_URL, {
+      withCredentials: true,
+      query: { userId },
+    });
+
+    newSocket.on("connect", () => {
+      set({ socketConnected: true });
+    });
+
+    newSocket.on("disconnect", () => {
+      set({ socketConnected: false });
+    });
+
+    newSocket.on("message:new", (payload: MessageData) => {
+      const { messages, activeChatUser, recentChats, socketUserId } = get();
+
+      if (!payload?._id) return;
+
+      const exists = messages.some((msg) => msg._id === payload._id);
+      if (exists) return;
+
+      const isForActiveChat =
+        activeChatUser &&
+        ((payload.senderId === activeChatUser._id &&
+          payload.receiverId === socketUserId) ||
+          (payload.receiverId === activeChatUser._id &&
+            payload.senderId === socketUserId));
+
+      if (isForActiveChat) {
+        set({ messages: [...messages, payload] });
+      }
+
+      const otherUserId =
+        payload.senderId === socketUserId
+          ? payload.receiverId
+          : payload.senderId;
+
+      const hasChat = recentChats.some((chat) => chat._id === otherUserId);
+      if (!hasChat) {
+        set({
+          recentChats: [
+            { _id: otherUserId, fullName: "New chat" },
+            ...recentChats,
+          ],
+        });
+      }
+    });
+
+    set({ socket: newSocket, socketUserId: userId });
+  },
+
+  disconnectSocket: () => {
+    const { socket } = get();
+    if (socket) {
+      socket.disconnect();
+    }
+    set({ socket: null, socketUserId: null, socketConnected: false });
   },
 
   openChat: async (user) => {
@@ -93,7 +172,10 @@ export const useMessageStore = create<MessageState>((set, get) => ({
       const newMessage: MessageData | undefined = res.data?.data;
 
       if (newMessage) {
-        set({ messages: [...messages, newMessage] });
+        const exists = messages.some((msg) => msg._id === newMessage._id);
+        if (!exists) {
+          set({ messages: [...messages, newMessage] });
+        }
       }
     } catch (error: any) {
       console.log(error);
