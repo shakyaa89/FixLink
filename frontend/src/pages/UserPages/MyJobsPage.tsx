@@ -112,7 +112,7 @@ export default function MyJobs() {
             </div>
 
             {/* Stats Summary */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 mt-6">
               <div className="bg-(--primary) border border-(--border) rounded-xl p-4">
                 <p className="text-sm text-(--muted) mb-1">Total Jobs</p>
                 <p className="text-2xl font-bold text-(--text)">
@@ -122,11 +122,7 @@ export default function MyJobs() {
               <div className="bg-(--primary) border border-(--border) rounded-xl p-4">
                 <p className="text-sm text-(--muted) mb-1">Open</p>
                 <p className="text-2xl font-bold text-green-600">
-                  {
-                    jobs.filter(
-                      (j) => j.jobStatus === "open" || j.jobStatus === "pending"
-                    ).length
-                  }
+                  {jobs.filter((j) => j.jobStatus === "open").length}
                 </p>
               </div>
               <div className="bg-(--primary) border border-(--border) rounded-xl p-4">
@@ -139,6 +135,12 @@ export default function MyJobs() {
                 <p className="text-sm text-(--muted) mb-1">Completed</p>
                 <p className="text-2xl font-bold text-blue-600">
                   {jobs.filter((j) => j.jobStatus === "completed").length}
+                </p>
+              </div>
+              <div className="bg-(--primary) border border-(--border) col-span-2 md:col-span-1 rounded-xl p-4">
+                <p className="text-sm text-(--muted) mb-1">In Progress</p>
+                <p className="text-2xl font-bold text-blue-600">
+                  {jobs.filter((j) => j.jobStatus === "in-progress").length}
                 </p>
               </div>
             </div>

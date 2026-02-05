@@ -20,61 +20,68 @@ export default function Navbar() {
   };
 
   return (
+    // asd
+
     <header className="bg-(--primary) shadow-sm border-b border-(--border)">
-      <nav className="px-4 py-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+      {/* max-w-7xl */}
+      <nav className="px-4 py-4 mx-auto  sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-3xl font-bold text-(--text)">FixLink</span>
-          </div>
-
-          {/* Desktop Menu */}
-          <div className="hidden gap-8 md:flex">
-            <Link
-              to={{ pathname: "/", hash: "#home" }}
-              className="text-(--muted) transition hover:text-(--accent)"
-            >
-              Home
-            </Link>
-
-            {!user && (
+          <div className="flex items-center gap-5">
+            <div className="flex items-center gap-2">
+              <span className="text-3xl font-bold text-(--text)">
+                <a href="/">FixLink</a>
+              </span>
+            </div>
+            <p className="font-bold">|</p>
+            {/* Desktop Menu */}
+            <div className="hidden gap-8 md:flex">
               <Link
-                to={{ pathname: "/", hash: "#services" }}
+                to={{ pathname: "/", hash: "#home" }}
                 className="text-(--muted) transition hover:text-(--accent)"
               >
-                Services
+                Home
               </Link>
-            )}
 
-            {user?.role === "user" && (
+              {!user && (
+                <Link
+                  to={{ pathname: "/", hash: "#services" }}
+                  className="text-(--muted) transition hover:text-(--accent)"
+                >
+                  Services
+                </Link>
+              )}
+
+              {user?.role === "user" && (
+                <Link
+                  to={{ pathname: "/user/dashboard" }}
+                  className="text-(--muted) transition hover:text-(--accent)"
+                >
+                  Dashboard
+                </Link>
+              )}
+
+              {user?.role === "serviceProvider" && (
+                <Link
+                  to={{ pathname: "/serviceprovider/dashboard" }}
+                  className="text-(--muted) transition hover:text-(--accent)"
+                >
+                  Provider
+                </Link>
+              )}
+
               <Link
-                to={{ pathname: "/user/dashboard" }}
+                to={{ pathname: "/", hash: "#about" }}
                 className="text-(--muted) transition hover:text-(--accent)"
               >
-                Dashboard
+                About
               </Link>
-            )}
-
-            {user?.role === "serviceProvider" && (
               <Link
-                to={{ pathname: "/serviceprovider/dashboard" }}
+                to={{ pathname: "/", hash: "#contact" }}
                 className="text-(--muted) transition hover:text-(--accent)"
               >
-                Provider
+                Contact
               </Link>
-            )}
-
-            <Link
-              to={{ pathname: "/", hash: "#about" }}
-              className="text-(--muted) transition hover:text-(--accent)"
-            >
-              About
-            </Link>
-            <Link
-              to={{ pathname: "/", hash: "#contact" }}
-              className="text-(--muted) transition hover:text-(--accent)"
-            >
-              Contact
-            </Link>
+            </div>
           </div>
 
           {/* Action Buttons */}
@@ -139,7 +146,6 @@ export default function Navbar() {
             )}
           </button>
         </div>
-
         {/* Mobile Menu */}
         {isOpen && (
           <div className="pb-4 mt-4 space-y-3 md:hidden">

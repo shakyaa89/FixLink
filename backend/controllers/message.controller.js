@@ -108,7 +108,7 @@ export const getMessageContacts = async (req, res) => {
           select: "title userId jobStatus",
           populate: {
             path: "userId",
-            select: "fullName",
+            select: "fullName profilePicture",
           },
         })
         .lean();
@@ -121,6 +121,7 @@ export const getMessageContacts = async (req, res) => {
         .map((offer) => ({
           _id: offer.jobId.userId._id.toString(),
           fullName: offer.jobId.userId.fullName,
+          profilePicture: offer.jobId.userId.profilePicture || "",
           jobId: offer.jobId._id.toString(),
           jobTitle: offer.jobId.title,
         }));
@@ -139,7 +140,7 @@ export const getMessageContacts = async (req, res) => {
           jobId: { $in: jobIds },
           status: "accepted",
         })
-          .populate("serviceProviderId", "fullName")
+          .populate("serviceProviderId", "fullName profilePicture")
           .lean();
 
         const jobTitleLookup = inProgressJobs.reduce((acc, job) => {
@@ -152,6 +153,7 @@ export const getMessageContacts = async (req, res) => {
           .map((offer) => ({
             _id: offer.serviceProviderId._id.toString(),
             fullName: offer.serviceProviderId.fullName,
+            profilePicture: offer.serviceProviderId.profilePicture || "",
             jobId: offer.jobId.toString(),
             jobTitle: jobTitleLookup[offer.jobId.toString()] || "",
           }));

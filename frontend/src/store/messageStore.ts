@@ -3,25 +3,25 @@ import toast from "react-hot-toast";
 import { io, type Socket } from "socket.io-client";
 import { API_BASE_URL, MessageApi, type MessageData } from "../api/Apis.ts";
 
-export interface ChatUserMeta {
+export interface ChatUser {
   _id: string;
   fullName: string;
   jobId?: string;
   jobTitle?: string;
+  profilePicture?: string;
 }
 
 interface MessageState {
-  recentChats: ChatUserMeta[];
+  recentChats: ChatUser[];
   contactsLoading: boolean;
-  activeChatUser: ChatUserMeta | null;
+  activeChatUser: ChatUser | null;
   messages: MessageData[];
   loading: boolean;
   sending: boolean;
   socket: Socket | null;
   socketUserId: string | null;
-  socketConnected: boolean;
   loadContacts: () => Promise<void>;
-  openChat: (user: ChatUserMeta) => Promise<void>;
+  openChat: (user: ChatUser) => Promise<void>;
   fetchMessages: (userId: string) => Promise<void>;
   sendMessage: (content: string) => Promise<void>;
   connectSocket: (userId: string) => void;
@@ -37,7 +37,6 @@ export const useMessageStore = create<MessageState>((set, get) => ({
   sending: false,
   socket: null,
   socketUserId: null,
-  socketConnected: false,
 
   loadContacts: async () => {
     set({ contactsLoading: true });
@@ -67,14 +66,6 @@ export const useMessageStore = create<MessageState>((set, get) => ({
     const newSocket = io(API_BASE_URL, {
       withCredentials: true,
       query: { userId },
-    });
-
-    newSocket.on("connect", () => {
-      set({ socketConnected: true });
-    });
-
-    newSocket.on("disconnect", () => {
-      set({ socketConnected: false });
     });
 
     newSocket.on("message:new", (payload: MessageData) => {
@@ -120,7 +111,7 @@ export const useMessageStore = create<MessageState>((set, get) => ({
     if (socket) {
       socket.disconnect();
     }
-    set({ socket: null, socketUserId: null, socketConnected: false });
+    set({ socket: null, socketUserId: null });
   },
 
   openChat: async (user) => {

@@ -5,6 +5,7 @@ const baseURL = `${API_BASE_URL}/api`;
 // const baseURL = "http://100.64.234.28:3000/api";
 
 interface User {
+  _id?: string;
   fullName: string;
   email: string;
   phoneNumber: string;
@@ -108,6 +109,9 @@ export const JobApi = {
 
   cancelJobApi: (jobId: string) =>
     Api.put(`/job/cancel/${jobId}`, {}, { headers: getAuthHeader() }),
+
+  completeJobApi: (jobId: string) =>
+    Api.put(`/job/complete/${jobId}`, {}, { headers: getAuthHeader() }),
 };
 
 export const OfferApi = {

@@ -1,5 +1,5 @@
 import Sidebar from "../../components/Sidebar/Sidebar";
-import { Send, MessageCircle, User, Menu, Loader2 } from "lucide-react";
+import { Send, MessageCircle, Menu, Loader2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useMessageStore } from "../../store/messageStore";
 import { useAuthStore } from "../../store/authStore";
@@ -65,6 +65,10 @@ export default function Messages() {
     setMessage("");
   };
 
+  useEffect(() => {
+    console.log(activeChatUser);
+  }, [activeChatUser]);
+
   return (
     <div className="flex min-h-screen">
       <div className="hidden lg:block">
@@ -128,12 +132,23 @@ export default function Messages() {
                     activeChatUser?._id === chat._id ? "bg-(--primary)" : ""
                   }`}
                 >
-                  <h3 className="font-medium text-(--text)">{chat.fullName}</h3>
-                  <span className="text-xs text-(--muted)">
-                    {chat.jobTitle
-                      ? `Job: ${chat.jobTitle}`
-                      : chat.jobId || chat._id}
-                  </span>
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={chat.profilePicture}
+                      alt=""
+                      className="w-12 h-12 rounded-full"
+                    />
+                    <div>
+                      <h3 className="font-medium text-(--text)">
+                        {chat.fullName}
+                      </h3>
+                      <span className="text-xs text-(--muted)">
+                        {chat.jobTitle
+                          ? `Job: ${chat.jobTitle}`
+                          : chat.jobId || chat._id}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
@@ -141,14 +156,17 @@ export default function Messages() {
 
           <section className="flex-1 flex flex-col bg-(--primary) h-full">
             <div className="p-4 border-b border-(--border) flex items-center gap-3">
-              <User className="w-8 h-8 text-(--accent)" />
+              {activeChatUser && (
+                <img
+                  src={activeChatUser?.profilePicture}
+                  alt=""
+                  className="w-8 h-8 rounded-full"
+                />
+              )}
               <div>
                 <h2 className="text-lg font-semibold text-(--text)">
                   {activeChatUser ? activeChatUser.fullName : "Select a chat"}
                 </h2>
-                {activeChatUser && (
-                  <p className="text-xs text-(--muted)">{activeChatUser._id}</p>
-                )}
               </div>
             </div>
 

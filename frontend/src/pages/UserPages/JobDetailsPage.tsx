@@ -17,7 +17,6 @@ import {
   AlertCircle,
   ArrowLeft,
   ExternalLink,
-  User,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -168,7 +167,7 @@ export default function JobDetailsPage() {
               </div>
               <span
                 className={`px-4 py-2 rounded-full text-sm font-medium capitalize w-fit ${getStatusStyles(
-                  job.jobStatus
+                  job.jobStatus,
                 )}`}
               >
                 {job.jobStatus}
@@ -386,7 +385,11 @@ export default function JobDetailsPage() {
                             {/* Provider Info */}
                             <div className="flex items-start gap-3 flex-1 min-w-0">
                               <div className="w-12 h-12 bg-(--primary) rounded-full flex items-center justify-center shrink-0 border border-(--border)">
-                                <User className="w-6 h-6 text-(--muted)" />
+                                <img
+                                  src={provider?.profilePicture}
+                                  alt="Provider Image"
+                                  className="w-12 h-12 rounded-full object-cover"
+                                />
                               </div>
                               <div className="min-w-0 flex-1">
                                 <h4 className="font-semibold text-(--text) text-lg">
@@ -409,7 +412,7 @@ export default function JobDetailsPage() {
                               </p>
                               <p className="text-xs text-(--muted) mt-1">
                                 {new Date(
-                                  offer.createdAt!
+                                  offer.createdAt!,
                                 ).toLocaleDateString()}
                               </p>
                             </div>
@@ -508,6 +511,50 @@ export default function JobDetailsPage() {
           )}
 
           {/* Job Tracking */}
+          {job.jobStatus === "completed" && (
+            <div className="bg-(--primary) border border-(--border) rounded-xl p-6 mb-6">
+              <h3 className="text-xl font-bold text-(--text) mb-4 flex items-center gap-2">
+                Job Progress
+              </h3>
+
+              <div className="flex items-center justify-between">
+                {/* Step 1 */}
+                <div className="flex flex-col items-center text-center flex-1">
+                  <div className="w-10 h-10 rounded-full bg-green-600 text-white flex items-center justify-center">
+                    <Check className="w-5 h-5" />
+                  </div>
+                  <p className="mt-2 text-sm font-medium text-(--text)">
+                    Job Accepted
+                  </p>
+                </div>
+
+                <div className="flex-1 h-1 bg-green-600 mx-2 rounded" />
+
+                {/* Step 2 */}
+                <div className="flex flex-col items-center text-center flex-1">
+                  <div className="w-10 h-10 rounded-full bg-green-600 text-white flex items-center justify-center">
+                    <Check className="w-5 h-5" />
+                  </div>
+                  <p className="mt-2 text-sm font-medium text-(--text)">
+                    In Progress
+                  </p>
+                </div>
+
+                <div className="flex-1 h-1 bg-green-600 mx-2 rounded" />
+
+                {/* Step 3 */}
+                <div className="flex flex-col items-center text-center flex-1">
+                  <div className="w-10 h-10 rounded-full bg-green-600 text-white flex items-center justify-center">
+                    <Check className="w-5 h-5" />
+                  </div>
+                  <p className="mt-2 text-sm font-medium text-(--text)">
+                    Completed
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
           {job.jobStatus === "in-progress" && (
             <div className="bg-(--primary) border border-(--border) rounded-xl p-6 mb-6">
               <h3 className="text-xl font-bold text-(--text) mb-4 flex items-center gap-2">

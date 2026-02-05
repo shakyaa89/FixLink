@@ -1,4 +1,5 @@
 import Job from "../models/job.model.js";
+import Offer from "../models/offer.model.js";
 
 export const createJob = async (req, res) => {
   const {
@@ -79,6 +80,7 @@ export const getJobById = async (req, res) => {
 export const getJobsForProvider = async (req, res) => {
   try {
     const { category } = req.query;
+    const serviceProviderId = req.user?.id || req.user?._id;
 
     if (!category) {
       return res.status(400).json({
@@ -86,10 +88,29 @@ export const getJobsForProvider = async (req, res) => {
       });
     }
 
+    if (!serviceProviderId) {
+      return res.status(401).json({
+        message: "User not authenticated",
+      });
+    }
+
+    const providerOffers = await Offer.find({ serviceProviderId }).select(
+      "jobId",
+    );
+
+    const providerJobIds = [...new Set(providerOffers.map((o) => o.jobId))];
+
     const jobs = await Job.find({
       jobCategory: category,
-      jobStatus: "open",
+      $or: [{ jobStatus: "open" }, { _id: { $in: providerJobIds } }],
     })
+      .populate({
+        path: "offers",
+        populate: {
+          path: "serviceProviderId",
+          model: "User",
+        },
+      })
       .populate("userId")
       .sort({ createdAt: -1 });
 
@@ -125,6 +146,29 @@ export const cancelJob = async (req, res) => {
     return res.status(200).json({ message: "Job cancelled successfully" });
   } catch (err) {
     console.log(err);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const completeJob = async (req, res) => {
+  try {
+    const jobId = req.params.id;
+
+    const job = await Job.findById(jobId);
+
+    if (!job) {
+      return res.status(404).json({ message: "Job not found" });
+    }
+
+    if (job.jobStatus === "completed") {
+      return res.status(400).json({ message: "Job is already completed" });
+    }
+
+    job.jobStatus = "completed";
+    await job.save();
+    return res.status(200).json({ message: "Job completed!" });
+  } catch (error) {
+    console.log(error);
     return res.status(500).json({ message: "Server error" });
   }
 };

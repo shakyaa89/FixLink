@@ -17,11 +17,15 @@ import { JobApi, type JobData } from "../../api/Apis";
 import { useAuthStore } from "../../store/authStore";
 import { Link } from "react-router-dom";
 
-type JobStatusFilter = "all" | "open" | "closed" | "pending";
+type JobStatusFilter =
+  | "all"
+  | "open"
+  | "in-progress"
+  | "completed"
+  | "cancelled";
 
 export default function ViewJobsPage() {
   const [jobs, setJobs] = useState<JobData[]>([]);
-  const [filteredJobs, setFilteredJobs] = useState<JobData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -35,12 +39,10 @@ export default function ViewJobsPage() {
       const response = await JobApi.fetchProviderJobsApi(user.providerCategory);
       const fetchedJobs = response.data.jobs || [];
       setJobs(fetchedJobs);
-      setFilteredJobs(fetchedJobs);
     } catch (err) {
       console.error("Error fetching jobs:", err);
       setError("Failed to load jobs. Please try again.");
       setJobs([]);
-      setFilteredJobs([]);
     } finally {
       setLoading(false);
     }
@@ -50,28 +52,20 @@ export default function ViewJobsPage() {
     fetchJobs();
   }, [user]);
 
-  // Filter jobs based on status and search query
-  useEffect(() => {
-    let filtered = jobs;
-
-    // Filter by status
-    if (statusFilter !== "all") {
-      filtered = filtered.filter((job) => job.jobStatus === statusFilter);
+  const filteredJobs = jobs.filter((job) => {
+    if (statusFilter !== "all" && job.jobStatus !== statusFilter) {
+      return false;
     }
-
-    // Filter by search query
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(
-        (job) =>
-          job.title?.toLowerCase().includes(query) ||
-          job.description?.toLowerCase().includes(query) ||
-          job.location?.toLowerCase().includes(query)
+      return (
+        job.title?.toLowerCase().includes(query) ||
+        job.description?.toLowerCase().includes(query) ||
+        job.location?.toLowerCase().includes(query)
       );
     }
-
-    setFilteredJobs(filtered);
-  }, [statusFilter, searchQuery, jobs]);
+    return true;
+  });
 
   const getStatusStyles = (status?: string) => {
     switch (status?.toLowerCase()) {
@@ -85,8 +79,22 @@ export default function ViewJobsPage() {
     }
   };
 
+  const getProviderOffer = (job: JobData) => {
+    if (!job.offers) return null;
+    const currentUserId = user?._id || user?.id;
+    if (!currentUserId) return null;
+    return (
+      job.offers.find((offer) => {
+        const offerProviderId =
+          (offer.serviceProviderId as { _id?: string })?._id ||
+          (offer.serviceProviderId as unknown as string);
+        return offerProviderId === currentUserId;
+      }) || null
+    );
+  };
+
   return (
-    <div className="flex min-h-screen bg-(--secondary)">
+    <div className="flex min-h-screen bg-(--primary)">
       <Sidebar />
 
       <main className="flex-1 py-8 px-4 sm:px-6 lg:px-8">
@@ -126,7 +134,8 @@ export default function ViewJobsPage() {
                 <p className="text-2xl font-bold text-green-600">
                   {
                     jobs.filter(
-                      (j) => j.jobStatus === "open" || j.jobStatus === "pending"
+                      (j) =>
+                        j.jobStatus === "open" || j.jobStatus === "pending",
                     ).length
                   }
                 </p>
@@ -194,8 +203,8 @@ export default function ViewJobsPage() {
                     >
                       <option value="all">All Jobs</option>
                       <option value="open">Open</option>
-                      <option value="pending">Pending</option>
-                      <option value="closed">Closed</option>
+                      <option value="in-progress">In Progress</option>
+                      <option value="cancelled">Cancelled</option>
                       <option value="completed">Completed</option>
                     </select>
                   </div>
@@ -254,13 +263,39 @@ export default function ViewJobsPage() {
                         <h2 className="text-lg font-semibold text-(--text) line-clamp-2">
                           {job.title || "Untitled Job"}
                         </h2>
-                        <span
-                          className={`px-3 py-1 rounded-full text-xs font-medium capitalize whitespace-nowrap ${getStatusStyles(
-                            job.jobStatus
-                          )}`}
-                        >
-                          {job.jobStatus}
-                        </span>
+                        <div className="flex flex-wrap items-center justify-end gap-2">
+                          <span
+                            className={`px-3 py-1 rounded-full text-xs font-medium capitalize whitespace-nowrap ${getStatusStyles(
+                              job.jobStatus,
+                            )}`}
+                          >
+                            {job.jobStatus}
+                          </span>
+                          {job.jobStatus === "in-progress" &&
+                            (() => {
+                              const providerOffer = getProviderOffer(job);
+                              if (!providerOffer) return null;
+                              const offerLabel =
+                                providerOffer.status === "accepted"
+                                  ? "Offer Accepted"
+                                  : providerOffer.status === "rejected"
+                                    ? "Offer Rejected"
+                                    : "Offer Sent";
+                              const offerStyles =
+                                providerOffer.status === "accepted"
+                                  ? "bg-blue-100 text-blue-700 border border-blue-200"
+                                  : providerOffer.status === "rejected"
+                                    ? "bg-red-100 text-red-700 border border-red-200"
+                                    : "bg-amber-100 text-amber-700 border border-amber-200";
+                              return (
+                                <span
+                                  className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${offerStyles}`}
+                                >
+                                  {offerLabel}
+                                </span>
+                              );
+                            })()}
+                        </div>
                       </div>
 
                       {/* Description */}
@@ -307,7 +342,8 @@ export default function ViewJobsPage() {
                         className="inline-flex items-center gap-2 px-4 py-2 text-sm text-white bg-(--accent) rounded-lg hover:bg-(--accent-hover) transition font-medium shadow-sm"
                       >
                         <Eye className="w-4 h-4" />
-                        View Details & Make Offer
+                        View Details{" "}
+                        {job.jobStatus === "open" && "& Make Offer"}
                       </Link>
                     </div>
                   </div>

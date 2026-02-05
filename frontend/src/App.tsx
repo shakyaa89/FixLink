@@ -26,6 +26,7 @@ import ViewJobsPage from "./pages/ServiceProviderPages/ViewJobsPage";
 import JobDetailsPage from "./pages/UserPages/JobDetailsPage";
 import JobDetailsProviderPage from "./pages/ServiceProviderPages/JobDetailsProviderPage";
 import { useThemeStore } from "./store/themeStore";
+import Chatbot from "./components/AI Chatbot/Chatbot";
 
 function App() {
   const { checkAuth, checking } = useAuthStore();
@@ -54,7 +55,7 @@ function App() {
     >
       <Toaster position="top-center" />
       <Navbar />
-
+      <Chatbot />
       <main className="grow">
         <Routes>
           <Route path="/" element={<HomePage />} />
