@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Sidebar from "../../components/Sidebar/Sidebar";
-import { JobApi, OfferApi, type JobData } from "../../api/Apis";
+import { JobApi, OfferApi, ReviewApi, type JobData } from "../../api/Apis";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   Ban,
@@ -28,6 +28,10 @@ export default function JobDetailsPage() {
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [showOfferAcceptDialog, setShowOfferAcceptDialog] = useState(false);
   const [acceptOfferId, setAcceptOfferId] = useState<string>("");
+  const [reviewRating, setReviewRating] = useState(0);
+  const [reviewComment, setReviewComment] = useState("");
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
+  const [reviewSubmitted, setReviewSubmitted] = useState(false);
   const { jobId } = useParams();
   const navigate = useNavigate();
 
@@ -97,6 +101,35 @@ export default function JobDetailsPage() {
     }
   };
 
+  const handleSubmitReview = async () => {
+    if (!job?._id) return;
+
+    if (reviewRating < 1 || reviewRating > 5) {
+      toast.error("Please select a rating between 1 and 5.");
+      return;
+    }
+
+    try {
+      setReviewSubmitting(true);
+      await ReviewApi.createReview({
+        jobId: job._id,
+        rating: reviewRating,
+        comment: reviewComment,
+      });
+      setReviewSubmitted(true);
+      toast.success("Review submitted.");
+    } catch (error: any) {
+      const message =
+        error?.response?.data?.message || "Failed to submit review.";
+      if (message === "Review already submitted") {
+        setReviewSubmitted(true);
+      }
+      toast.error(message);
+    } finally {
+      setReviewSubmitting(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex min-h-screen">
@@ -140,6 +173,11 @@ export default function JobDetailsPage() {
       </div>
     );
   }
+
+  const acceptedOffer = job.offers?.find((offer) => offer.status === "accepted");
+  const provider = acceptedOffer?.serviceProviderId as
+    | { fullName?: string }
+    | undefined;
 
   return (
     <div className="flex min-h-screen bg-(--secondary)">
@@ -552,6 +590,64 @@ export default function JobDetailsPage() {
                   </p>
                 </div>
               </div>
+            </div>
+          )}
+
+          {job.jobStatus === "completed" && provider && (
+            <div className="bg-(--primary) border border-(--border) rounded-xl p-6 mb-6">
+              <h3 className="text-xl font-bold text-(--text) mb-2">
+                Leave a Review
+              </h3>
+              <p className="text-sm text-(--muted) mb-4">
+                Share your experience with {provider.fullName || "the provider"}.
+              </p>
+
+              {reviewSubmitted ? (
+                <div className="text-green-700 bg-green-50 border border-green-200 rounded-lg p-4">
+                  Thanks! Your review has been submitted.
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-(--text) mb-2">
+                      Rating
+                    </label>
+                    <select
+                      value={reviewRating}
+                      onChange={(e) => setReviewRating(Number(e.target.value))}
+                      className="w-full border border-(--border) rounded-lg px-3 py-2 bg-(--primary) text-(--text)"
+                    >
+                      <option value={0}>Select rating</option>
+                      {[1, 2, 3, 4, 5].map((value) => (
+                        <option key={value} value={value}>
+                          {value}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-(--text) mb-2">
+                      Comment (optional)
+                    </label>
+                    <textarea
+                      value={reviewComment}
+                      onChange={(e) => setReviewComment(e.target.value)}
+                      rows={4}
+                      className="w-full border border-(--border) rounded-lg px-3 py-2 bg-(--primary) text-(--text)"
+                      placeholder="Share details about the service"
+                    />
+                  </div>
+
+                  <button
+                    onClick={handleSubmitReview}
+                    disabled={reviewSubmitting}
+                    className="px-5 py-2.5 bg-(--accent) text-white rounded-lg hover:bg-(--accent-hover) transition disabled:opacity-60"
+                  >
+                    {reviewSubmitting ? "Submitting..." : "Submit Review"}
+                  </button>
+                </div>
+              )}
             </div>
           )}
 

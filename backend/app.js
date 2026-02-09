@@ -10,6 +10,7 @@ import authRouter from "./routes/auth.route.js";
 import jobRouter from "./routes/job.route.js";
 import offerRouter from "./routes/offer.route.js";
 import messageRouter from "./routes/message.route.js";
+import reviewRouter from "./routes/review.route.js";
 import connectDB from "./lib/db.js";
 import { initSocket } from "./lib/socket.js";
 
@@ -46,6 +47,7 @@ app.use("/api/auth", authRouter);
 app.use("/api/job", jobRouter);
 app.use("/api/offer", offerRouter);
 app.use("/api/messages", messageRouter);
+app.use("/api/reviews", reviewRouter);
 
 const server = http.createServer(app);
 initSocket(server);

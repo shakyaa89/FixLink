@@ -61,6 +61,17 @@ export interface MessageData {
   updatedAt?: string;
 }
 
+export interface ReviewData {
+  _id?: string;
+  jobId: { _id?: string; title?: string } | string;
+  reviewerId: User;
+  revieweeId: User;
+  rating: number;
+  comment?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface SendMessagePayload {
   receiverId: string;
   content: string;
@@ -131,4 +142,12 @@ export const MessageApi = {
 
   fetchMessages: (userId: string) =>
     Api.get(`/messages/user/${userId}`, { headers: getAuthHeader() }),
+};
+
+export const ReviewApi = {
+  createReview: (data: { jobId: string; rating: number; comment?: string }) =>
+    Api.post("/reviews/create", data, { headers: getAuthHeader() }),
+
+  fetchMyReceivedReviews: () =>
+    Api.get("/reviews/received", { headers: getAuthHeader() }),
 };

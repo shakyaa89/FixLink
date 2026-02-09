@@ -1,52 +1,41 @@
 import { Star, TrendingUp, Users } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import Sidebar from "../../components/Sidebar/Sidebar";
+import { ReviewApi, type ReviewData } from "../../api/Apis";
 
 export default function ReviewsPage() {
-  const reviews = [
-    {
-      id: 1,
-      name: "Shakyaa",
-      rating: 5,
-      comment:
-        "Excellent service. Very professional and quick. The team exceeded my expectations and delivered outstanding results. Would highly recommend to anyone looking for quality work.",
-      date: "12 Aug 2025",
-      avatar: "SS",
-    },
-    {
-      id: 2,
-      name: "Shakyaa",
-      rating: 4,
-      comment:
-        "Good work overall, pricing was fair. Communication could be improved but the final delivery was solid.",
-      date: "05 Aug 2025",
-      avatar: "SS",
-    },
-    {
-      id: 3,
-      name: "Shakyaa",
-      rating: 5,
-      comment:
-        "Outstanding experience from start to finish. Very attentive to details and requirements.",
-      date: "28 Jul 2025",
-      avatar: "SS",
-    },
-    {
-      id: 4,
-      name: "Shakyaa",
-      rating: 4,
-      comment:
-        "Great service and timely delivery. Minor revisions were needed but handled promptly.",
-      date: "15 Jul 2025",
-      avatar: "SS",
-    },
-  ];
+  const [reviews, setReviews] = useState<ReviewData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const averageRating = (
-    reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length
-  ).toFixed(1);
-  const totalReviews = reviews.length;
-  const fiveStarCount = reviews.filter((r) => r.rating === 5).length;
-  const fourStarCount = reviews.filter((r) => r.rating === 4).length;
+  useEffect(() => {
+    const loadReviews = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await ReviewApi.fetchMyReceivedReviews();
+        setReviews(response.data.reviews || []);
+      } catch (err) {
+        console.error("Failed to load reviews", err);
+        setError("Failed to load reviews. Please try again.");
+        setReviews([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadReviews();
+  }, []);
+
+  const stats = useMemo(() => {
+    const total = reviews.length;
+    const sum = reviews.reduce((acc, r) => acc + (r.rating || 0), 0);
+    const average = total ? (sum / total).toFixed(1) : "0.0";
+    const counts = [5, 4, 3, 2, 1].map((value) =>
+      reviews.filter((r) => r.rating === value).length
+    );
+    return { total, average, counts };
+  }, [reviews]);
 
   return (
     <div className="flex min-h-screen ">
@@ -73,7 +62,7 @@ export default function ReviewsPage() {
                 </div>
                 <div>
                   <div className="text-3xl font-bold text-(--text)">
-                    {averageRating}
+                    {stats.average}
                   </div>
                   <div className="text-sm text-(--muted)">Average Rating</div>
                 </div>
@@ -86,9 +75,7 @@ export default function ReviewsPage() {
                   <Users className="w-6 h-6 text-(--accent)" />
                 </div>
                 <div>
-                  <div className="text-3xl font-bold text-(--text)">
-                    {totalReviews}
-                  </div>
+                  <div className="text-3xl font-bold text-(--text)">{stats.total}</div>
                   <div className="text-sm text-(--muted)">Total Reviews</div>
                 </div>
               </div>
@@ -101,7 +88,10 @@ export default function ReviewsPage() {
                 </div>
                 <div>
                   <div className="text-3xl font-bold text-(--text)">
-                    {Math.round((fiveStarCount / totalReviews) * 100)}%
+                    {stats.total
+                      ? Math.round((stats.counts[0] / stats.total) * 100)
+                      : 0}
+                    %
                   </div>
                   <div className="text-sm text-(--muted)">5-Star Reviews</div>
                 </div>
@@ -115,40 +105,31 @@ export default function ReviewsPage() {
               Rating Distribution
             </h2>
             <div className="space-y-3">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-1 w-20">
-                  <span className="text-sm font-medium text-(--text)">5</span>
-                  <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                </div>
-                <div className="flex-1 h-3 bg-(--secondary) rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-yellow-400 rounded-full"
-                    style={{
-                      width: `${(fiveStarCount / totalReviews) * 100}%`,
-                    }}
-                  ></div>
-                </div>
-                <span className="text-sm text-(--muted) w-12 text-right">
-                  {fiveStarCount}
-                </span>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-1 w-20">
-                  <span className="text-sm font-medium text-(--text)">4</span>
-                  <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                </div>
-                <div className="flex-1 h-3 bg-(--secondary) rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-yellow-400 rounded-full"
-                    style={{
-                      width: `${(fourStarCount / totalReviews) * 100}%`,
-                    }}
-                  ></div>
-                </div>
-                <span className="text-sm text-(--muted) w-12 text-right">
-                  {fourStarCount}
-                </span>
-              </div>
+              {[5, 4, 3, 2, 1].map((value, index) => {
+                const count = stats.counts[index];
+                const percent = stats.total
+                  ? Math.round((count / stats.total) * 100)
+                  : 0;
+                return (
+                  <div key={value} className="flex items-center gap-4">
+                    <div className="flex items-center gap-1 w-20">
+                      <span className="text-sm font-medium text-(--text)">
+                        {value}
+                      </span>
+                      <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                    </div>
+                    <div className="flex-1 h-3 bg-(--secondary) rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-yellow-400 rounded-full"
+                        style={{ width: `${percent}%` }}
+                      ></div>
+                    </div>
+                    <span className="text-sm text-(--muted) w-12 text-right">
+                      {count}
+                    </span>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
@@ -156,46 +137,85 @@ export default function ReviewsPage() {
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-(--text)">Reviews</h2>
 
-            {reviews.map((review) => (
-              <div
-                key={review.id}
-                className="bg-(--primary) rounded-2xl p-8 shadow-sm border border-(--border) hover:shadow-md transition-shadow"
-              >
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-full bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-lg shrink-0">
-                    {review.avatar}
-                  </div>
+            {loading && (
+              <div className="text-(--muted)">Loading reviews...</div>
+            )}
 
-                  <div className="flex-1">
-                    <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-3">
-                      <h3 className="text-lg font-semibold text-(--text)">
-                        {review.name}
-                      </h3>
-                      <span className="text-sm text-(--muted) mt-1 md:mt-0">
-                        {review.date}
-                      </span>
+            {error && <div className="text-red-600">{error}</div>}
+
+            {!loading && !error && reviews.length === 0 && (
+              <div className="text-(--muted)">No reviews yet.</div>
+            )}
+
+            {reviews.map((review) => {
+              const reviewerName = review.reviewerId?.fullName || "Anonymous";
+              const initials = reviewerName
+                .split(" ")
+                .filter(Boolean)
+                .slice(0, 2)
+                .map((part) => part[0])
+                .join("")
+                .toUpperCase();
+
+              return (
+                <div
+                  key={review._id}
+                  className="bg-(--primary) rounded-2xl p-8 shadow-sm border border-(--border) hover:shadow-md transition-shadow"
+                >
+                  <div className="flex items-start gap-4">
+                    {review.reviewerId?.profilePicture ? (
+                      <img
+                        src={review.reviewerId.profilePicture}
+                        alt={reviewerName}
+                        className="w-12 h-12 rounded-full object-cover shrink-0"
+                      />
+                    ) : (
+                      <div className="w-12 h-12 rounded-full bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-lg shrink-0">
+                        {initials || "?"}
+                      </div>
+                    )}
+
+                    <div className="flex-1">
+                      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-3">
+                        <div>
+                          <h3 className="text-lg font-semibold text-(--text)">
+                            {reviewerName}
+                          </h3>
+                          {typeof review.jobId === "object" &&
+                            review.jobId?.title && (
+                              <p className="text-sm text-(--muted)">
+                                {review.jobId.title}
+                              </p>
+                            )}
+                        </div>
+                        <span className="text-sm text-(--muted) mt-1 md:mt-0">
+                          {review.createdAt
+                            ? new Date(review.createdAt).toLocaleDateString()
+                            : ""}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-1 mb-4">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <Star
+                            key={i}
+                            className={`w-5 h-5 ${
+                              i < review.rating
+                                ? "fill-yellow-400 text-yellow-400"
+                                : "text-(--muted)"
+                            }`}
+                          />
+                        ))}
+                      </div>
+
+                      <p className="text-(--text) leading-relaxed">
+                        {review.comment || "No comment provided."}
+                      </p>
                     </div>
-
-                    <div className="flex items-center gap-1 mb-4">
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`w-5 h-5 ${
-                            i < review.rating
-                              ? "fill-yellow-400 text-yellow-400"
-                              : "text-(--muted)"
-                          }`}
-                        />
-                      ))}
-                    </div>
-
-                    <p className="text-(--text) leading-relaxed">
-                      {review.comment}
-                    </p>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </main>
