@@ -27,6 +27,8 @@ import JobDetailsPage from "./pages/UserPages/JobDetailsPage";
 import JobDetailsProviderPage from "./pages/ServiceProviderPages/JobDetailsProviderPage";
 import { useThemeStore } from "./store/themeStore";
 import Chatbot from "./components/AI Chatbot/Chatbot";
+import CompleteProfilePage from "./pages/ServiceProviderPages/CompleteProfilePage";
+import ServiceProviderOnboardingRoute from "./routes/ServiceProviderOnboardingRoute";
 
 function App() {
   const { checkAuth, checking } = useAuthStore();
@@ -120,6 +122,15 @@ function App() {
               <ServiceProviderRoute>
                 <ViewJobsPage />
               </ServiceProviderRoute>
+            }
+          />
+
+          <Route
+            path="/serviceprovider/complete-profile"
+            element={
+              <ServiceProviderOnboardingRoute>
+                <CompleteProfilePage />
+              </ServiceProviderOnboardingRoute>
             }
           />
 

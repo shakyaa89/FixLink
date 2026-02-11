@@ -3,6 +3,7 @@ import { Menu, Moon, Sun, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuthStore } from "../../store/authStore";
 import { useThemeStore } from "../../store/themeStore";
+import { isServiceProviderProfileComplete } from "../../utils/serviceProviderProfile";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -10,6 +11,7 @@ export default function Navbar() {
   const { theme, toggleTheme } = useThemeStore();
 
   const { user, logout } = useAuthStore();
+  const isProviderComplete = isServiceProviderProfileComplete(user);
 
   const handleLogout = () => {
     logout();
@@ -23,8 +25,7 @@ export default function Navbar() {
     // asd
 
     <header className="bg-(--primary) shadow-sm border-b border-(--border)">
-      {/* max-w-7xl */}
-      <nav className="px-4 py-4 mx-auto  sm:px-6 lg:px-8">
+      <nav className="px-4 py-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-5">
             <div className="flex items-center gap-2">
@@ -32,7 +33,7 @@ export default function Navbar() {
                 <a href="/">FixLink</a>
               </span>
             </div>
-            <p className="font-bold">|</p>
+            <p className="text-(--muted)">|</p>
             {/* Desktop Menu */}
             <div className="hidden gap-8 md:flex">
               <Link
@@ -62,10 +63,14 @@ export default function Navbar() {
 
               {user?.role === "serviceProvider" && (
                 <Link
-                  to={{ pathname: "/serviceprovider/dashboard" }}
+                  to={{
+                    pathname: isProviderComplete
+                      ? "/serviceprovider/dashboard"
+                      : "/serviceprovider/complete-profile",
+                  }}
                   className="text-(--muted) transition hover:text-(--accent)"
                 >
-                  Provider
+                  {isProviderComplete ? "Provider" : "Complete Profile"}
                 </Link>
               )}
 
@@ -257,19 +262,25 @@ export default function Navbar() {
             {user?.role === "serviceProvider" && (
               <>
                 <Link
-                  to="/serviceprovider/dashboard"
+                  to={
+                    isProviderComplete
+                      ? "/serviceprovider/dashboard"
+                      : "/serviceprovider/complete-profile"
+                  }
                   onClick={() => setIsOpen(false)}
                   className="block text-(--text) hover:text-(--accent) transition border-b border-(--border) pb-3"
                 >
-                  Dashboard
+                  {isProviderComplete ? "Dashboard" : "Complete Profile"}
                 </Link>
-                <Link
-                  to="/serviceprovider/jobs"
-                  onClick={() => setIsOpen(false)}
-                  className="block text-(--text) hover:text-(--accent) transition border-b border-(--border) pb-3"
-                >
-                  View Job
-                </Link>
+                {isProviderComplete && (
+                  <Link
+                    to="/serviceprovider/jobs"
+                    onClick={() => setIsOpen(false)}
+                    className="block text-(--text) hover:text-(--accent) transition border-b border-(--border) pb-3"
+                  >
+                    View Job
+                  </Link>
+                )}
               </>
             )}
 

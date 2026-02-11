@@ -10,6 +10,7 @@ interface AuthState {
   login: (email: string, password: string) => Promise<any>;
   logout: () => void;
   checkAuth: () => Promise<void>;
+  setUser: (user: any | null) => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -65,4 +66,6 @@ export const useAuthStore = create<AuthState>((set) => ({
       set({ checking: false });
     }
   },
+
+  setUser: (user) => set({ user }),
 }));

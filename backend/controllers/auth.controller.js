@@ -34,6 +34,8 @@ export async function registerController(req, res) {
       idURL
     );
 
+    const isServiceProvider = role === "serviceProvider";
+
     // Required fields
     if (!fullName || !email || !phoneNumber || !password || !profilePicture) {
       return res.status(400).json({ message: "All fields are required" });
@@ -65,18 +67,76 @@ export async function registerController(req, res) {
 
       profilePicture: profilePicture || "",
 
-      verificationStatus: role === "serviceProvider" ? "pending" : null,
-      verificationProofURL:
-        role === "serviceProvider" ? verificationProofURL : null,
-      providerCategory: role === "serviceProvider" ? providerCategory : "",
-      idProofURL: role === "serviceProvider" ? idURL : "",
+      verificationStatus: isServiceProvider ? "pending" : "",
+      verificationProofURL: isServiceProvider ? verificationProofURL || "" : "",
+      providerCategory: isServiceProvider ? providerCategory || "" : "",
+      idProofURL: isServiceProvider ? idURL || "" : "",
     });
 
     await user.save();
 
+    const token = jwt.sign(
+      { userId: user._id, role: user.role },
+      process.env.JWT_SECRET_KEY,
+      { expiresIn: "1d" }
+    );
+
     return res.status(201).json({
       message: "User registered successfully",
-      userId: user,
+      user,
+      token,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+}
+
+export async function completeServiceProviderProfile(req, res) {
+  const {
+    verificationProofURL,
+    providerCategory,
+    idURL,
+    address,
+    addressDescription,
+    addressURL,
+  } = req.body;
+
+  try {
+    const userId = req.user?._id;
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const user = await User.findById(userId).select("-password");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (user.role !== "serviceProvider") {
+      return res.status(403).json({ message: "User not authorized" });
+    }
+
+    if (!verificationProofURL || !idURL || !providerCategory || !address) {
+      return res
+        .status(400)
+        .json({ message: "All documents and details are required" });
+    }
+
+    user.verificationProofURL = verificationProofURL;
+    user.idProofURL = idURL;
+    user.providerCategory = providerCategory;
+    user.address = address;
+    user.addressDescription = addressDescription || user.addressDescription;
+    user.addressURL = addressURL || user.addressURL;
+    user.verificationStatus = "pending";
+
+    await user.save();
+
+    return res.status(200).json({
+      message: "Service provider profile completed",
+      user,
     });
   } catch (error) {
     console.log(error);

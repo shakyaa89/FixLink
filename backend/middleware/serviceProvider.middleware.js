@@ -25,6 +25,13 @@ export async function protectServiceProviderRoute(req, res, next) {
       return res.status(401).json({ message: "User not authorized!" });
     }
 
+    if (!isServiceProviderProfileComplete(user)) {
+      return res.status(403).json({
+        message: "Complete your service provider profile to continue",
+        profileIncomplete: true,
+      });
+    }
+
     req.user = user;
 
     next();
@@ -32,4 +39,15 @@ export async function protectServiceProviderRoute(req, res, next) {
     console.log(err);
     return res.status(401).json({ message: "Token verification failed" });
   }
+}
+
+export function isServiceProviderProfileComplete(user) {
+  return Boolean(
+    user &&
+      user.role === "serviceProvider" &&
+      user.verificationProofURL &&
+      user.idProofURL &&
+      user.providerCategory &&
+      user.address
+  );
 }

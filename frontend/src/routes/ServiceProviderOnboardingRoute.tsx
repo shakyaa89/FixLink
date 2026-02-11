@@ -7,7 +7,7 @@ type Props = {
   children: ReactNode;
 };
 
-const ServiceProviderRoute = ({ children }: Props) => {
+const ServiceProviderOnboardingRoute = ({ children }: Props) => {
   const { user, checking } = useAuthStore();
 
   if (checking) return null;
@@ -20,11 +20,11 @@ const ServiceProviderRoute = ({ children }: Props) => {
     return <Navigate to="/auth" replace />;
   }
 
-  if (!isServiceProviderProfileComplete(user)) {
-    return <Navigate to="/serviceprovider/complete-profile" replace />;
+  if (isServiceProviderProfileComplete(user)) {
+    return <Navigate to="/serviceprovider/dashboard" replace />;
   }
 
   return <>{children}</>;
 };
 
-export default ServiceProviderRoute;
+export default ServiceProviderOnboardingRoute;

@@ -20,6 +20,15 @@ interface User {
   idURL?: string;
 }
 
+interface ServiceProviderProfilePayload {
+  verificationProofURL: string;
+  providerCategory: string;
+  idURL: string;
+  address: string;
+  addressDescription?: string;
+  addressURL?: string;
+}
+
 interface UserLoginData {
   email: string;
   password: string;
@@ -98,6 +107,11 @@ export const AuthApi = {
   checkAuthApi: () => Api.get("/auth/me", { headers: getAuthHeader() }), // manually add token
 
   logoutApi: () => Api.post("/auth/logout", {}, { headers: getAuthHeader() }), // manually add token
+
+  completeServiceProviderProfile: (data: ServiceProviderProfilePayload) =>
+    Api.put("/auth/service-provider/complete-profile", data, {
+      headers: getAuthHeader(),
+    }),
 };
 
 export const JobApi = {

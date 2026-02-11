@@ -1,9 +1,11 @@
 import { NavLink } from "react-router-dom";
 import { Home, Briefcase, MessageSquare, Star, Flag, Plus } from "lucide-react";
 import { useAuthStore } from "../../store/authStore";
+import { isServiceProviderProfileComplete } from "../../utils/serviceProviderProfile";
 
 export default function Sidebar() {
   const { user } = useAuthStore();
+  const isProviderComplete = isServiceProviderProfileComplete(user);
 
   return (
     <aside
@@ -63,7 +65,25 @@ export default function Sidebar() {
           </>
         )}
 
-        {user?.role === "serviceProvider" && (
+        {user?.role === "serviceProvider" && !isProviderComplete && (
+          <NavLink
+            to="/serviceprovider/complete-profile"
+            className={({ isActive }) =>
+              `flex items-center gap-3 px-4 py-3 rounded-lg ${
+                isActive
+                  ? "bg-(--accent) text-white shadow"
+                  : "hover:bg-(--secondary)"
+              } `
+            }
+          >
+            <Flag className="w-5 h-5 shrink-0" />
+            <p className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+              Complete Profile
+            </p>
+          </NavLink>
+        )}
+
+        {user?.role === "serviceProvider" && isProviderComplete && (
           <>
             <NavLink
               to="/serviceProvider/dashboard"

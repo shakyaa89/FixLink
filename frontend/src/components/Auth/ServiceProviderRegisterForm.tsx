@@ -1,9 +1,10 @@
-import { Mail, Lock, User, Phone, Upload, MapPin, Loader2 } from "lucide-react";
+import { Mail, Lock, User, Phone, Upload, Loader2 } from "lucide-react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { AuthApi } from "../../api/Apis";
 import { useState } from "react";
+import { useAuthStore } from "../../store/authStore";
 
 function ServiceProviderRegisterForm() {
   const [loading, setLoading] = useState(false);
@@ -16,30 +17,17 @@ function ServiceProviderRegisterForm() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
-  const [verificationProofURL, setVerificationProofURL] = useState<File | null>(
-    null
-  );
-  const [idProofURL, setIdProofURL] = useState<File | null>(null);
-
-  const [providerCategory, setProviderCategory] = useState("");
-  const [address, setAddress] = useState("");
 
   const [agreeToTerms, setAgreeToTerms] = useState(false);
 
   const navigate = useNavigate();
+  const { setUser } = useAuthStore();
 
-  const uploadToCloudinary = async (file: File, type: string) => {
+  const uploadToCloudinary = async (file: File) => {
     setUploading(true);
     const formData = new FormData();
     formData.append("file", file);
-
-    if (type === "profile") {
-      formData.append("upload_preset", "profileUpload");
-    } else if (type === "verification") {
-      formData.append("upload_preset", "verificationUpload");
-    } else if (type === "id") {
-      formData.append("upload_preset", "idUpload");
-    }
+    formData.append("upload_preset", "profileUpload");
 
     try {
       const { data } = await axios.post(
@@ -61,22 +49,14 @@ function ServiceProviderRegisterForm() {
 
     console.log("called");
 
-    if (
-      !fullName ||
-      !email ||
-      !phoneNumber ||
-      !password ||
-      !profilePicture ||
-      !verificationProofURL ||
-      !providerCategory ||
-      !address
-    ) {
+    if (!fullName || !email || !phoneNumber || !password || !profilePicture) {
       toast.error("Please fill in all required fields");
       return;
     }
 
     if (!/^\d{10}$/.test(phoneNumber)) {
       toast.error("Invalid phone number");
+      return;
     }
 
     if (password !== confirmPassword) {
@@ -92,43 +72,32 @@ function ServiceProviderRegisterForm() {
     try {
       setLoading(true);
 
-      // Upload image to Cloudinary
+      // Upload profile image to Cloudinary
       let profileUrl = "";
       if (profilePicture) {
         console.log("Uploading profile picture...");
-        profileUrl = await uploadToCloudinary(profilePicture, "profile");
+        profileUrl = await uploadToCloudinary(profilePicture);
       }
 
-      let verificationURL = "";
-      if (verificationProofURL) {
-        console.log("Uploading verification picture...");
-        verificationURL = await uploadToCloudinary(
-          verificationProofURL,
-          "verification"
-        );
-      }
-
-      let idURL = "";
-      if (idProofURL) {
-        console.log("Uploading ID picture...");
-        idURL = await uploadToCloudinary(idProofURL, "id");
-      }
-
-      // Send everything to backend
+      // Send basic details to backend
       const response = await AuthApi.registerApi({
         fullName,
         email,
         phoneNumber,
         password,
         role: "serviceProvider",
-        address,
         profilePicture: profileUrl,
-        verificationProofURL: verificationURL,
-        providerCategory: providerCategory,
-        idURL: idURL,
       });
 
       toast.success(response?.data?.message);
+
+      if (response?.data?.token) {
+        localStorage.setItem("jwtToken", response.data.token);
+      }
+
+      if (response?.data?.user) {
+        setUser(response.data.user);
+      }
 
       // Reset form
       setFullName("");
@@ -137,11 +106,10 @@ function ServiceProviderRegisterForm() {
       setPassword("");
       setConfirmPassword("");
       setProfilePicture(null);
-      setAddress("");
 
       setAgreeToTerms(false);
 
-      navigate("/");
+      navigate("/serviceprovider/complete-profile");
     } catch (err: any) {
       const message =
         err.response?.data?.message || err.message || "Registration failed";
@@ -239,55 +207,6 @@ function ServiceProviderRegisterForm() {
           </div>
         </div>
 
-        {/* Provider Category */}
-        <div>
-          <label className="block text-sm font-semibold text-(--text) mb-2">
-            Service Category<span className="text-red-500">*</span>
-          </label>
-          <select
-            value={providerCategory}
-            onChange={(e) => setProviderCategory(e.target.value)}
-            className="w-full px-4 py-3 border-2 border-(--border) rounded-xl focus:border-blue-600"
-          >
-            <option value="">Select a category</option>
-            <option key="Plumbing" value="Plumbing">
-              Plumbing
-            </option>
-            <option key="Electrical" value="Electrical">
-              Electrical
-            </option>
-            <option key="Cleaning" value="Cleaning">
-              Cleaning
-            </option>
-            <option key="Painting" value="Painting">
-              Painting
-            </option>
-            <option key="Carpentry" value="Carpentry">
-              Carpentry
-            </option>
-            <option key="General Repairs" value="General Repairs">
-              General Repairs
-            </option>
-          </select>
-        </div>
-
-        {/* Address */}
-        <div>
-          <label className="block text-sm font-semibold text-(--text) mb-2">
-            Address<span className="text-red-500">*</span>
-          </label>
-          <div className="relative">
-            <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-(--muted)" />
-            <input
-              type="text"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              placeholder="Enter your address"
-              className="w-full pl-12 pr-4 py-3 border-2 border-(--border) rounded-xl focus:border-blue-600"
-            />
-          </div>
-        </div>
-
         {/* Profile Picture */}
         <div>
           <label className="block text-sm font-semibold text-(--text) mb-2">
@@ -309,60 +228,6 @@ function ServiceProviderRegisterForm() {
           </div>
           {profilePicture && (
             <p className="text-sm text-green-600 mt-2">{profilePicture.name}</p>
-          )}
-        </div>
-
-        {/* Verification Picture */}
-        <div>
-          <label className="block text-sm font-semibold text-(--text) mb-2">
-            Verify Your Service (Service License or other document)
-            <span className="text-red-500">*</span>
-          </label>
-          <div
-            className="border-2 border-dashed border-(--border) rounded-xl p-6 text-center cursor-pointer"
-            onClick={() =>
-              document.getElementById("verification-input")?.click()
-            }
-          >
-            <Upload className="w-8 h-8 text-(--muted) mx-auto mb-2" />
-            <p className="text-sm text-(--text)">Click to upload</p>
-            <input
-              id="verification-input"
-              type="file"
-              onChange={(e) =>
-                setVerificationProofURL(e.target.files?.[0] || null)
-              }
-              accept="image/*"
-              className="hidden"
-            />
-          </div>
-          {verificationProofURL && (
-            <p className="text-sm text-green-600 mt-2">
-              {verificationProofURL.name}
-            </p>
-          )}
-        </div>
-
-        <div>
-          <label className="block text-sm font-semibold text-(--text) mb-2">
-            Citizenship Picture<span className="text-red-500">*</span>
-          </label>
-          <div
-            className="border-2 border-dashed border-(--border) rounded-xl p-6 text-center cursor-pointer"
-            onClick={() => document.getElementById("id-input")?.click()}
-          >
-            <Upload className="w-8 h-8 text-(--muted) mx-auto mb-2" />
-            <p className="text-sm text-(--text)">Click to upload</p>
-            <input
-              id="id-input"
-              type="file"
-              onChange={(e) => setIdProofURL(e.target.files?.[0] || null)}
-              accept="image/*"
-              className="hidden"
-            />
-          </div>
-          {verificationProofURL && (
-            <p className="text-sm text-green-600 mt-2">{idProofURL?.name}</p>
           )}
         </div>
 
