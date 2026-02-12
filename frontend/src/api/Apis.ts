@@ -81,6 +81,11 @@ export interface ReviewData {
   updatedAt?: string;
 }
 
+export interface AiChatMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
 export interface SendMessagePayload {
   receiverId: string;
   content: string;
@@ -164,4 +169,15 @@ export const ReviewApi = {
 
   fetchMyReceivedReviews: () =>
     Api.get("/reviews/received", { headers: getAuthHeader() }),
+};
+
+export const AiApi = {
+  chat: (data: {
+    message: string;
+    history?: AiChatMessage[];
+    category?: string;
+  }) =>
+    Api.post("/ai/chat", data, {
+      headers: getAuthHeader(),
+    }),
 };

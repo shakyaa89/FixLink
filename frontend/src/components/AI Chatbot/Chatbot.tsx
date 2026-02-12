@@ -1,8 +1,75 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { MessageSquare, X } from "lucide-react";
+import { AiApi, type AiChatMessage } from "../../api/Apis";
+import { useAuthStore } from "../../store/authStore";
+
+interface ChatMessage {
+  role: "user" | "assistant";
+  content: string;
+}
 
 export default function Chatbot() {
   const [open, setOpen] = useState(false);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    {
+      role: "assistant",
+      content: "Hello! How can I help you today?",
+    },
+  ]);
+  const { user } = useAuthStore();
+
+  const category = useMemo(
+    () => (user?.providerCategory ? String(user.providerCategory) : ""),
+    [user]
+  );
+
+  const sendMessage = async () => {
+    const trimmed = input.trim();
+    if (!trimmed || loading) {
+      return;
+    }
+
+    const nextMessages: ChatMessage[] = [
+      ...messages,
+      { role: "user", content: trimmed },
+    ];
+
+    setMessages(nextMessages);
+    setInput("");
+    setLoading(true);
+
+    try {
+      const history: AiChatMessage[] = nextMessages.map((message) => ({
+        role: message.role,
+        content: message.content,
+      }));
+
+      const response = await AiApi.chat({
+        message: trimmed,
+        history,
+        category,
+      });
+
+      const reply =
+        response?.data?.reply ||
+        "I could not generate a response right now. Please try again.";
+
+      setMessages((prev) => [...prev, { role: "assistant", content: reply }]);
+    } catch (error) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content:
+            "Sorry, I could not reach the AI service right now. Please try again.",
+        },
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div>
@@ -30,13 +97,23 @@ export default function Chatbot() {
 
           {/* Messages */}
           <div className="p-4 h-64 overflow-y-auto space-y-3 bg-(--primary)">
-            <div className="bg-(--secondary) p-2 rounded-lg text-sm text-(--text) w-fit max-w-[80%]">
-              Hello! How can I help you today?
-            </div>
-
-            <div className="bg-(--accent) text-white p-2 rounded-lg text-sm w-fit max-w-[80%] ml-auto">
-              I need a plumber.
-            </div>
+            {messages.map((message, index) => (
+              <div
+                key={`${message.role}-${index}`}
+                className={
+                  message.role === "assistant"
+                    ? "bg-(--secondary) p-2 rounded-lg text-sm text-(--text) w-fit max-w-[80%]"
+                    : "bg-(--accent) text-white p-2 rounded-lg text-sm w-fit max-w-[80%] ml-auto"
+                }
+              >
+                {message.content}
+              </div>
+            ))}
+            {loading && (
+              <div className="bg-(--secondary) p-2 rounded-lg text-sm text-(--text) w-fit max-w-[80%]">
+                Thinking...
+              </div>
+            )}
           </div>
 
           {/* Input */}
@@ -44,9 +121,20 @@ export default function Chatbot() {
             <input
               type="text"
               placeholder="Type a message..."
+              value={input}
+              onChange={(event) => setInput(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  sendMessage();
+                }
+              }}
               className="flex-1 px-3 py-2 text-sm rounded-lg border border-(--border) focus:outline-none focus:ring-1 focus:ring-(--accent) bg-(--primary) text-(--text)"
             />
-            <button className="bg-(--accent) hover:bg-(--accent-hover) text-white px-4 py-2 rounded-lg text-sm">
+            <button
+              onClick={sendMessage}
+              disabled={loading}
+              className="bg-(--accent) hover:bg-(--accent-hover) text-white px-4 py-2 rounded-lg text-sm disabled:opacity-60"
+            >
               Send
             </button>
           </div>
