@@ -86,7 +86,7 @@ export default function Sidebar() {
         {user?.role === "serviceProvider" && isProviderComplete && (
           <>
             <NavLink
-              to="/serviceProvider/dashboard"
+              to="/serviceprovider/dashboard"
               className={({ isActive }) =>
                 `flex items-center gap-3 px-4 py-3 rounded-lg ${
                   isActive

@@ -1,0 +1,120 @@
+import { useRouter } from "expo-router";
+import { Pressable, Text, TextInput, View, ScrollView } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import colors from "./_constants/theme";
+import { useState } from "react";
+import { Home, Mail, Lock, Eye, EyeOff, ArrowLeft } from "lucide-react-native";
+
+export default function Login() {
+  const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  return (
+    <SafeAreaView className="flex-1 bg-primary">
+      <ScrollView
+        className="flex-1"
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View className="flex-1 px-6 py-8 gap-8">
+          {/* Header */}
+          <View className="gap-4">
+            <Pressable
+              onPress={() => router.back()}
+              className="w-10 h-10 border border-border rounded-xl items-center justify-center active:bg-secondary"
+            >
+              <ArrowLeft size={20} color={colors.text} />
+            </Pressable>
+
+            <View className="gap-2">
+              <Text className="text-4xl font-bold text-text">Welcome back</Text>
+              <Text className="text-base text-muted leading-relaxed">
+                Log in to manage your jobs and messages.
+              </Text>
+            </View>
+          </View>
+
+          {/* Form */}
+          <View className="gap-5">
+            <View className="gap-2">
+              <Text className="text-sm font-medium text-text">Email</Text>
+              <View className="border border-border rounded-xl px-4 py-3 flex-row items-center gap-3 bg-secondary">
+                <Mail size={20} color={colors.muted} />
+                <TextInput
+                  className="flex-1 text-text text-base"
+                  placeholder="you@example.com"
+                  placeholderTextColor={colors.muted}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  value={email}
+                  onChangeText={setEmail}
+                />
+              </View>
+            </View>
+
+            <View className="gap-2">
+              <View className="flex-row items-center justify-between">
+                <Text className="text-sm font-medium text-text">Password</Text>
+              </View>
+              <View className="border border-border rounded-xl px-4 py-3 flex-row items-center gap-3 bg-secondary">
+                <Lock size={20} color={colors.muted} />
+                <TextInput
+                  className="flex-1 text-text text-base"
+                  placeholder="Enter your password"
+                  placeholderTextColor={colors.muted}
+                  secureTextEntry={!showPassword}
+                  value={password}
+                  onChangeText={setPassword}
+                />
+                <Pressable onPress={() => setShowPassword(!showPassword)}>
+                  {showPassword ? (
+                    <EyeOff size={20} color={colors.muted} />
+                  ) : (
+                    <Eye size={20} color={colors.muted} />
+                  )}
+                </Pressable>
+              </View>
+            </View>
+          </View>
+
+          {/* CTA */}
+          <View className="gap-4">
+            <Pressable
+              className="bg-accent rounded-xl py-4 items-center active:opacity-90"
+              onPress={() => router.push("/")}
+            >
+              <Text className="text-white text-base font-bold">Log In</Text>
+            </Pressable>
+
+            <View className="flex-row items-center gap-3">
+              <View className="flex-1 h-px bg-border" />
+              <Text className="text-sm text-muted">or</Text>
+              <View className="flex-1 h-px bg-border" />
+            </View>
+
+            <Pressable
+              className="border border-border rounded-xl py-4 items-center bg-secondary active:bg-border/20"
+              onPress={() => { }}
+            >
+              <Text className="text-text text-base font-semibold">Continue with Google</Text>
+            </Pressable>
+          </View>
+
+          {/* Footer */}
+          <View className="items-center pt-4">
+            <Pressable
+              onPress={() => router.push("/register")}
+            >
+              <Text className="text-base text-muted">
+                New to FixLink?{" "}
+                <Text className="text-accent font-semibold">Create an account</Text>
+              </Text>
+            </Pressable>
+          </View>          
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
+}

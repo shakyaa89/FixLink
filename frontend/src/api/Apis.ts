@@ -91,6 +91,51 @@ export interface SendMessagePayload {
   content: string;
 }
 
+export interface AdminUserData {
+  _id?: string;
+  fullName: string;
+  email: string;
+  role: "user" | "serviceProvider" | "admin";
+  verificationStatus?: string;
+  createdAt?: string;
+  profilePicture?: string;
+  providerCategory?: string;
+}
+
+export interface AdminJobData {
+  _id?: string;
+  title: string;
+  jobCategory?: string;
+  jobStatus?: string;
+  createdAt?: string;
+  userId?: { _id?: string; fullName?: string };
+}
+
+export interface AdminDisputeData {
+  _id?: string;
+  title: string;
+  jobId?: { _id?: string; title?: string } | string;
+  status?: string;
+  priority?: string;
+  updatedAt?: string;
+}
+
+export interface AdminProviderData {
+  _id?: string;
+  fullName: string;
+  email: string;
+  phoneNumber?: string;
+  profilePicture?: string;
+  providerCategory?: string;
+  verificationStatus?: string;
+  verificationProofURL?: string;
+  idProofURL?: string;
+  address?: string;
+  addressDescription?: string;
+  addressURL?: string;
+  createdAt?: string;
+}
+
 // Helper to get Authorization header
 const getAuthHeader = () => {
   const token = localStorage.getItem("jwtToken");
@@ -180,4 +225,26 @@ export const AiApi = {
     Api.post("/ai/chat", data, {
       headers: getAuthHeader(),
     }),
+};
+
+export const AdminApi = {
+  fetchOverview: () =>
+    Api.get("/admin/overview", { headers: getAuthHeader() }),
+
+  fetchUsers: () => Api.get("/admin/users", { headers: getAuthHeader() }),
+
+  fetchJobs: () => Api.get("/admin/jobs", { headers: getAuthHeader() }),
+
+  fetchDisputes: () =>
+    Api.get("/admin/disputes", { headers: getAuthHeader() }),
+
+  fetchServiceProviders: () =>
+    Api.get("/admin/service-providers", { headers: getAuthHeader() }),
+
+  updateServiceProviderVerification: (providerId: string, status: string) =>
+    Api.put(
+      `/admin/service-providers/${providerId}/verification`,
+      { status },
+      { headers: getAuthHeader() }
+    ),
 };

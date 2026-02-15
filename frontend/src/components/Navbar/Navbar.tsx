@@ -74,6 +74,15 @@ export default function Navbar() {
                 </Link>
               )}
 
+              {user?.role === "admin" && (
+                <Link
+                  to={{ pathname: "/admin/dashboard" }}
+                  className="text-(--muted) transition hover:text-(--accent)"
+                >
+                  Admin
+                </Link>
+              )}
+
               <Link
                 to={{ pathname: "/", hash: "#about" }}
                 className="text-(--muted) transition hover:text-(--accent)"
@@ -284,6 +293,39 @@ export default function Navbar() {
               </>
             )}
 
+            {user?.role === "admin" && (
+              <>
+                <Link
+                  to="/admin/dashboard"
+                  onClick={() => setIsOpen(false)}
+                  className="block text-(--text) hover:text-(--accent) transition border-b border-(--border) pb-3"
+                >
+                  Dashboard
+                </Link>
+                <Link
+                  to="/admin/users"
+                  onClick={() => setIsOpen(false)}
+                  className="block text-(--text) hover:text-(--accent) transition border-b border-(--border) pb-3"
+                >
+                  Users
+                </Link>
+                <Link
+                  to="/admin/jobs"
+                  onClick={() => setIsOpen(false)}
+                  className="block text-(--text) hover:text-(--accent) transition border-b border-(--border) pb-3"
+                >
+                  Jobs
+                </Link>
+                <Link
+                  to="/admin/disputes"
+                  onClick={() => setIsOpen(false)}
+                  className="block text-(--text) hover:text-(--accent) transition border-b border-(--border) pb-3"
+                >
+                  Disputes
+                </Link>
+              </>
+            )}
+
             <div className="flex flex-col gap-2 pt-2">
               {user ? (
                 <>
@@ -312,7 +354,7 @@ export default function Navbar() {
                   <Link
                     to="/auth"
                     onClick={() => setIsOpen(false)}
-                    className="w-full px-4 py-2 font-medium transition text-center text-blue-500 rounded-lg border border-blue-500"
+                    className="w-full px-4 py-2 font-medium transition text-center text-(--accent) rounded-lg border border-(--accent)"
                   >
                     Sign In
                   </Link>

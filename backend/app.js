@@ -12,6 +12,7 @@ import offerRouter from "./routes/offer.route.js";
 import messageRouter from "./routes/message.route.js";
 import reviewRouter from "./routes/review.route.js";
 import aiRouter from "./routes/ai.route.js";
+import adminRouter from "./routes/admin.route.js";
 import connectDB from "./lib/db.js";
 import { initSocket } from "./lib/socket.js";
 
@@ -50,6 +51,7 @@ app.use("/api/offer", offerRouter);
 app.use("/api/messages", messageRouter);
 app.use("/api/reviews", reviewRouter);
 app.use("/api/ai", aiRouter);
+app.use("/api/admin", adminRouter);
 
 const server = http.createServer(app);
 initSocket(server);

@@ -29,6 +29,12 @@ import { useThemeStore } from "./store/themeStore";
 import Chatbot from "./components/AI Chatbot/Chatbot";
 import CompleteProfilePage from "./pages/ServiceProviderPages/CompleteProfilePage";
 import ServiceProviderOnboardingRoute from "./routes/ServiceProviderOnboardingRoute";
+import AdminProtectedRoute from "./routes/AdminProtectedRoute";
+import AdminDashboard from "./pages/AdminPages/AdminDashboard";
+import AdminUsersPage from "./pages/AdminPages/AdminUsersPage";
+import AdminJobsPage from "./pages/AdminPages/AdminJobsPage";
+import AdminDisputesPage from "./pages/AdminPages/AdminDisputesPage";
+import AdminProviderVerificationPage from "./pages/AdminPages/AdminProviderVerificationPage";
 
 function App() {
   const { checkAuth, checking } = useAuthStore();
@@ -140,6 +146,51 @@ function App() {
               <ServiceProviderRoute>
                 <JobDetailsProviderPage />
               </ServiceProviderRoute>
+            }
+          />
+
+          <Route
+            path="/admin/dashboard"
+            element={
+              <AdminProtectedRoute>
+                <AdminDashboard />
+              </AdminProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/users"
+            element={
+              <AdminProtectedRoute>
+                <AdminUsersPage />
+              </AdminProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/jobs"
+            element={
+              <AdminProtectedRoute>
+                <AdminJobsPage />
+              </AdminProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/providers"
+            element={
+              <AdminProtectedRoute>
+                <AdminProviderVerificationPage />
+              </AdminProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/disputes"
+            element={
+              <AdminProtectedRoute>
+                <AdminDisputesPage />
+              </AdminProtectedRoute>
             }
           />
 

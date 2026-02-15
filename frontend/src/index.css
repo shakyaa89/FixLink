@@ -9,7 +9,11 @@
   --muted: #4a5565; /* Muted Text Color */
   --accent: #155dfc; /* Accent Color */
   --accent-hover: #1447e6; /* Accent Hover Color */
-}
+  --success: #12b981; /* Success Text */
+  --success-bg: #ecfdf3; /* Success Background */
+  --danger: #ef4444; /* Danger Text */
+  --danger-bg: #fef2f2; /* Danger Background */
+ }
 
 .dark {
   /* Dark Mode */
@@ -20,6 +24,10 @@
   --muted: #ddd; /* Muted Text Color */
   --accent: #155dfc; /* Accent Color */
   --accent-hover: #5b6379; /* Accent Hover Color */
+  --success: #2ed3a2; /* Success Text */
+  --success-bg: #173227; /* Success Background */
+  --danger: #ff6b6b; /* Danger Text */
+  --danger-bg: #351b1b; /* Danger Background */
 }
 
 * {
