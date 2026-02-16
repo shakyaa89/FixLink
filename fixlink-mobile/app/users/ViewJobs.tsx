@@ -1,8 +1,10 @@
 import { useRouter } from "expo-router";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ArrowLeft, Calendar, MapPin, Wrench, Zap, Droplet } from "lucide-react-native";
-import colors from "./_constants/theme";
+import { ArrowLeft, Calendar, MapPin, Wrench, Zap, Droplet, BriefcaseBusiness } from "lucide-react-native";
+import colors from "@/app/_constants/theme";
+import { JobApi, JobData } from "@/api/Apis";
+import { useEffect, useState } from "react";
 
 const filters = [
   "All",
@@ -68,9 +70,25 @@ const jobs = [
   },
 ];
 
-function Jobs() {
+function ViewJobs() {
   const router = useRouter();
 
+  const [jobs, setJobs] = useState<JobData[]>([]);
+
+  async function fetchJobs(){
+    try {
+      const response = await JobApi.fetchUserJobsApi();
+      const fetchedJobs = response.data.jobs || [];
+      setJobs(fetchedJobs);
+    } catch (err) {
+      console.error("Error fetching jobs:", err);
+      setJobs([]);
+    }
+  }
+
+  useEffect(() => {
+    fetchJobs();
+  }, [])
 
   return (
     <SafeAreaView className="flex-1 bg-primary">
@@ -112,7 +130,6 @@ function Jobs() {
 
           <View className="gap-4">
             {jobs.map((job) => {
-              const Icon = job.icon;
               return (
                 <View
                   key={job._id}
@@ -120,7 +137,7 @@ function Jobs() {
                 >
                   <View className="flex-row items-center gap-3">
                     <View className="w-12 h-12 rounded-xl bg-accent/10 items-center justify-center">
-                      <Icon size={22} color={colors.accent} />
+                      <BriefcaseBusiness size={22} color={colors.accent} />
                     </View>
                     <View className="flex-1">
                       <Text className="text-base font-semibold text-text">
@@ -131,7 +148,7 @@ function Jobs() {
                       </Text>
                     </View>
                     <Text className="text-base font-semibold text-accent">
-                      ${job.userPrice}
+                      Rs.{job.userPrice}
                     </Text>
                   </View>
 
@@ -147,13 +164,13 @@ function Jobs() {
                     <View className="flex-row items-center gap-2">
                       <Calendar size={16} color={colors.muted} />
                       <Text className="text-sm text-muted">
-                        {new Date(job.createdAt).toLocaleDateString()}
+                        {new Date(job.createdAt!).toLocaleDateString()}
                       </Text>
                     </View>
                   </View>
 
                   <View className="mt-3 self-start rounded-full border border-border px-3 py-1">
-                    <Text className="text-xs text-muted">{job.jobStatus}</Text>
+                    <Text className="text-xs text-muted capitalize w-full">{job.jobStatus}</Text>
                   </View>
 
                   <Pressable
@@ -161,7 +178,7 @@ function Jobs() {
                     onPress={() => router.push("/public/login")}
                   >
                     <Text className="text-white text-sm font-semibold">
-                      Apply for Job
+                      View Details
                     </Text>
                   </Pressable>
                 </View>
@@ -174,4 +191,4 @@ function Jobs() {
   );
 }
 
-export default Jobs;
+export default ViewJobs;

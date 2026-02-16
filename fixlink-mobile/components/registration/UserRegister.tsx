@@ -1,18 +1,23 @@
 import { useRouter } from "expo-router";
 import { Pressable, Text, TextInput, View, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import colors from "./_constants/theme";
 import { useState } from "react";
 import { Home, Mail, Lock, Eye, EyeOff, ArrowLeft, User, Phone } from "lucide-react-native";
+import colors from "@/app/_constants/theme";
 
-export default function Register() {
+export default function UserRegister() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
-  const [accountType, setAccountType] = useState<"user" | "provider">("user");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [profilePicture, setProfilePicture] = useState<File | null>(null);
+  const [address, setAddress] = useState("");
+  const [addressDescription, setAddressDescription] = useState("");
+  const [addressUrl, setAddressUrl] = useState("");
+  const [agreeToTerms, setAgreeToTerms] = useState(false);
 
   return (
     <SafeAreaView className="flex-1 bg-primary">
@@ -36,46 +41,6 @@ export default function Register() {
               <Text className="text-base text-muted leading-relaxed">
                 Set up your FixLink profile in minutes.
               </Text>
-            </View>
-          </View>
-
-          {/* Account Type Selection */}
-          <View className="gap-3">
-            <Text className="text-sm font-medium text-text">I am a</Text>
-            <View className="flex-row gap-3">
-              <Pressable
-                onPress={() => setAccountType("user")}
-                className={`flex-1 border rounded-xl p-4 ${accountType === "user"
-                  ? "bg-accent border-accent"
-                  : "bg-secondary border-border"
-                  }`}
-              >
-                <Text className={`text-base font-semibold ${accountType === "user" ? "text-white" : "text-text"
-                  }`}>
-                  User
-                </Text>
-                <Text className={`text-sm mt-1 ${accountType === "user" ? "text-white/80" : "text-muted"
-                  }`}>
-                  Find service providers
-                </Text>
-              </Pressable>
-
-              <Pressable
-                onPress={() => setAccountType("provider")}
-                className={`flex-1 border rounded-xl p-4 ${accountType === "provider"
-                  ? "bg-accent border-accent"
-                  : "bg-secondary border-border"
-                  }`}
-              >
-                <Text className={`text-base font-semibold ${accountType === "provider" ? "text-white" : "text-text"
-                  }`}>
-                  Pro
-                </Text>
-                <Text className={`text-sm mt-1 ${accountType === "provider" ? "text-white/80" : "text-muted"
-                  }`}>
-                  Offer my services
-                </Text>
-              </Pressable>
             </View>
           </View>
 
@@ -120,8 +85,8 @@ export default function Register() {
                   placeholder="(555) 123-4567"
                   placeholderTextColor={colors.muted}
                   keyboardType="phone-pad"
-                  value={phone}
-                  onChangeText={setPhone}
+                  value={phoneNumber}
+                  onChangeText={setPhoneNumber}
                 />
               </View>
             </View>
@@ -187,7 +152,7 @@ export default function Register() {
           {/* Footer */}
           <View className="items-center pt-4 pb-6">
             <Pressable
-              onPress={() => router.push("/login")}
+              onPress={() => router.push("/public/login")}
             >
               <Text className="text-base text-muted">
                 Already have an account?{" "}

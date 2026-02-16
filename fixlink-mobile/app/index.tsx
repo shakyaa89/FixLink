@@ -13,9 +13,20 @@ import {
   Hammer,
   Lock
 } from "lucide-react-native";
+import { useAuthStore } from "@/store/authStore";
+import { useEffect } from "react";
 
 export default function Index() {
   const router = useRouter();
+
+  const { user } = useAuthStore();
+
+  // useEffect(() => {
+  //   if (user) {
+  //     router.replace("/jobs");
+  //   }
+  // }, [])
+
 
   return (
     <SafeAreaView className="flex-1 bg-primary">
@@ -112,7 +123,7 @@ export default function Index() {
           <View className="gap-3 mb-6">
             <Pressable
               className="bg-accent rounded-xl py-4 items-center active:opacity-90"
-              onPress={() => router.push("/login")}
+              onPress={() => router.push("/public/login")}
             >
               <Text className="text-white text-lg font-bold">Get Started</Text>
             </Pressable>

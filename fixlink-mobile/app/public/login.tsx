@@ -1,15 +1,32 @@
 import { useRouter } from "expo-router";
-import { Pressable, Text, TextInput, View, ScrollView } from "react-native";
+import { Pressable, Text, TextInput, View, ScrollView, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import colors from "./_constants/theme";
+import colors from "@/app/_constants/theme";
 import { useState } from "react";
 import { Home, Mail, Lock, Eye, EyeOff, ArrowLeft } from "lucide-react-native";
+import { useAuthStore } from "@/store/authStore";
+import Toast from "react-native-toast-message";
 
 export default function Login() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const { login, loading } = useAuthStore();
+
+  const handleLogin = async () => {
+    if (!email || !password) return;
+
+    const success = await login(email, password);
+    if (success) {
+      Toast.show({
+        type: 'success',
+        text2: "Logged In Successfully!"
+      })
+      router.push("/jobs"); 
+    }
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-primary">
@@ -83,9 +100,14 @@ export default function Login() {
           <View className="gap-4">
             <Pressable
               className="bg-accent rounded-xl py-4 items-center active:opacity-90"
-              onPress={() => router.push("/")}
+              onPress={handleLogin}
+              disabled={loading}
             >
-              <Text className="text-white text-base font-bold">Log In</Text>
+              {loading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text className="text-white text-base font-bold">Log In</Text>
+              )}
             </Pressable>
 
             <View className="flex-row items-center gap-3">
@@ -105,7 +127,7 @@ export default function Login() {
           {/* Footer */}
           <View className="items-center pt-4">
             <Pressable
-              onPress={() => router.push("/register")}
+              onPress={() => router.push("/public/registerscreen")}
             >
               <Text className="text-base text-muted">
                 New to FixLink?{" "}
