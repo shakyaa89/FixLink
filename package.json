@@ -6,6 +6,10 @@
     "dev": "concurrently \"npm run backend\" \"npm run frontend\" \"npm run mobile\"",
     "backend": "cd backend && npm start",
     "frontend": "cd frontend && npm run dev -- --host",
-    "mobile" : "cd fixlink-mobile && npx expo start -c"
+    "mobile": "cd fixlink-mobile && npx expo start -c"
+  },
+  "dependencies": {
+    "@react-native-picker/picker": "^2.11.4",
+    "expo-image-picker": "^17.0.10"
   }
 }
