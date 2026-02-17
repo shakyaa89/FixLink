@@ -13,6 +13,7 @@ import messageRouter from "./routes/message.route.js";
 import reviewRouter from "./routes/review.route.js";
 import aiRouter from "./routes/ai.route.js";
 import adminRouter from "./routes/admin.route.js";
+import disputeRouter from "./routes/dispute.route.js";
 import connectDB from "./lib/db.js";
 import { initSocket } from "./lib/socket.js";
 
@@ -33,6 +34,8 @@ app.use(
       "http://192.168.1.70:3000",
       "http://localhost:3000",
       "http://100.64.234.28:5173",
+      "http://192.168.1.70:3005",
+      "http://localhost:8081"
     ],
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -52,6 +55,7 @@ app.use("/api/messages", messageRouter);
 app.use("/api/reviews", reviewRouter);
 app.use("/api/ai", aiRouter);
 app.use("/api/admin", adminRouter);
+app.use("/api/disputes", disputeRouter);
 
 const server = http.createServer(app);
 initSocket(server);

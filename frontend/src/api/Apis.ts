@@ -136,6 +136,24 @@ export interface AdminProviderData {
   createdAt?: string;
 }
 
+export interface DisputeData {
+  _id?: string;
+  jobId?: { _id?: string; title?: string } | string;
+  title: string;
+  description?: string;
+  status?: "open" | "resolved";
+  priority?: "low" | "medium" | "high";
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface DisputableJobData {
+  _id: string;
+  title: string;
+  jobStatus?: string;
+  createdAt?: string;
+}
+
 // Helper to get Authorization header
 const getAuthHeader = () => {
   const token = localStorage.getItem("jwtToken");
@@ -214,6 +232,24 @@ export const ReviewApi = {
 
   fetchMyReceivedReviews: () =>
     Api.get("/reviews/received", { headers: getAuthHeader() }),
+
+  fetchMySentReviews: () =>
+    Api.get("/reviews/sent", { headers: getAuthHeader() }),
+};
+
+export const DisputeApi = {
+  fetchMyDisputes: () =>
+    Api.get("/disputes/my", { headers: getAuthHeader() }),
+
+  fetchDisputableJobs: () =>
+    Api.get("/disputes/jobs", { headers: getAuthHeader() }),
+
+  createDispute: (data: {
+    jobId: string;
+    title: string;
+    description?: string;
+    priority?: "low" | "medium" | "high";
+  }) => Api.post("/disputes/create", data, { headers: getAuthHeader() }),
 };
 
 export const AiApi = {

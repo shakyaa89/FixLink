@@ -128,7 +128,7 @@ export const AuthApi = {
 export const JobApi = {
     createJobApi: async (jobData: JobData) => {
         const headers = await getAuthHeader();
-        Api.post("/job/create", jobData, { headers })
+        return Api.post("/job/create", jobData, { headers })
     },
 
     fetchUserJobsApi: async () =>
@@ -150,4 +150,20 @@ export const JobApi = {
 
     completeJobApi: async (jobId: string) =>
         Api.put(`/job/complete/${jobId}`, {}, { headers: await getAuthHeader() }),
+};
+
+export const OfferApi = {
+    createOffer: async (data: { jobId: string; offeredPrice: number }) =>
+        Api.post("/offer/create", data, { headers: await getAuthHeader() }),
+
+    acceptOffer: async (data: { offerId: string }) =>
+        Api.put("/offer/accept", data, { headers: await getAuthHeader() }),
+};
+
+export const ReviewApi = {
+    createReview: async (data: { jobId: string; rating: number; comment?: string }) =>
+        Api.post("/reviews/create", data, { headers: await getAuthHeader() }),
+
+    fetchMyReceivedReviews: async () =>
+        Api.get("/reviews/received", { headers: await getAuthHeader() }),
 };

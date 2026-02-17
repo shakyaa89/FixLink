@@ -1,18 +1,14 @@
-import { Stack, useRouter } from "expo-router";
+import { Redirect, Stack } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuthStore } from "@/store/authStore";
-import { useEffect } from "react";
 
 
 export default function PublicLayout() {
     const { user } = useAuthStore();
-    const router = useRouter();
 
-    useEffect(() => {
-        if (user) {
-            router.replace("/jobs");
-        }
-    }, [user])
+    if (user) {
+        return <Redirect href="/protected/jobs" />;
+    }
 
     return (
         <SafeAreaView style={{ flex: 1 }}>

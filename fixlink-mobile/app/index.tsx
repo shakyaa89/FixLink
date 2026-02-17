@@ -21,11 +21,21 @@ export default function Index() {
 
   const { user } = useAuthStore();
 
-  // useEffect(() => {
-  //   if (user) {
-  //     router.replace("/jobs");
-  //   }
-  // }, [])
+  useEffect(() => {
+    if (!user) return;
+
+    if (user.role === "user") {
+      router.replace("/protected/user/dashboard");
+      return;
+    }
+
+    if (user.role === "serviceProvider") {
+      router.replace("/protected/service-provider/dashboard");
+      return;
+    }
+
+    router.replace("/protected/jobs");
+  }, [user, router]);
 
 
   return (
@@ -51,41 +61,6 @@ export default function Index() {
             <Text className="text-lg text-muted leading-relaxed">
               Connect with verified local service providers for quick, reliable home repairs and maintenance.
             </Text>
-          </View>
-
-          {/* Feature Cards */}
-          <View className="gap-3 mb-8">
-            <Text className="text-lg font-semibold text-text mb-2">Why FixLink?</Text>
-
-            <View className="bg-secondary border border-border rounded-xl p-4 flex-row items-center gap-4">
-              <View className="w-12 h-12 bg-accent/20 rounded-full items-center justify-center">
-                <Wrench size={24} color="#3B82F6" />
-              </View>
-              <View className="flex-1">
-                <Text className="text-base font-semibold text-text">Expert Professionals</Text>
-                <Text className="text-sm text-muted mt-1">Verified, licensed service providers</Text>
-              </View>
-            </View>
-
-            <View className="bg-secondary border border-border rounded-xl p-4 flex-row items-center gap-4">
-              <View className="w-12 h-12 bg-accent/20 rounded-full items-center justify-center">
-                <Zap size={24} color="#3B82F6" />
-              </View>
-              <View className="flex-1">
-                <Text className="text-base font-semibold text-text">Fast Response</Text>
-                <Text className="text-sm text-muted mt-1">Get matched with professionals</Text>
-              </View>
-            </View>
-
-            <View className="bg-secondary border border-border rounded-xl p-4 flex-row items-center gap-4">
-              <View className="w-12 h-12 bg-accent/20 rounded-full items-center justify-center">
-                <Shield size={24} color="#3B82F6" />
-              </View>
-              <View className="flex-1">
-                <Text className="text-base font-semibold text-text">Quality Guaranteed</Text>
-                <Text className="text-sm text-muted mt-1">Professional level quality guaranteed</Text>
-              </View>
-            </View>
           </View>
 
           {/* Popular Services */}

@@ -4,7 +4,9 @@ import Sidebar from "../../components/Sidebar/Sidebar";
 import { ReviewApi, type ReviewData } from "../../api/Apis";
 
 export default function ReviewsPage() {
-  const [reviews, setReviews] = useState<ReviewData[]>([]);
+  const [receivedReviews, setReceivedReviews] = useState<ReviewData[]>([]);
+  const [sentReviews, setSentReviews] = useState<ReviewData[]>([]);
+  const [activeTab, setActiveTab] = useState<"received" | "sent">("received");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -13,12 +15,17 @@ export default function ReviewsPage() {
       try {
         setLoading(true);
         setError(null);
-        const response = await ReviewApi.fetchMyReceivedReviews();
-        setReviews(response.data.reviews || []);
+        const [receivedResponse, sentResponse] = await Promise.all([
+          ReviewApi.fetchMyReceivedReviews(),
+          ReviewApi.fetchMySentReviews(),
+        ]);
+        setReceivedReviews(receivedResponse.data.reviews || []);
+        setSentReviews(sentResponse.data.reviews || []);
       } catch (err) {
         console.error("Failed to load reviews", err);
         setError("Failed to load reviews. Please try again.");
-        setReviews([]);
+        setReceivedReviews([]);
+        setSentReviews([]);
       } finally {
         setLoading(false);
       }
@@ -28,14 +35,80 @@ export default function ReviewsPage() {
   }, []);
 
   const stats = useMemo(() => {
-    const total = reviews.length;
-    const sum = reviews.reduce((acc, r) => acc + (r.rating || 0), 0);
+    const total = receivedReviews.length;
+    const sum = receivedReviews.reduce((acc, r) => acc + (r.rating || 0), 0);
     const average = total ? (sum / total).toFixed(1) : "0.0";
     const counts = [5, 4, 3, 2, 1].map((value) =>
-      reviews.filter((r) => r.rating === value).length
+      receivedReviews.filter((r) => r.rating === value).length
     );
     return { total, average, counts };
-  }, [reviews]);
+  }, [receivedReviews]);
+
+  const renderReviewCard = (review: ReviewData, mode: "received" | "sent") => {
+    const person = mode === "received" ? review.reviewerId : review.revieweeId;
+    const personName = person?.fullName || "Anonymous";
+    const initials = personName
+      .split(" ")
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0])
+      .join("")
+      .toUpperCase();
+
+    return (
+      <div
+        key={review._id}
+        className="bg-(--primary) rounded-2xl p-8 shadow-sm border border-(--border) hover:shadow-md transition-shadow"
+      >
+        <div className="flex items-start gap-4">
+          {person?.profilePicture ? (
+            <img
+              src={person.profilePicture}
+              alt={personName}
+              className="w-12 h-12 rounded-full object-cover shrink-0"
+            />
+          ) : (
+            <div className="w-12 h-12 rounded-full bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-lg shrink-0">
+              {initials || "?"}
+            </div>
+          )}
+
+          <div className="flex-1">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-3">
+              <div>
+                <h3 className="text-lg font-semibold text-(--text)">{personName}</h3>
+                {typeof review.jobId === "object" && review.jobId?.title && (
+                  <p className="text-sm text-(--muted)">{review.jobId.title}</p>
+                )}
+              </div>
+              <span className="text-sm text-(--muted) mt-1 md:mt-0">
+                {review.createdAt
+                  ? new Date(review.createdAt).toLocaleDateString()
+                  : ""}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-1 mb-4">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Star
+                  key={i}
+                  className={`w-5 h-5 ${
+                    i < review.rating
+                      ? "fill-yellow-400 text-yellow-400"
+                      : "text-(--muted)"
+                  }`}
+                />
+              ))}
+            </div>
+
+            <p className="text-(--text) leading-relaxed">
+              {review.comment || "No comment provided."}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="flex min-h-screen ">
@@ -49,7 +122,7 @@ export default function ReviewsPage() {
               Your Reviews and Ratings
             </h1>
             <p className="text-(--muted) text-lg">
-              See what providers have to say
+              See reviews about you and reviews you have given
             </p>
           </div>
 
@@ -133,89 +206,60 @@ export default function ReviewsPage() {
             </div>
           </div>
 
-          {/* Reviews List */}
+          {/* Reviews Tabs */}
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-(--text)">Reviews</h2>
+            <div className="flex items-center gap-2 bg-(--secondary) p-1 rounded-xl border border-(--border) w-fit">
+              <button
+                onClick={() => setActiveTab("received")}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                  activeTab === "received"
+                    ? "bg-(--accent) text-(--primary)"
+                    : "text-(--muted) hover:text-(--text)"
+                }`}
+              >
+                Reviews About You
+              </button>
+              <button
+                onClick={() => setActiveTab("sent")}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                  activeTab === "sent"
+                    ? "bg-(--accent) text-(--primary)"
+                    : "text-(--muted) hover:text-(--text)"
+                }`}
+              >
+                Reviews You Sent
+              </button>
+            </div>
 
-            {loading && (
-              <div className="text-(--muted)">Loading reviews...</div>
+            {activeTab === "received" ? (
+              <>
+                <h2 className="text-2xl font-bold text-(--text)">Reviews About You</h2>
+
+                {loading && <div className="text-(--muted)">Loading reviews...</div>}
+
+                {error && <div className="text-red-600">{error}</div>}
+
+                {!loading && !error && receivedReviews.length === 0 && (
+                  <div className="text-(--muted)">No reviews yet.</div>
+                )}
+
+                {receivedReviews.map((review) => renderReviewCard(review, "received"))}
+              </>
+            ) : (
+              <>
+                <h2 className="text-2xl font-bold text-(--text)">Reviews You Sent</h2>
+
+                {loading && <div className="text-(--muted)">Loading reviews...</div>}
+
+                {error && <div className="text-red-600">{error}</div>}
+
+                {!loading && !error && sentReviews.length === 0 && (
+                  <div className="text-(--muted)">You have not submitted any reviews yet.</div>
+                )}
+
+                {sentReviews.map((review) => renderReviewCard(review, "sent"))}
+              </>
             )}
-
-            {error && <div className="text-red-600">{error}</div>}
-
-            {!loading && !error && reviews.length === 0 && (
-              <div className="text-(--muted)">No reviews yet.</div>
-            )}
-
-            {reviews.map((review) => {
-              const reviewerName = review.reviewerId?.fullName || "Anonymous";
-              const initials = reviewerName
-                .split(" ")
-                .filter(Boolean)
-                .slice(0, 2)
-                .map((part) => part[0])
-                .join("")
-                .toUpperCase();
-
-              return (
-                <div
-                  key={review._id}
-                  className="bg-(--primary) rounded-2xl p-8 shadow-sm border border-(--border) hover:shadow-md transition-shadow"
-                >
-                  <div className="flex items-start gap-4">
-                    {review.reviewerId?.profilePicture ? (
-                      <img
-                        src={review.reviewerId.profilePicture}
-                        alt={reviewerName}
-                        className="w-12 h-12 rounded-full object-cover shrink-0"
-                      />
-                    ) : (
-                      <div className="w-12 h-12 rounded-full bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-lg shrink-0">
-                        {initials || "?"}
-                      </div>
-                    )}
-
-                    <div className="flex-1">
-                      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-3">
-                        <div>
-                          <h3 className="text-lg font-semibold text-(--text)">
-                            {reviewerName}
-                          </h3>
-                          {typeof review.jobId === "object" &&
-                            review.jobId?.title && (
-                              <p className="text-sm text-(--muted)">
-                                {review.jobId.title}
-                              </p>
-                            )}
-                        </div>
-                        <span className="text-sm text-(--muted) mt-1 md:mt-0">
-                          {review.createdAt
-                            ? new Date(review.createdAt).toLocaleDateString()
-                            : ""}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center gap-1 mb-4">
-                        {Array.from({ length: 5 }).map((_, i) => (
-                          <Star
-                            key={i}
-                            className={`w-5 h-5 ${
-                              i < review.rating
-                                ? "fill-yellow-400 text-yellow-400"
-                                : "text-(--muted)"
-                            }`}
-                          />
-                        ))}
-                      </div>
-
-                      <p className="text-(--text) leading-relaxed">
-                        {review.comment || "No comment provided."}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
           </div>
         </div>
       </main>

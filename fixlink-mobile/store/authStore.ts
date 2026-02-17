@@ -8,6 +8,7 @@ interface AuthState {
   user: any | null;
   loading: boolean;
   checking: boolean;
+  authInitialized: boolean;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
@@ -18,6 +19,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   loading: false,
   checking: false,
+  authInitialized: false,
 
   login: async (email, password) => {
     set({ loading: true });
@@ -25,7 +27,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       const res = await AuthApi.loginApi({ email, password });
 
       await AsyncStorage.setItem('jwtToken', res.data.token);
-      set({ user: res.data.user });
+      set({ user: res.data.user, authInitialized: true });
       Toast.show({
         type: 'success',
         text1: res.data.message ?? 'Login successful',
@@ -54,7 +56,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       // ignore API failure on logout
     } finally {
       await AsyncStorage.removeItem('jwtToken');
-      set({ user: null });
+      set({ user: null, authInitialized: true });
 
       Toast.show({
         type: 'success',
@@ -64,19 +66,24 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   checkAuth: async () => {
+    const { authInitialized, checking } = useAuthStore.getState();
+    if (authInitialized || checking) {
+      return;
+    }
+
     set({ checking: true });
     try {
       const token = await AsyncStorage.getItem('jwtToken');
       if (!token) {
-        set({ user: null });
+        set({ user: null, authInitialized: true });
         return;
       }
 
       const res = await AuthApi.checkAuthApi();
-      set({ user: res.data });
+      set({ user: res.data, authInitialized: true });
     } catch {
       await AsyncStorage.removeItem('jwtToken');
-      set({ user: null });
+      set({ user: null, authInitialized: true });
     } finally {
       set({ checking: false });
     }

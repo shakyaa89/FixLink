@@ -24,7 +24,15 @@ export default function Login() {
         type: 'success',
         text2: "Logged In Successfully!"
       })
-      router.push("/jobs"); 
+      const currentUser = useAuthStore.getState().user;
+
+      if (currentUser?.role === "user") {
+        router.replace("/protected/user/dashboard");
+      } else if (currentUser?.role === "serviceProvider") {
+        router.replace("/protected/service-provider/dashboard");
+      } else {
+        router.replace("/protected/jobs");
+      }
     }
   };
 

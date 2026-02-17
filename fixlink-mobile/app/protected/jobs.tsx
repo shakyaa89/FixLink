@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ArrowLeft, BriefcaseBusiness, Calendar, MapPin } from "lucide-react-native";
-import colors from "./_constants/theme";
+import colors from "../_constants/theme";
 import { JobApi, type JobData } from "@/api/Apis";
 import { useAuthStore } from "@/store/authStore";
 import { useCallback, useEffect, useMemo, useState } from "react";

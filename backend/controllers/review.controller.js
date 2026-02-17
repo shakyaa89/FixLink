@@ -115,3 +115,24 @@ export const getMyReceivedReviews = async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 };
+
+export const getMySentReviews = async (req, res) => {
+  try {
+    const userId = req.user?._id;
+
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const reviews = await Review.find({ reviewerId: userId })
+      .populate("revieweeId", "fullName profilePicture")
+      .populate("jobId", "title")
+      .sort({ createdAt: -1 })
+      .lean();
+
+    return res.status(200).json({ reviews });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};

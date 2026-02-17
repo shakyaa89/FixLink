@@ -9,7 +9,7 @@ export const getAdminOverview = async (req, res) => {
         .select("fullName email role verificationStatus createdAt")
         .sort({ createdAt: -1 })
         .limit(5)
-        .lean(), // returns plain js objects.
+        .lean(), // .lean() returns plain js objects.
       Job.find()
         .populate("userId", "fullName")
         .sort({ createdAt: -1 })
