@@ -47,21 +47,6 @@ export default function CreateJobPage() {
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    if (!user) {
-      router.replace("/public/login");
-      return;
-    }
-
-    if (user.role !== "user") {
-      if (user.role === "serviceProvider") {
-        router.replace("/protected/service-provider/dashboard");
-      } else {
-        router.replace("/protected/jobs");
-      }
-    }
-  }, [user, router]);
-
   const pickImages = async () => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
@@ -149,7 +134,7 @@ export default function CreateJobPage() {
         text1: response?.data?.message || "Job created successfully",
       });
 
-      router.replace("/protected/jobs");
+      router.replace("/jobs");
     } catch (error: any) {
       Toast.show({
         type: "error",

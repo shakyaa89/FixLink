@@ -27,11 +27,11 @@ export default function Login() {
       const currentUser = useAuthStore.getState().user;
 
       if (currentUser?.role === "user") {
-        router.replace("/protected/user/dashboard");
+        router.replace("/user/dashboard");
       } else if (currentUser?.role === "serviceProvider") {
-        router.replace("/protected/service-provider/dashboard");
+        router.replace("/service-provider/dashboard");
       } else {
-        router.replace("/protected/jobs");
+        router.replace("/jobs");
       }
     }
   };
@@ -135,7 +135,7 @@ export default function Login() {
           {/* Footer */}
           <View className="items-center pt-4">
             <Pressable
-              onPress={() => router.push("/public/registerscreen")}
+              onPress={() => router.push("/public/register")}
             >
               <Text className="text-base text-muted">
                 New to FixLink?{" "}

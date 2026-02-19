@@ -81,23 +81,6 @@ export default function UserDashboard() {
     }
   }, [user]);
 
-  useEffect(() => {
-    if (!user) {
-      router.replace("/public/login");
-      return;
-    }
-    if (user.role !== "user") {
-      if (user.role === "serviceProvider") {
-        router.replace("/protected/service-provider/dashboard");
-      } else {
-        router.replace("/protected/jobs");
-      }
-      return;
-    }
-    setLoading(true);
-    fetchJobs();
-  }, [user, fetchJobs, router]);
-
   const stats = useMemo(() => {
     const total = jobs.length;
     const active = jobs.filter(
@@ -176,7 +159,7 @@ export default function UserDashboard() {
             <Text className="text-base font-semibold text-text">Quick Actions</Text>
             <Pressable
               className="bg-accent rounded-2xl px-5 py-4 flex-row items-center justify-between active:opacity-90"
-              onPress={() => router.push("/protected/user/create-job")}
+              onPress={() => router.push("/user/create-job")}
             >
               <View className="gap-1">
                 <Text className="text-white font-bold text-base">Post a New Job</Text>
@@ -189,7 +172,7 @@ export default function UserDashboard() {
 
             <Pressable
               className="bg-secondary border border-border rounded-2xl px-5 py-4 flex-row items-center justify-between active:opacity-80"
-              onPress={() => router.push("/protected/jobs")}
+              onPress={() => router.push("/jobs")}
             >
               <View className="gap-1">
                 <Text className="text-text font-bold text-base">Browse My Jobs</Text>
@@ -207,7 +190,7 @@ export default function UserDashboard() {
               <Text className="text-base font-semibold text-text">Recent Jobs</Text>
               <Pressable
                 className="flex-row items-center gap-1"
-                onPress={() => router.push("/protected/jobs")}
+                onPress={() => router.push("/jobs")}
               >
                 <Text className="text-sm text-accent font-medium">See all</Text>
                 <ChevronRight size={16} color={colors.accent} />
@@ -232,7 +215,7 @@ export default function UserDashboard() {
                 </View>
                 <Pressable
                   className="bg-accent rounded-xl px-5 py-2.5 mt-1 active:opacity-90"
-                  onPress={() => router.push("/protected/user/create-job")}
+                  onPress={() => router.push("/user/create-job")}
                 >
                   <Text className="text-white font-semibold text-sm">Post a Job</Text>
                 </Pressable>
@@ -250,7 +233,7 @@ export default function UserDashboard() {
                       onPress={() => {
                         if (!job._id) return;
                         router.push({
-                          pathname: "/protected/job-details/[jobId]",
+                          pathname: "/job-details/[jobId]",
                           params: { jobId: job._id },
                         });
                       }}

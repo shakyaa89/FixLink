@@ -1,7 +1,7 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export const API_BASE_URL = 'http://192.168.1.70:3005';
+export const API_BASE_URL = 'http://192.168.1.66:3005';
 const baseURL = `${API_BASE_URL}/api`;
 
 

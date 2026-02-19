@@ -12,16 +12,16 @@ export default function NavBar() {
 
     function goToDashboard() {
         if (user?.role === "user") {
-            router.push("/protected/user/dashboard");
+            router.push("/user/dashboard");
             return;
         }
 
         if (user?.role === "serviceProvider") {
-            router.push("/protected/service-provider/dashboard");
+            router.push("/service-provider/dashboard");
             return;
         }
 
-        router.push("/protected/jobs");
+        router.push("/jobs");
     }
 
     function HandleLogout(){
@@ -55,7 +55,7 @@ export default function NavBar() {
                 </Pressable>
                 <Pressable
                     className="flex-1 items-center gap-1 py-2 active:opacity-70"
-                    onPress={() => router.push("/protected/jobs")}
+                    onPress={() => router.push("/jobs")}
                 >
                     <View className={`p-2 rounded-xl`}>
                         <BriefcaseBusiness

@@ -136,7 +136,7 @@ function Jobs() {
 
           {role === "user" && (
             <Pressable
-              onPress={() => router.push("/protected/user/create-job")}
+              onPress={() => router.push("/user/create-job")}
               className="bg-accent rounded-xl py-3 items-center"
             >
               <Text className="text-white text-sm font-semibold">Create Job</Text>
@@ -232,7 +232,7 @@ function Jobs() {
                     onPress={() => {
                       if (!job._id) return;
                       router.push({
-                        pathname: "/protected/job-details/[jobId]",
+                        pathname: "/job-details/[jobId]",
                         params: { jobId: job._id },
                       });
                     }}

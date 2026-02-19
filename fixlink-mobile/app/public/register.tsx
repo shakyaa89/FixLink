@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import colors from "@/app/_constants/theme";
 
-export default function RegisterScreen() {
+export default function Register() {
   const [userRole, setUserRole] = useState<"user" | "serviceProvider">("user");
 
   return (

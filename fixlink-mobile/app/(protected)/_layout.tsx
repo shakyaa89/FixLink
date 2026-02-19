@@ -3,11 +3,11 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuthStore } from "@/store/authStore";
 
 
-export default function PublicLayout() {
+export default function ProtectedLayout() {
     const { user } = useAuthStore();
 
-    if (user) {
-        return <Redirect href="/jobs" />;
+    if (!user) {
+        return <Redirect href="/public/login" />;
     }
 
     return (

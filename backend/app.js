@@ -31,10 +31,10 @@ app.use(
     origin: [
       "http://192.168.1.70:5173",
       "http://localhost:5173",
-      "http://192.168.1.70:3000",
+      "http://192.168.1.70:3005",
       "http://localhost:3000",
       "http://100.64.234.28:5173",
-      "http://192.168.1.70:3005",
+      "http://192.168.1.66:3005",
       "http://localhost:8081"
     ],
     credentials: true,

@@ -1,20 +1,20 @@
 import { Redirect, Stack } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuthStore } from "@/store/authStore";
-import { ActivityIndicator } from "react-native";
 
 export default function RootLayout() {
-  const { checking, user } = useAuthStore();
-
-  if (checking) {
-    return (
-      <SafeAreaView style={{ flex: 1 }}>
-        <ActivityIndicator />
-      </SafeAreaView>);
-  }
+  const { user } = useAuthStore();
 
   if (!user) {
     return <Redirect href="/" />;
+  }
+
+  if (user.role !== "serviceProvider") {
+    if (user.role === "user") {
+      return <Redirect href="/user/dashboard" />;
+    }
+
+    return <Redirect href="/jobs" />;
   }
 
   return (

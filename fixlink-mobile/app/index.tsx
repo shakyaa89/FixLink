@@ -1,120 +1,85 @@
 import { useRouter } from "expo-router";
-import { Pressable, Text, View, ScrollView } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
-  Wrench,
-  Zap,
-  Shield,
-  Star,
   Home,
-  Droplet,
-  Wind,
-  Paintbrush,
-  Hammer,
-  Lock
+  Star,
+  CheckCircle,
+  Clock,
+  Shield
 } from "lucide-react-native";
 import { useAuthStore } from "@/store/authStore";
 import { useEffect } from "react";
 
 export default function Index() {
   const router = useRouter();
-
   const { user } = useAuthStore();
 
   useEffect(() => {
     if (!user) return;
 
     if (user.role === "user") {
-      router.replace("/protected/user/dashboard");
+      router.replace("/user/dashboard");
       return;
     }
 
     if (user.role === "serviceProvider") {
-      router.replace("/protected/service-provider/dashboard");
+      router.replace("/service-provider/dashboard");
       return;
     }
 
-    router.replace("/protected/jobs");
+    router.replace("/jobs");
   }, [user, router]);
-
 
   return (
     <SafeAreaView className="flex-1 bg-primary">
-      <ScrollView
-        className="flex-1"
-        showsVerticalScrollIndicator={false}
-      >
-        <View className="px-6 pb-8">
-          {/* Header with Logo */}
-          <View className="pt-4 pb-6">
-            <View className="flex-row items-center gap-2">
-              <Text className="text-6xl font-bold text-text">FixLink</Text>
-            </View>
-          </View>
+      <View className="flex-1 px-6 py-6 justify-between">
+        
 
-          {/* Hero Section */}
-          <View className="gap-3 mb-8">
-            <Text className="text-4xl font-bold text-text leading-tight">
+        {/* Hero Section */}
+        <View className="gap-8 flex-1 justify-center">
+          <Text className="text-6xl font-bold text-text">FixLink</Text>
+          <View className="gap-3">
+            <Text className="text-5xl font-bold text-text leading-tight">
               Home Repairs,{'\n'}
               <Text className="text-accent">Made Simple</Text>
             </Text>
             <Text className="text-lg text-muted leading-relaxed">
-              Connect with verified local service providers for quick, reliable home repairs and maintenance.
+              Connect with verified local service providers for quick, reliable home repairs.
             </Text>
-          </View>
+          </View>          
 
-          {/* Popular Services */}
-          <View className="mb-8">
-            <Text className="text-lg font-semibold text-text mb-3">Services</Text>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              className="gap-3"
-            >
-              <View className="bg-accent/10 border border-accent/30 rounded-xl px-4 py-3 mr-2 flex-row items-center gap-2">
-                <Zap size={18} color="#3B82F6" />
-                <Text className="text-accent font-medium">Electrical</Text>
-              </View>
-              <View className="bg-accent/10 border border-accent/30 rounded-xl px-4 py-3 mr-2 flex-row items-center gap-2">
-                <Droplet size={18} color="#3B82F6" />
-                <Text className="text-accent font-medium">Plumbing</Text>
-              </View>
-              <View className="bg-accent/10 border border-accent/30 rounded-xl px-4 py-3 mr-2 flex-row items-center gap-2">
-                <Wind size={18} color="#3B82F6" />
-                <Text className="text-accent font-medium">HVAC</Text>
-              </View>
-              <View className="bg-accent/10 border border-accent/30 rounded-xl px-4 py-3 mr-2 flex-row items-center gap-2">
-                <Paintbrush size={18} color="#3B82F6" />
-                <Text className="text-accent font-medium">Painting</Text>
-              </View>
-              <View className="bg-accent/10 border border-accent/30 rounded-xl px-4 py-3 flex-row items-center gap-2">
-                <Hammer size={18} color="#3B82F6" />
-                <Text className="text-accent font-medium">Carpentry</Text>
-              </View>
-            </ScrollView>
-          </View>
-
-          {/* CTA Buttons */}
-          <View className="gap-3 mb-6">
-            <Pressable
-              className="bg-accent rounded-xl py-4 items-center active:opacity-90"
-              onPress={() => router.push("/public/login")}
-            >
-              <Text className="text-white text-lg font-bold">Get Started</Text>
-            </Pressable>
-          </View>
-
-          {/* Trust Badge */}
-          <View className="items-center pb-4">
-            <View className="bg-secondary border border-border rounded-full px-6 py-3 flex-row items-center gap-2">
-              <Lock size={16} color="#9CA3AF" />
-              <Text className="text-sm text-muted text-center">
-                Secure • Trusted
-              </Text>
+          {/* Quick Features */}
+          <View className="flex-row gap-3">
+            <View className="flex-1 bg-secondary border border-border rounded-xl p-3 items-center gap-2">
+              <CheckCircle size={24} color="#3B82F6" />
+              <Text className="text-xs text-text font-medium text-center">Verified{'\n'}Pros</Text>
+            </View>
+            <View className="flex-1 bg-secondary border border-border rounded-xl p-3 items-center gap-2">
+              <Clock size={24} color="#3B82F6" />
+              <Text className="text-xs text-text font-medium text-center">Fast{'\n'}Matching</Text>
+            </View>
+            <View className="flex-1 bg-secondary border border-border rounded-xl p-3 items-center gap-2">
+              <Shield size={24} color="#3B82F6" />
+              <Text className="text-xs text-text font-medium text-center">Quality{'\n'}Guarantee</Text>
             </View>
           </View>
         </View>
-      </ScrollView>
+
+        {/* CTA Buttons */}
+        <View className="gap-3">
+          <Pressable
+            className="bg-accent rounded-2xl py-4 items-center active:opacity-90"
+            onPress={() => router.push("/public/login")}
+          >
+            <Text className="text-white text-lg font-bold">Get Started</Text>
+          </Pressable>
+
+          <View className="items-center pt-2">
+            <Text className="text-xs text-muted">Highly Trusted by Users</Text>
+          </View>
+        </View>
+      </View>
     </SafeAreaView>
   );
 }

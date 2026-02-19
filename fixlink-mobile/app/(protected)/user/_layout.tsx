@@ -9,12 +9,12 @@ export default function RootLayout() {
     return <Redirect href="/" />;
   }
 
-  if (user.role !== "serviceProvider") {
-    if (user.role === "user") {
-      return <Redirect href="/protected/user/dashboard" />;
+  if (user.role !== "user") {
+    if (user.role === "serviceProvider") {
+      return <Redirect href="/service-provider/dashboard" />;
     }
 
-    return <Redirect href="/protected/jobs" />;
+    return <Redirect href="/jobs" />;
   }
 
   return (

@@ -50,9 +50,9 @@ export default function ProviderDashboard() {
 
     if (user.role !== "serviceProvider") {
       if (user.role === "user") {
-        router.replace("/protected/user/dashboard");
+        router.replace("/user/dashboard");
       } else {
-        router.replace("/protected/jobs");
+        router.replace("/jobs");
       }
       return;
     }
@@ -115,7 +115,7 @@ export default function ProviderDashboard() {
 
           <Pressable
             className="bg-accent rounded-xl py-3.5 items-center"
-            onPress={() => router.push("/protected/jobs")}
+            onPress={() => router.push("/jobs")}
           >
             <View className="flex-row items-center gap-2">
               <BriefcaseBusiness size={18} color="#fff" />
@@ -142,7 +142,7 @@ export default function ProviderDashboard() {
                     onPress={() => {
                       if (!job._id) return;
                       router.push({
-                        pathname: "/protected/job-details/[jobId]",
+                        pathname: "/job-details/[jobId]",
                         params: { jobId: job._id },
                       });
                     }}

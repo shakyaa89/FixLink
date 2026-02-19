@@ -19,7 +19,7 @@ const disputeSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["open", "in-review", "resolved"],
+      enum: ["open", "resolved"],
       default: "open",
     },
     priority: {
