@@ -3,7 +3,7 @@ import { MapPin, Upload, Loader2, Link2, FileText } from "lucide-react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import { AuthApi } from "../../api/Apis";
+import { AiApi, AuthApi } from "../../api/Apis";
 import { useAuthStore } from "../../store/authStore";
 
 export default function CompleteProfilePage() {
@@ -59,6 +59,23 @@ export default function CompleteProfilePage() {
       );
       const idURL = await uploadToCloudinary(idProofFile, "idUpload");
 
+      var verificationStat: "pending" | "verified" | "rejected" = "pending";
+
+      var rejectionReason = "";
+
+      const verificationPayload = { verificationProofURL: verificationProofURL, category: providerCategory }
+
+      const verification = await AiApi.verifyProvider(verificationPayload)
+
+      console.log(verification.data.reply);
+
+      if(verification.data.reply === "PROPER"){
+        verificationStat = "verified";
+      }else {
+        rejectionReason = verification.data.reply;
+        verificationStat = "rejected";
+      }
+
       const response = await AuthApi.completeServiceProviderProfile({
         providerCategory,
         address,
@@ -66,6 +83,8 @@ export default function CompleteProfilePage() {
         addressURL,
         verificationProofURL,
         idURL,
+        verificationStatus: verificationStat,
+        rejectionReason: rejectionReason
       });
 
       toast.success(response?.data?.message || "Profile completed");

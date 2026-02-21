@@ -6,16 +6,6 @@ import { useAuthStore } from "../../store/authStore";
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState("overview");
 
-  const profileData = {
-    name: "Shakyaa",
-    role: "user",
-    email: "shakyaa@shakyaa.com",
-    phone: "9849977706",
-    location: "Nepal, Kathmandu",
-    memberSince: "January 2025",
-    totalSpent: "5,000",
-  };
-
   const { user } = useAuthStore();
 
   return (
@@ -68,8 +58,20 @@ export default function ProfilePage() {
             </div>
           </div>
 
+          {user.role === "serviceProvider" &&
+            user.verificationStatus === "rejected" && (
+              <div className="mb-8 rounded-xl border border-red-200 bg-red-50 px-6 py-4">
+                <p className="text-sm font-semibold text-red-800">
+                  Verification was rejected
+                </p>
+                <p className="mt-1 text-sm text-red-700">
+                  {user.rejectionReason || "No rejection reason provided."}
+                </p>
+              </div>
+            )}
+
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <div className="bg-(--primary) rounded-2xl p-6 shadow-sm border border-(--border)">
               <div className="text-sm text-(--muted) mb-1">Completed Jobs</div>
               <div className="text-3xl font-bold text-(--text)">0</div>
@@ -77,12 +79,6 @@ export default function ProfilePage() {
             <div className="bg-(--primary) rounded-2xl p-6 shadow-sm border border-(--border)">
               <div className="text-sm text-(--muted) mb-1">Active Jobs</div>
               <div className="text-3xl font-bold text-(--accent)">0</div>
-            </div>
-            <div className="bg-(--primary) rounded-2xl p-6 shadow-sm border border-(--border)">
-              <div className="text-sm text-(--muted) mb-1">Total Spent</div>
-              <div className="text-3xl font-bold text-(--text)">
-                Rs. {profileData.totalSpent}
-              </div>
             </div>
           </div>
 

@@ -100,6 +100,8 @@ export async function completeServiceProviderProfile(req, res) {
     address,
     addressDescription,
     addressURL,
+    verificationStatus,
+    rejectionReason
   } = req.body;
 
   try {
@@ -130,7 +132,8 @@ export async function completeServiceProviderProfile(req, res) {
     user.address = address;
     user.addressDescription = addressDescription || user.addressDescription;
     user.addressURL = addressURL || user.addressURL;
-    user.verificationStatus = "pending";
+    user.verificationStatus = verificationStatus ?? "pending";
+    user.rejectionReason = rejectionReason;
 
     await user.save();
 

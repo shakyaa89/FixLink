@@ -27,6 +27,8 @@ interface ServiceProviderProfilePayload {
   address: string;
   addressDescription?: string;
   addressURL?: string;
+  verificationStatus: string;
+  rejectionReason: string;
 }
 
 interface UserLoginData {
@@ -261,6 +263,8 @@ export const AiApi = {
     Api.post("/ai/chat", data, {
       headers: getAuthHeader(),
     }),
+
+  verifyProvider: (data: { verificationProofURL: string; category: string; }) => Api.post("/ai/verify", data)
 };
 
 export const AdminApi = {

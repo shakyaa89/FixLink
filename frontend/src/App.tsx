@@ -19,8 +19,8 @@ import Messages from "./pages/UserPages/Messages";
 import ReviewsPage from "./pages/UserPages/ReviewsPage";
 import ProfilePage from "./pages/UserPages/ProfilePage";
 import DisputesPage from "./pages/UserPages/DisputesPage";
-import ProtectedRoute from "./routesRoute";
 import ServiceProviderRoute from "./routes/ServiceProviderRoute";
+import ProtectedRoute from "./routes/ProtectedRoute";
 import ServiceProviderDashboard from "./pages/ServiceProviderPages/ServiceProviderDashboard";
 import ViewJobsPage from "./pages/ServiceProviderPages/ViewJobsPage";
 import JobDetailsPage from "./pages/UserPages/JobDetailsPage";
@@ -199,7 +199,7 @@ function App() {
             element={
               <ProtectedRoute>
                 <Messages />
-              <Route>
+              </ProtectedRoute>
             }
           />
 
@@ -208,7 +208,7 @@ function App() {
             element={
               <ProtectedRoute>
                 <ReviewsPage />
-              <Route>
+              </ProtectedRoute>
             }
           />
 
@@ -217,7 +217,7 @@ function App() {
             element={
               <ProtectedRoute>
                 <ProfilePage />
-              <Route>
+              </ProtectedRoute>
             }
           />
 
@@ -226,7 +226,7 @@ function App() {
             element={
               <ProtectedRoute>
                 <DisputesPage />
-              <Route>
+              </ProtectedRoute>
             }
           />
 

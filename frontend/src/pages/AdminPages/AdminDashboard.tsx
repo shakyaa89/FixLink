@@ -218,7 +218,7 @@ export default function AdminDashboard() {
                       </p>
                     </div>
                     <span
-                      className={`text-xs font-semibold px-3 py-1 rounded-full`}
+                      className={`text-xs font-semibold px-3 py-1 rounded-full capitalize bg-(--secondary) text-(--muted) border border-(--border)`}
                     >
                       {dispute.status}
                     </span>

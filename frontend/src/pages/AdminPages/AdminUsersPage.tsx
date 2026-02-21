@@ -31,13 +31,13 @@ export default function AdminUsersPage() {
     const total = users.length;
     const providers = users.filter((user) => user.role === "serviceProvider").length;
     const admins = users.filter((user) => user.role === "admin").length;
-    const suspended = users.filter((user) => user.verificationStatus === "rejected").length;
+    const rejected = users.filter((user) => user.verificationStatus === "rejected").length;
 
     return [
       { title: "Total Users", value: total, icon: Users },
       { title: "Providers", value: providers, icon: UserCheck },
       { title: "Admins", value: admins, icon: ShieldCheck },
-      { title: "Suspended", value: suspended, icon: UserX },
+      { title: "Rejected", value: rejected, icon: UserX },
     ];
   }, [users]);
 
@@ -90,12 +90,9 @@ export default function AdminUsersPage() {
           <div className="bg-(--primary) border border-(--border) rounded-2xl shadow-sm overflow-hidden">
             <div className="flex items-center justify-between px-6 py-4 border-b border-(--border) bg-(--secondary)">
               <h2 className="text-lg font-semibold text-(--text)">All Users</h2>
-              <button className="px-4 py-2 text-sm font-medium rounded-lg bg-(--accent) text-(--primary) hover:bg-(--accent-hover) transition">
-                Invite Admin
-              </button>
             </div>
 
-            <div className="divide-y divide-[var(--border)]">
+            <div className="divide-y divide-(--border)">
               {!loading && users.length === 0 && (
                 <div className="px-6 py-6 text-sm text-(--muted)">
                   No users found.

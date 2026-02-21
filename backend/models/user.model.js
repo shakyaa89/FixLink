@@ -63,6 +63,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    rejectionReason: {
+      type: String,
+      default: "",
+    },
     providerCategory: {
       type: String,
       enum: [

@@ -26,7 +26,7 @@ export default function UserDashboard() {
   const [jobs, setJobs] = useState<JobData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [stats, setStats] = useState<DashboardStats>({
+  const [stats] = useState<DashboardStats>({
     activeJobs: 0,
     completedJobs: 0,
     offersReceived: 0,
@@ -135,8 +135,21 @@ export default function UserDashboard() {
         <div className="max-w-7xl mx-auto">
           {/* Welcome Section */}
           <div className="mb-8">
+            {user.verificationStatus !== "verified" && (
+              <div className="mb-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+                <p className="text-sm font-semibold text-red-800">
+                  Your profile has not been verified yet.
+                </p>
+                {user.verificationStatus === "rejected" &&
+                  user.rejectionReason && (
+                    <p className="mt-1 text-sm text-red-700">
+                      Rejection reason: {user.rejectionReason}
+                    </p>
+                  )}
+              </div>
+            )}
             <h1 className="text-3xl sm:text-4xl font-bold text-(--text)">
-              Welcome Back!
+              Hello, {user.fullName.split(" ")[0]}
             </h1>
             <p className="text-lg text-(--muted) mt-2">
               Manage your jobs, messages, and offers all in one place.
