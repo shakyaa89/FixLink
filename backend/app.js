@@ -26,21 +26,30 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
+// app.use(
+//   cors({
+//     origin: [
+//       "http://192.168.1.70:5173",
+//       "http://localhost:5173",
+//       "http://192.168.1.70:3005",
+//       "http://localhost:3005",
+//       "http://100.64.234.28:5173",
+//       "http://192.168.1.66:3005",
+//       "http://localhost:8081",
+//       "http://172.16.17.90:8081"
+//     ],
+//     credentials: true,
+//     allowedHeaders: ["Content-Type", "Authorization"],
+//   })
+// );
+
 app.use(
   cors({
-    origin: [
-      "http://192.168.1.70:5173",
-      "http://localhost:5173",
-      "http://192.168.1.70:3005",
-      "http://localhost:3000",
-      "http://100.64.234.28:5173",
-      "http://192.168.1.66:3005",
-      "http://localhost:8081"
-    ],
+    origin: true,
     credentials: true,
-    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

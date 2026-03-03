@@ -26,19 +26,6 @@ export default function Messages() {
 
   const loggedInId = user?._id || user?.id;
 
-  useEffect(() => {
-    if (!loggedInId) return;
-    loadContacts();
-  }, [loggedInId, loadContacts]);
-
-  useEffect(() => {
-    if (!loggedInId) return;
-    connectSocket(String(loggedInId));
-    return () => {
-      disconnectSocket();
-    };
-  }, [loggedInId, connectSocket, disconnectSocket]);
-
   // const formatTimestamp = (value?: string) => {
   //   if (!value) return "";
   //   try {
@@ -64,6 +51,19 @@ export default function Messages() {
     await sendMessage(message.trim());
     setMessage("");
   };
+
+  useEffect(() => {
+    if (!loggedInId) return;
+    loadContacts();
+  }, [loggedInId, loadContacts]);
+
+  useEffect(() => {
+    if (!loggedInId) return;
+    connectSocket(String(loggedInId));
+    return () => {
+      disconnectSocket();
+    };
+  }, [loggedInId, connectSocket, disconnectSocket]);
 
   useEffect(() => {
     console.log(activeChatUser);

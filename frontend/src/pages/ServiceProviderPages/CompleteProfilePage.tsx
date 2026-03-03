@@ -31,7 +31,7 @@ export default function CompleteProfilePage() {
     try {
       const { data } = await axios.post(
         "https://api.cloudinary.com/v1_1/ddmyk2hd6/image/upload",
-        formData
+        formData,
       );
       return data.secure_url as string;
     } catch (err) {
@@ -45,7 +45,12 @@ export default function CompleteProfilePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!providerCategory || !address || !verificationProofFile || !idProofFile) {
+    if (
+      !providerCategory ||
+      !address ||
+      !verificationProofFile ||
+      !idProofFile
+    ) {
       toast.error("Please fill in all required fields");
       return;
     }
@@ -55,23 +60,26 @@ export default function CompleteProfilePage() {
 
       const verificationProofURL = await uploadToCloudinary(
         verificationProofFile,
-        "verificationUpload"
+        "verificationUpload",
       );
       const idURL = await uploadToCloudinary(idProofFile, "idUpload");
 
-      var verificationStat: "pending" | "verified" | "rejected" = "pending";
+      let verificationStat: "pending" | "verified" | "rejected" = "pending";
 
-      var rejectionReason = "";
+      let rejectionReason = "";
 
-      const verificationPayload = { verificationProofURL: verificationProofURL, category: providerCategory }
+      const verificationPayload = {
+        verificationProofURL: verificationProofURL,
+        category: providerCategory,
+      };
 
-      const verification = await AiApi.verifyProvider(verificationPayload)
+      const verification = await AiApi.verifyProvider(verificationPayload);
 
       console.log(verification.data.reply);
 
-      if(verification.data.reply === "PROPER"){
+      if (verification.data.reply === "PROPER") {
         verificationStat = "verified";
-      }else {
+      } else {
         rejectionReason = verification.data.reply;
         verificationStat = "rejected";
       }
@@ -84,7 +92,7 @@ export default function CompleteProfilePage() {
         verificationProofURL,
         idURL,
         verificationStatus: verificationStat,
-        rejectionReason: rejectionReason
+        rejectionReason: rejectionReason,
       });
 
       toast.success(response?.data?.message || "Profile completed");

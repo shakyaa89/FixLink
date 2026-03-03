@@ -8,30 +8,15 @@ export default function AdminUsersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const response = await AdminApi.fetchUsers();
-        const fetchedUsers = (response.data.users || []);
-        setUsers(fetchedUsers);
-      } catch (err) {
-        console.error("Failed to load users", err);
-        setError("Unable to load users. Please try again.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUsers();
-  }, []);
-
   const stats = useMemo(() => {
     const total = users.length;
-    const providers = users.filter((user) => user.role === "serviceProvider").length;
+    const providers = users.filter(
+      (user) => user.role === "serviceProvider",
+    ).length;
     const admins = users.filter((user) => user.role === "admin").length;
-    const rejected = users.filter((user) => user.verificationStatus === "rejected").length;
+    const rejected = users.filter(
+      (user) => user.verificationStatus === "rejected",
+    ).length;
 
     return [
       { title: "Total Users", value: total, icon: Users },
@@ -40,6 +25,25 @@ export default function AdminUsersPage() {
       { title: "Rejected", value: rejected, icon: UserX },
     ];
   }, [users]);
+
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await AdminApi.fetchUsers();
+      const fetchedUsers = response.data.users || [];
+      setUsers(fetchedUsers);
+    } catch (err) {
+      console.error("Failed to load users", err);
+      setError("Unable to load users. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   return (
     <div className="flex min-h-screen bg-(--primary)">
@@ -110,24 +114,25 @@ export default function AdminUsersPage() {
                     <p className="text-xs text-(--muted)">{user.email}</p>
                   </div>
                   <div>
-                    <span
-                      className="text-xs font-semibold px-3 py-1 rounded-full bg-(--secondary) text-(--muted) border border-(--border)"
-                    >
-                      {user.role === "serviceProvider" ? "Service Provider" : user.role === "user" ? "User" : "Admin"}
+                    <span className="text-xs font-semibold px-3 py-1 rounded-full bg-(--secondary) text-(--muted) border border-(--border)">
+                      {user.role === "serviceProvider"
+                        ? "Service Provider"
+                        : user.role === "user"
+                          ? "User"
+                          : "Admin"}
                     </span>
                   </div>
                   <div>
-                    <span
-                      className="text-xs font-semibold px-3 py-1 rounded-full bg-(--secondary) text-(--muted) border border-(--border) capitalize"
-                    >
+                    <span className="text-xs font-semibold px-3 py-1 rounded-full bg-(--secondary) text-(--muted) border border-(--border) capitalize">
                       {user.verificationStatus ? user.verificationStatus : "-"}
                     </span>
                   </div>
                   <div>
-                    <p className="text-sm text-(--text)">{new Date(user.createdAt!).toLocaleDateString()}</p>
+                    <p className="text-sm text-(--text)">
+                      {new Date(user.createdAt!).toLocaleDateString()}
+                    </p>
                     <p className="text-xs text-(--muted)">{user._id}</p>
                   </div>
-                  
                 </div>
               ))}
             </div>

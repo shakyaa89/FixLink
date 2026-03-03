@@ -43,6 +43,20 @@ export default function MyJobs() {
     }
   };
 
+  const getStatusBadgeStyles = (status?: string) => {
+    switch (status) {
+      case "open":
+      case "pending":
+        return "bg-green-100 text-green-700 border border-green-200";
+      case "closed":
+        return "bg-red-100 text-red-700 border border-red-200";
+      case "completed":
+        return "bg-blue-100 text-blue-700 border border-blue-200";
+      default:
+        return "bg-(--secondary) text-(--text) border border-(--border)";
+    }
+  };
+
   useEffect(() => {
     fetchJobs();
   }, []);
@@ -63,26 +77,12 @@ export default function MyJobs() {
         (job) =>
           job.title?.toLowerCase().includes(query) ||
           job.description?.toLowerCase().includes(query) ||
-          job.location?.toLowerCase().includes(query)
+          job.location?.toLowerCase().includes(query),
       );
     }
 
     setFilteredJobs(filtered);
   }, [statusFilter, searchQuery, jobs]);
-
-  const getStatusBadgeStyles = (status?: string) => {
-    switch (status) {
-      case "open":
-      case "pending":
-        return "bg-green-100 text-green-700 border border-green-200";
-      case "closed":
-        return "bg-red-100 text-red-700 border border-red-200";
-      case "completed":
-        return "bg-blue-100 text-blue-700 border border-blue-200";
-      default:
-        return "bg-(--secondary) text-(--text) border border-(--border)";
-    }
-  };
 
   return (
     <div className="flex min-h-screen bg-(--secondary)">
@@ -255,7 +255,7 @@ export default function MyJobs() {
                         </h2>
                         <span
                           className={`px-3 py-1 rounded-full text-xs font-medium capitalize whitespace-nowrap ${getStatusBadgeStyles(
-                            job.jobStatus
+                            job.jobStatus,
                           )}`}
                         >
                           {job.jobStatus}

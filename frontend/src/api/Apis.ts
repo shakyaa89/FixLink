@@ -1,8 +1,8 @@
 import axios from "axios";
 
-export const API_BASE_URL = "http://192.168.1.66:3005";
+// export const API_BASE_URL = "http://192.168.1.66:3005";
+export const API_BASE_URL = "http://localhost:3005";
 const baseURL = `${API_BASE_URL}/api`;
-// const baseURL = "http://100.64.234.28:3000/api";
 
 interface User {
   _id?: string;
@@ -240,8 +240,7 @@ export const ReviewApi = {
 };
 
 export const DisputeApi = {
-  fetchMyDisputes: () =>
-    Api.get("/disputes/my", { headers: getAuthHeader() }),
+  fetchMyDisputes: () => Api.get("/disputes/my", { headers: getAuthHeader() }),
 
   fetchDisputableJobs: () =>
     Api.get("/disputes/jobs", { headers: getAuthHeader() }),
@@ -264,19 +263,18 @@ export const AiApi = {
       headers: getAuthHeader(),
     }),
 
-  verifyProvider: (data: { verificationProofURL: string; category: string; }) => Api.post("/ai/verify", data)
+  verifyProvider: (data: { verificationProofURL: string; category: string }) =>
+    Api.post("/ai/verify", data),
 };
 
 export const AdminApi = {
-  fetchOverview: () =>
-    Api.get("/admin/overview", { headers: getAuthHeader() }),
+  fetchOverview: () => Api.get("/admin/overview", { headers: getAuthHeader() }),
 
   fetchUsers: () => Api.get("/admin/users", { headers: getAuthHeader() }),
 
   fetchJobs: () => Api.get("/admin/jobs", { headers: getAuthHeader() }),
 
-  fetchDisputes: () =>
-    Api.get("/admin/disputes", { headers: getAuthHeader() }),
+  fetchDisputes: () => Api.get("/admin/disputes", { headers: getAuthHeader() }),
 
   fetchServiceProviders: () =>
     Api.get("/admin/service-providers", { headers: getAuthHeader() }),
@@ -285,6 +283,6 @@ export const AdminApi = {
     Api.put(
       `/admin/service-providers/${providerId}/verification`,
       { status },
-      { headers: getAuthHeader() }
+      { headers: getAuthHeader() },
     ),
 };

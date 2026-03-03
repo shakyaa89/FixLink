@@ -16,7 +16,10 @@ const ProtectedRoute = ({ children }: Props) => {
     return <Navigate to="/auth" replace />;
   }
 
-  if (user?.role === "serviceProvider" && !isServiceProviderProfileComplete(user)) {
+  if (
+    user?.role === "serviceProvider" &&
+    !isServiceProviderProfileComplete(user)
+  ) {
     return <Navigate to="/serviceprovider/complete-profile" replace />;
   }
 

@@ -1,5 +1,11 @@
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, Users, Briefcase, Flag, FileCheck2 } from "lucide-react";
+import {
+  LayoutDashboard,
+  Users,
+  Briefcase,
+  Flag,
+  FileCheck2,
+} from "lucide-react";
 
 export default function AdminSidebar() {
   return (

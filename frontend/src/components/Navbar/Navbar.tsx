@@ -22,8 +22,6 @@ export default function Navbar() {
   };
 
   return (
-    // asd
-
     <header className="bg-(--primary) shadow-sm border-b border-(--border)">
       <nav className="px-4 py-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
@@ -83,18 +81,23 @@ export default function Navbar() {
                 </Link>
               )}
 
-              <Link
-                to={{ pathname: "/", hash: "#about" }}
-                className="text-(--muted) transition hover:text-(--accent)"
-              >
-                About
-              </Link>
-              <Link
-                to={{ pathname: "/", hash: "#contact" }}
-                className="text-(--muted) transition hover:text-(--accent)"
-              >
-                Contact
-              </Link>
+              {user?.role !== "admin" && (
+                <>
+                  <Link
+                    to={{ pathname: "/", hash: "#about" }}
+                    className="text-(--muted) transition hover:text-(--accent)"
+                  >
+                    About
+                  </Link>
+
+                  <Link
+                    to={{ pathname: "/", hash: "#contact" }}
+                    className="text-(--muted) transition hover:text-(--accent)"
+                  >
+                    Contact
+                  </Link>
+                </>
+              )}
             </div>
           </div>
 

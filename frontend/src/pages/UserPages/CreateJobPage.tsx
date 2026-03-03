@@ -40,7 +40,7 @@ export default function CreateJobPage() {
 
         const { data } = await axios.post(
           "https://api.cloudinary.com/v1_1/diocl7ilu/image/upload",
-          formData
+          formData,
         );
 
         urls.push(data.secure_url);

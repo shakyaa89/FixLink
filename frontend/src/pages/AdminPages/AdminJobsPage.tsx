@@ -8,31 +8,18 @@ export default function AdminJobsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchJobs = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const response = await AdminApi.fetchJobs();
-        const fetchedJobs = (response.data.jobs || []);
-        setJobs(fetchedJobs);
-      } catch (err) {
-        console.error("Failed to load jobs", err);
-        setError("Unable to load jobs. Please try again.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchJobs();
-  }, []);
-
   const stats = useMemo(() => {
     const total = jobs.length;
     const open = jobs.filter((job) => job.jobStatus === "open").length;
-    const inProgress = jobs.filter((job) => job.jobStatus === "in-progress").length;
-    const completed = jobs.filter((job) => job.jobStatus === "completed").length;
-    const cancelled = jobs.filter((job) => job.jobStatus === "cancelled").length;
+    const inProgress = jobs.filter(
+      (job) => job.jobStatus === "in-progress",
+    ).length;
+    const completed = jobs.filter(
+      (job) => job.jobStatus === "completed",
+    ).length;
+    const cancelled = jobs.filter(
+      (job) => job.jobStatus === "cancelled",
+    ).length;
 
     return [
       { title: "Total Jobs", value: total, icon: Briefcase },
@@ -42,6 +29,25 @@ export default function AdminJobsPage() {
       { title: "Cancelled", value: cancelled, icon: XCircle },
     ];
   }, [jobs]);
+
+  const fetchJobs = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await AdminApi.fetchJobs();
+      const fetchedJobs = response.data.jobs || [];
+      setJobs(fetchedJobs);
+    } catch (err) {
+      console.error("Failed to load jobs", err);
+      setError("Unable to load jobs. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchJobs();
+  }, []);
 
   return (
     <div className="flex min-h-screen bg-(--primary)">
@@ -97,7 +103,7 @@ export default function AdminJobsPage() {
               </button>
             </div>
 
-            <div className="divide-y divide-[var(--border)]">
+            <div className="divide-y divide-(--border)">
               {!loading && jobs.length === 0 && (
                 <div className="px-6 py-6 text-sm text-(--muted)">
                   No jobs found.
@@ -113,7 +119,9 @@ export default function AdminJobsPage() {
                     <p className="text-xs text-(--muted)">{job.jobCategory}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-(--text)">{job.userId?.fullName}</p>
+                    <p className="text-sm text-(--text)">
+                      {job.userId?.fullName}
+                    </p>
                     <p className="text-xs text-(--muted)">{job._id}</p>
                   </div>
                   <div>

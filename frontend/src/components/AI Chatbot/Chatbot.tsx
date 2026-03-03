@@ -22,7 +22,7 @@ export default function Chatbot() {
 
   const category = useMemo(
     () => (user?.providerCategory ? String(user.providerCategory) : ""),
-    [user]
+    [user],
   );
 
   const sendMessage = async () => {

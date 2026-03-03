@@ -3,7 +3,6 @@ import { FileCheck2, ShieldCheck, ShieldX } from "lucide-react";
 import AdminSidebar from "../../components/AdminSidebar/AdminSidebar";
 import { AdminApi, type AdminProviderData } from "../../api/Apis";
 
-
 export default function AdminProviderVerificationPage() {
   const [providers, setProviders] = useState<AdminProviderData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -15,7 +14,7 @@ export default function AdminProviderVerificationPage() {
       setLoading(true);
       setError(null);
       const response = await AdminApi.fetchServiceProviders();
-      const fetchedProviders = (response.data.providers || []);
+      const fetchedProviders = response.data.providers || [];
       setProviders(fetchedProviders);
     } catch (err) {
       console.error("Failed to load providers", err);
@@ -25,13 +24,10 @@ export default function AdminProviderVerificationPage() {
     }
   };
 
-  useEffect(() => {
-
-    fetchProviders();
-  }, []);
-
- 
-  const handleUpdate = async (providerId: string, status: "verified" | "rejected") => {
+  const handleUpdate = async (
+    providerId: string,
+    status: "verified" | "rejected",
+  ) => {
     try {
       setUpdatingId(providerId);
       await AdminApi.updateServiceProviderVerification(providerId, status);
@@ -43,6 +39,10 @@ export default function AdminProviderVerificationPage() {
       setUpdatingId(null);
     }
   };
+
+  useEffect(() => {
+    fetchProviders();
+  }, []);
 
   return (
     <div className="flex min-h-screen bg-(--primary)">
@@ -57,7 +57,8 @@ export default function AdminProviderVerificationPage() {
                 Provider Verification
               </h1>
               <p className="text-(--muted) mt-2">
-                Review uploaded documents and approve or reject service providers.
+                Review uploaded documents and approve or reject service
+                providers.
               </p>
             </div>
             <div className="flex items-center gap-2 text-(--accent)">
@@ -82,7 +83,7 @@ export default function AdminProviderVerificationPage() {
               </span>
             </div>
 
-            <div className="divide-y divide-[var(--border)]">
+            <div className="divide-y divide-(--border)">
               {!loading && providers.length === 0 && (
                 <div className="px-6 py-6 text-sm text-(--muted)">
                   No service providers found.
@@ -96,7 +97,10 @@ export default function AdminProviderVerificationPage() {
                 >
                   <div className="lg:col-span-2 flex items-center gap-3">
                     <img
-                      src={provider.profilePicture || "https://via.placeholder.com/40"}
+                      src={
+                        provider.profilePicture ||
+                        "https://via.placeholder.com/40"
+                      }
                       alt={provider.fullName}
                       className="w-10 h-10 rounded-full object-cover border border-(--border)"
                     />
@@ -113,13 +117,13 @@ export default function AdminProviderVerificationPage() {
 
                   <div>
                     <p className="text-xs text-(--muted)">Submitted</p>
-                    <p className="text-sm text-(--text)">{new Date(provider.createdAt!).toLocaleDateString()}</p>
+                    <p className="text-sm text-(--text)">
+                      {new Date(provider.createdAt!).toLocaleDateString()}
+                    </p>
                   </div>
 
                   <div>
-                    <span
-                      className="text-xs font-semibold px-3 py-1 rounded-full capitalize bg-(--secondary) text-(--muted) border border-(--border)"
-                    >
+                    <span className="text-xs font-semibold px-3 py-1 rounded-full capitalize bg-(--secondary) text-(--muted) border border-(--border)">
                       {provider.verificationStatus}
                     </span>
                   </div>
@@ -166,7 +170,9 @@ export default function AdminProviderVerificationPage() {
 
                   <div className="flex flex-wrap items-center gap-2 lg:justify-end lg:col-span-2">
                     <button
-                      onClick={() => provider._id && handleUpdate(provider._id, "verified")}
+                      onClick={() =>
+                        provider._id && handleUpdate(provider._id, "verified")
+                      }
                       disabled={!provider._id || updatingId === provider._id}
                       className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-(--success-bg) text-(--success) border border-(--border) transition disabled:opacity-60"
                     >
@@ -175,7 +181,9 @@ export default function AdminProviderVerificationPage() {
                       </span>
                     </button>
                     <button
-                      onClick={() => provider._id && handleUpdate(provider._id, "rejected")}
+                      onClick={() =>
+                        provider._id && handleUpdate(provider._id, "rejected")
+                      }
                       disabled={!provider._id || updatingId === provider._id}
                       className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-(--danger-bg) text-(--danger) border border-(--border) transition disabled:opacity-60"
                     >

@@ -22,18 +22,6 @@ export default function HomePage() {
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (location.hash) {
-      const id = location.hash.replace("#", "");
-      setTimeout(() => {
-        const el = document.getElementById(id);
-        if (el) {
-          el.scrollIntoView({ behavior: "smooth", block: "start" });
-        }
-      }, 50);
-    }
-  }, [location]);
-
   const services = [
     {
       icon: Droplets,
@@ -84,6 +72,27 @@ export default function HomePage() {
     "24/7 Customer Support",
   ];
 
+  const handleGetStarted = () => {
+    if (user == null) {
+      navigate("/auth");
+      return;
+    }
+
+    navigate("/user/dashboard");
+  };
+
+  useEffect(() => {
+    if (location.hash) {
+      const id = location.hash.replace("#", "");
+      setTimeout(() => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, 50);
+    }
+  }, [location]);
+
   return (
     <div className="bg-(--primary)">
       {/* Hero Section */}
@@ -116,11 +125,7 @@ export default function HomePage() {
 
             <div className="flex flex-col sm:flex-row gap-4">
               <button
-                onClick={() => {
-                  user == null
-                    ? navigate("/auth")
-                    : navigate("/user/dashboard");
-                }}
+                onClick={handleGetStarted}
                 className="bg-(--accent) text-(--primary) px-8 py-4 rounded-xl font-semibold text-lg hover:bg-(--accent-hover) transition-all flex items-center justify-center space-x-2"
               >
                 <span>Get Started</span>
@@ -304,7 +309,7 @@ export default function HomePage() {
 
               {/* Active Progress Bar */}
               <div
-                className="absolute top-8 left-0 h-1 bg-gradient-to-r from-blue-600 via-purple-600 to-green-600 hidden md:block transition-all duration-500"
+                className="absolute top-8 left-0 h-1 bg-linear-to-br from-blue-600 via-purple-600 to-green-600 hidden md:block transition-all duration-500"
                 style={{ left: "10%", width: "80%" }}
               />
 
@@ -312,7 +317,7 @@ export default function HomePage() {
               <div className="relative grid md:grid-cols-3 gap-8 md:gap-4">
                 {/* Step 1 */}
                 <div className="flex flex-col items-center text-center">
-                  <div className="relative z-10 w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-400 rounded-full flex items-center justify-center mb-4 shadow-lg ring-4 ring-white">
+                  <div className="relative z-10 w-16 h-16 bg-linear-to-br from-blue-600 to-blue-400 rounded-full flex items-center justify-center mb-4 shadow-lg ring-4 ring-white">
                     <span className="text-2xl font-bold text-white">1</span>
                   </div>
                   <div className="bg-white rounded-lg p-6 shadow-md hover:shadow-xl transition-shadow duration-300 w-full">
@@ -327,7 +332,7 @@ export default function HomePage() {
 
                 {/* Step 2 */}
                 <div className="flex flex-col items-center text-center">
-                  <div className="relative z-10 w-16 h-16 bg-gradient-to-br from-purple-600 to-purple-400 rounded-full flex items-center justify-center mb-4 shadow-lg ring-4 ring-white">
+                  <div className="relative z-10 w-16 h-16 bg-linear-to-br from-purple-600 to-purple-400 rounded-full flex items-center justify-center mb-4 shadow-lg ring-4 ring-white">
                     <span className="text-2xl font-bold text-white">2</span>
                   </div>
                   <div className="bg-white rounded-lg p-6 shadow-md hover:shadow-xl transition-shadow duration-300 w-full">
@@ -342,7 +347,7 @@ export default function HomePage() {
 
                 {/* Step 3 */}
                 <div className="flex flex-col items-center text-center">
-                  <div className="relative z-10 w-16 h-16 bg-gradient-to-br from-green-600 to-green-400 rounded-full flex items-center justify-center mb-4 shadow-lg ring-4 ring-white">
+                  <div className="relative z-10 w-16 h-16 bg-linear-to-br from-green-600 to-green-400 rounded-full flex items-center justify-center mb-4 shadow-lg ring-4 ring-white">
                     <span className="text-2xl font-bold text-white">3</span>
                   </div>
                   <div className="bg-white rounded-lg p-6 shadow-md hover:shadow-xl transition-shadow duration-300 w-full">

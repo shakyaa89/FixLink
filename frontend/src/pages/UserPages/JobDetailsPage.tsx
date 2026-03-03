@@ -48,12 +48,6 @@ export default function JobDetailsPage() {
     }
   };
 
-  useEffect(() => {
-    if (jobId) {
-      fetchJob();
-    }
-  }, [jobId]);
-
   const getStatusStyles = (status?: string) => {
     switch (status?.toLowerCase()) {
       case "open":
@@ -127,6 +121,12 @@ export default function JobDetailsPage() {
     }
   };
 
+  useEffect(() => {
+    if (jobId) {
+      fetchJob();
+    }
+  }, [jobId]);
+
   if (loading) {
     return (
       <div className="flex min-h-screen">
@@ -171,7 +171,9 @@ export default function JobDetailsPage() {
     );
   }
 
-  const acceptedOffer = job.offers?.find((offer) => offer.status === "accepted");
+  const acceptedOffer = job.offers?.find(
+    (offer) => offer.status === "accepted",
+  );
   const provider = acceptedOffer?.serviceProviderId as
     | { fullName?: string }
     | undefined;
@@ -596,48 +598,49 @@ export default function JobDetailsPage() {
                 Leave a Review
               </h3>
               <p className="text-sm text-(--muted) mb-4">
-                Share your experience with {provider.fullName || "the provider"}.
+                Share your experience with {provider.fullName || "the provider"}
+                .
               </p>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-(--text) mb-2">
-                      Rating
-                    </label>
-                    <select
-                      value={reviewRating}
-                      onChange={(e) => setReviewRating(Number(e.target.value))}
-                      className="w-full border border-(--border) rounded-lg px-3 py-2 bg-(--primary) text-(--text)"
-                    >
-                      <option value={0}>Select rating</option>
-                      {[1, 2, 3, 4, 5].map((value) => (
-                        <option key={value} value={value}>
-                          {value}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-(--text) mb-2">
-                      Comment (optional)
-                    </label>
-                    <textarea
-                      value={reviewComment}
-                      onChange={(e) => setReviewComment(e.target.value)}
-                      rows={4}
-                      className="w-full border border-(--border) rounded-lg px-3 py-2 bg-(--primary) text-(--text)"
-                      placeholder="Share details about the service"
-                    />
-                  </div>
-
-                  <button
-                    onClick={handleSubmitReview}
-                    disabled={reviewSubmitting}
-                    className="px-5 py-2.5 bg-(--accent) text-white rounded-lg hover:bg-(--accent-hover) transition disabled:opacity-60"
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-(--text) mb-2">
+                    Rating
+                  </label>
+                  <select
+                    value={reviewRating}
+                    onChange={(e) => setReviewRating(Number(e.target.value))}
+                    className="w-full border border-(--border) rounded-lg px-3 py-2 bg-(--primary) text-(--text)"
                   >
-                    {reviewSubmitting ? "Submitting..." : "Submit Review"}
-                  </button>
+                    <option value={0}>Select rating</option>
+                    {[1, 2, 3, 4, 5].map((value) => (
+                      <option key={value} value={value}>
+                        {value}
+                      </option>
+                    ))}
+                  </select>
                 </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-(--text) mb-2">
+                    Comment (optional)
+                  </label>
+                  <textarea
+                    value={reviewComment}
+                    onChange={(e) => setReviewComment(e.target.value)}
+                    rows={4}
+                    className="w-full border border-(--border) rounded-lg px-3 py-2 bg-(--primary) text-(--text)"
+                    placeholder="Share details about the service"
+                  />
+                </div>
+
+                <button
+                  onClick={handleSubmitReview}
+                  disabled={reviewSubmitting}
+                  className="px-5 py-2.5 bg-(--accent) text-white rounded-lg hover:bg-(--accent-hover) transition disabled:opacity-60"
+                >
+                  {reviewSubmitting ? "Submitting..." : "Submit Review"}
+                </button>
+              </div>
             </div>
           )}
 

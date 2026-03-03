@@ -7,7 +7,12 @@ import {
   TrendingUp,
 } from "lucide-react";
 import AdminSidebar from "../../components/AdminSidebar/AdminSidebar";
-import { AdminApi, type AdminDisputeData, type AdminJobData, type AdminUserData } from "../../api/Apis";
+import {
+  AdminApi,
+  type AdminDisputeData,
+  type AdminJobData,
+  type AdminUserData,
+} from "../../api/Apis";
 
 export default function AdminDashboard() {
   const [users, setUsers] = useState<AdminUserData[]>([]);
@@ -16,38 +21,15 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchOverview = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const response = await AdminApi.fetchOverview();
-        const fetchedUsers = (response.data.users || []) as AdminUserData[];
-        const fetchedJobs = (response.data.jobs || []) as AdminJobData[];
-        const fetchedDisputes = (response.data.disputes || []) as AdminDisputeData[];
-
-        setUsers(fetchedUsers);
-
-        setJobs(fetchedJobs);
-
-        setDisputes(fetchedDisputes);
-      } catch (err) {
-        console.error("Failed to load admin overview", err);
-        setError("Unable to load admin overview. Please try again.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchOverview();
-  }, []);
-
-
   const stats = useMemo(() => {
     const totalUsers = users.length;
-    const totalProviders = users.filter((user) => user.role === "serviceProvider").length;
+    const totalProviders = users.filter(
+      (user) => user.role === "serviceProvider",
+    ).length;
     const totalJobs = jobs.length;
-    const openDisputes = disputes.filter((dispute) => dispute.status === "open").length;
+    const openDisputes = disputes.filter(
+      (dispute) => dispute.status === "open",
+    ).length;
 
     return [
       {
@@ -72,6 +54,33 @@ export default function AdminDashboard() {
       },
     ];
   }, [users, jobs, disputes]);
+
+  const fetchOverview = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await AdminApi.fetchOverview();
+      const fetchedUsers = (response.data.users || []) as AdminUserData[];
+      const fetchedJobs = (response.data.jobs || []) as AdminJobData[];
+      const fetchedDisputes = (response.data.disputes ||
+        []) as AdminDisputeData[];
+
+      setUsers(fetchedUsers);
+
+      setJobs(fetchedJobs);
+
+      setDisputes(fetchedDisputes);
+    } catch (err) {
+      console.error("Failed to load admin overview", err);
+      setError("Unable to load admin overview. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchOverview();
+  }, []);
 
   return (
     <div className="flex min-h-screen bg-(--primary)">
@@ -147,12 +156,15 @@ export default function AdminDashboard() {
                         {user.fullName}
                       </p>
                       <p className="text-xs text-(--muted)">
-                        {user.role === "serviceProvider" ? "Service Provider" : user.role === "user" ? "User" : "Admin"} • {new Date(user.createdAt!).toLocaleDateString()}
+                        {user.role === "serviceProvider"
+                          ? "Service Provider"
+                          : user.role === "user"
+                            ? "User"
+                            : "Admin"}{" "}
+                        • {new Date(user.createdAt!).toLocaleDateString()}
                       </p>
                     </div>
-                    <span
-                      className="text-xs font-semibold px-3 py-1 rounded-full capitalize bg-(--secondary) text-(--muted) border border-(--border)"
-                    >
+                    <span className="text-xs font-semibold px-3 py-1 rounded-full capitalize bg-(--secondary) text-(--muted) border border-(--border)">
                       {user.verificationStatus ? user.verificationStatus : "-"}
                     </span>
                   </div>
@@ -179,16 +191,14 @@ export default function AdminDashboard() {
                     <div>
                       <p className="text-(--text) font-medium">{job.title}</p>
                       <p className="text-xs text-(--muted)">
-                        {job.jobCategory} • {new Date(job.createdAt!).toLocaleDateString()}
+                        {job.jobCategory} •{" "}
+                        {new Date(job.createdAt!).toLocaleDateString()}
                       </p>
                     </div>
-                    <span
-                      className="text-xs font-semibold px-3 py-1 rounded-full capitalize bg-(--secondary) text-(--muted) border border-(--border)"
-                    >
+                    <span className="text-xs font-semibold px-3 py-1 rounded-full capitalize bg-(--secondary) text-(--muted) border border-(--border)">
                       {job.jobStatus}
                     </span>
                   </div>
-                  
                 ))}
               </div>
             </section>
@@ -202,7 +212,9 @@ export default function AdminDashboard() {
               </div>
               <div className="space-y-4">
                 {!loading && disputes.length === 0 && (
-                  <p className="text-sm text-(--muted)">No disputes available.</p>
+                  <p className="text-sm text-(--muted)">
+                    No disputes available.
+                  </p>
                 )}
                 {disputes.map((dispute) => (
                   <div
@@ -223,7 +235,6 @@ export default function AdminDashboard() {
                       {dispute.status}
                     </span>
                   </div>
-                  
                 ))}
               </div>
             </section>

@@ -15,33 +15,6 @@ export default function AdminDisputesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchDisputes = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const response = await AdminApi.fetchDisputes();
-        const fetchedDisputes = (response.data.disputes || []) as AdminDisputeData[];
-        setDisputes(
-          fetchedDisputes.map((dispute) => ({
-            ...dispute,
-            statusLabel: mapDisputeStatus(dispute.status),
-            priorityLabel: mapPriority(dispute.priority),
-            updatedLabel: formatDate(dispute.updatedAt),
-            jobLabel: resolveJobLabel(dispute.jobId),
-          }))
-        );
-      } catch (err) {
-        console.error("Failed to load disputes", err);
-        setError("Unable to load disputes. Please try again.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchDisputes();
-  }, []);
-
   const formatDate = (value?: string) => {
     if (!value) return "-";
     const date = new Date(value);
@@ -73,10 +46,10 @@ export default function AdminDisputesPage() {
     const total = disputes.length;
     const open = disputes.filter((item) => item.statusLabel === "Open").length;
     const inReview = disputes.filter(
-      (item) => item.statusLabel === "In Review"
+      (item) => item.statusLabel === "In Review",
     ).length;
     const resolved = disputes.filter(
-      (item) => item.statusLabel === "Resolved"
+      (item) => item.statusLabel === "Resolved",
     ).length;
 
     return [
@@ -112,6 +85,34 @@ export default function AdminDisputesPage() {
     }
     return "bg-(--secondary) text-(--muted)";
   };
+
+  const fetchDisputes = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await AdminApi.fetchDisputes();
+      const fetchedDisputes = (response.data.disputes ||
+        []) as AdminDisputeData[];
+      setDisputes(
+        fetchedDisputes.map((dispute) => ({
+          ...dispute,
+          statusLabel: mapDisputeStatus(dispute.status),
+          priorityLabel: mapPriority(dispute.priority),
+          updatedLabel: formatDate(dispute.updatedAt),
+          jobLabel: resolveJobLabel(dispute.jobId),
+        })),
+      );
+    } catch (err) {
+      console.error("Failed to load disputes", err);
+      setError("Unable to load disputes. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDisputes();
+  }, []);
 
   return (
     <div className="flex min-h-screen bg-(--primary)">
@@ -169,7 +170,7 @@ export default function AdminDisputesPage() {
               </button>
             </div>
 
-            <div className="divide-y divide-[var(--border)]">
+            <div className="divide-y divide-(--border)">
               {!loading && disputes.length === 0 && (
                 <div className="px-6 py-6 text-sm text-(--muted)">
                   No disputes found.
@@ -193,7 +194,7 @@ export default function AdminDisputesPage() {
                   <div>
                     <span
                       className={`text-xs font-semibold px-3 py-1 rounded-full ${statusClass(
-                        dispute.statusLabel
+                        dispute.statusLabel,
                       )}`}
                     >
                       {dispute.statusLabel}
@@ -202,14 +203,16 @@ export default function AdminDisputesPage() {
                   <div>
                     <span
                       className={`text-xs font-semibold px-3 py-1 rounded-full ${priorityClass(
-                        dispute.priorityLabel
+                        dispute.priorityLabel,
                       )}`}
                     >
                       {dispute.priorityLabel} Priority
                     </span>
                   </div>
                   <div>
-                    <p className="text-sm text-(--text)">{dispute.updatedLabel}</p>
+                    <p className="text-sm text-(--text)">
+                      {dispute.updatedLabel}
+                    </p>
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
                     <button className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-(--secondary) text-(--text) border border-(--border) transition">

@@ -32,41 +32,6 @@ export default function UserDashboard() {
     totalReviews: 0,
   });
 
-  useEffect(() => {
-    const fetchJobs = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const response = await JobApi.fetchUserJobsApi();
-
-        const fetchedJobs: JobData[] = response.data.jobs || [];
-        setJobs(fetchedJobs);
-
-        // Calculate stats
-        const activeCount = fetchedJobs.filter(
-          (job) => job.jobStatus === "pending"
-        ).length;
-        const completedCount = fetchedJobs.filter(
-          (job) => job.jobStatus === "completed"
-        ).length;
-
-        setStats({
-          activeJobs: activeCount,
-          completedJobs: completedCount,
-          offersReceived: 12, // Replace with actual data from API
-          totalReviews: 5, // Replace with actual data from API
-        });
-      } catch (err) {
-        console.error("Error fetching jobs:", err);
-        setError("Failed to load dashboard data. Please try again.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchJobs();
-  }, []);
-
   const quickActions = [
     {
       to: "/user/create-job",
@@ -136,6 +101,41 @@ export default function UserDashboard() {
       bgColor: "bg-amber-50",
     },
   ];
+
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await JobApi.fetchUserJobsApi();
+
+        const fetchedJobs: JobData[] = response.data.jobs || [];
+        setJobs(fetchedJobs);
+
+        // Calculate stats
+        const activeCount = fetchedJobs.filter(
+          (job) => job.jobStatus === "pending",
+        ).length;
+        const completedCount = fetchedJobs.filter(
+          (job) => job.jobStatus === "completed",
+        ).length;
+
+        setStats({
+          activeJobs: activeCount,
+          completedJobs: completedCount,
+          offersReceived: 12, // Replace with actual data from API
+          totalReviews: 5, // Replace with actual data from API
+        });
+      } catch (err) {
+        console.error("Error fetching jobs:", err);
+        setError("Failed to load dashboard data. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchJobs();
+  }, []);
 
   return (
     <div className="flex min-h-screen bg-(--primary)">
@@ -272,8 +272,8 @@ export default function UserDashboard() {
                                 job.jobStatus === "pending"
                                   ? "bg-blue-100 text-blue-700"
                                   : job.jobStatus === "completed"
-                                  ? "bg-green-100 text-green-700"
-                                  : "bg-gray-100 text-gray-700"
+                                    ? "bg-green-100 text-green-700"
+                                    : "bg-gray-100 text-gray-700"
                               }`}
                             >
                               {job.jobStatus || "Unknown"}

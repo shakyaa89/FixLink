@@ -48,10 +48,6 @@ export default function ViewJobsPage() {
     }
   };
 
-  useEffect(() => {
-    fetchJobs();
-  }, [user]);
-
   const filteredJobs = jobs.filter((job) => {
     if (statusFilter !== "all" && job.jobStatus !== statusFilter) {
       return false;
@@ -92,6 +88,10 @@ export default function ViewJobsPage() {
       }) || null
     );
   };
+
+  useEffect(() => {
+    fetchJobs();
+  }, [user]);
 
   return (
     <div className="flex min-h-screen bg-(--primary)">

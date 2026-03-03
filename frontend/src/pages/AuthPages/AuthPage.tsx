@@ -48,6 +48,22 @@ export default function AuthPage() {
             </button>
           </div>
 
+          {!showLogin && (
+            <div className="flex items-center justify-center w-full ">
+              <button
+                onClick={() => {
+                  setServiceProviderRegister(!serviceProviderRegister);
+                  setShowLogin(false);
+                  window.scrollTo(0, 0);
+                }}
+                className="text-center text-md text-(--primary) mb-6 px-6 py-2 rounded-lg bg-(--accent) hover:bg-(--accent-hover) transition duration-300 ease-in-out"
+              >
+                Register as a{" "}
+                {serviceProviderRegister ? "User" : "Service Provider"}
+              </button>
+            </div>
+          )}
+
           {/* LOGIN FORM */}
           {showLogin && <LoginForm />}
 
@@ -57,20 +73,6 @@ export default function AuthPage() {
           {!showLogin && serviceProviderRegister && (
             <ServiceProviderRegisterForm />
           )}
-        </div>
-
-        <div className="flex items-center justify-center w-full ">
-          <button
-            onClick={() => {
-              setServiceProviderRegister(!serviceProviderRegister);
-              setShowLogin(false);
-              window.scrollTo(0, 0);
-            }}
-            className="text-center text-md text-(--primary) mt-6 px-6 py-2 rounded-lg bg-(--accent) hover:bg-(--accent-hover) transition duration-300 ease-in-out"
-          >
-            Register as a{" "}
-            {serviceProviderRegister ? "User" : "Service Provider"}
-          </button>
         </div>
 
         {/* Footer */}

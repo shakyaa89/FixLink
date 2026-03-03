@@ -32,7 +32,7 @@ function ServiceProviderRegisterForm() {
     try {
       const { data } = await axios.post(
         "https://api.cloudinary.com/v1_1/ddmyk2hd6/image/upload",
-        formData
+        formData,
       );
       return data.secure_url;
     } catch (err) {

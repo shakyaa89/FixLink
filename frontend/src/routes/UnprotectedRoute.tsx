@@ -13,7 +13,10 @@ const UnprotectedRoute = ({ children }: Props) => {
   if (checking) return null;
 
   if (user && !checking) {
-    if (user.role === "serviceProvider" && !isServiceProviderProfileComplete(user)) {
+    if (
+      user.role === "serviceProvider" &&
+      !isServiceProviderProfileComplete(user)
+    ) {
       return <Navigate to="/serviceprovider/complete-profile" replace />;
     }
     return <Navigate to="/" replace />;

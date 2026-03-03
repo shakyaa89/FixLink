@@ -23,9 +23,7 @@ export default function DisputesPage() {
   const [jobId, setJobId] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [priority, setPriority] = useState<"low" | "medium" | "high">(
-    "medium"
-  );
+  const [priority, setPriority] = useState<"low" | "medium" | "high">("medium");
 
   const fetchDisputeData = async () => {
     try {
@@ -45,14 +43,12 @@ export default function DisputesPage() {
     }
   };
 
-  useEffect(() => {
-    fetchDisputeData();
-  }, []);
-
   const stats = useMemo(() => {
     const total = disputes.length;
     const open = disputes.filter((item) => item.status === "open").length;
-    const resolved = disputes.filter((item) => item.status === "resolved").length;
+    const resolved = disputes.filter(
+      (item) => item.status === "resolved",
+    ).length;
     const inProgress = Math.max(total - open - resolved, 0);
 
     return { total, open, inProgress, resolved };
@@ -113,6 +109,10 @@ export default function DisputesPage() {
     if (status === "in-review") return "In Review";
     return "Open";
   };
+
+  useEffect(() => {
+    fetchDisputeData();
+  }, []);
 
   return (
     <div className="flex min-h-screen">
@@ -188,8 +188,13 @@ export default function DisputesPage() {
           </div>
 
           <div className="mb-8 bg-(--primary) rounded-2xl p-6 shadow-sm border border-(--border)">
-            <h2 className="text-2xl font-bold text-(--text) mb-4">New Dispute</h2>
-            <form onSubmit={handleCreateDispute} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <h2 className="text-2xl font-bold text-(--text) mb-4">
+              New Dispute
+            </h2>
+            <form
+              onSubmit={handleCreateDispute}
+              className="grid grid-cols-1 md:grid-cols-2 gap-4"
+            >
               <div className="md:col-span-2">
                 <label className="block text-sm text-(--muted) mb-2">Job</label>
                 <select
@@ -207,7 +212,9 @@ export default function DisputesPage() {
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-sm text-(--muted) mb-2">Title</label>
+                <label className="block text-sm text-(--muted) mb-2">
+                  Title
+                </label>
                 <input
                   type="text"
                   value={title}
@@ -218,7 +225,9 @@ export default function DisputesPage() {
               </div>
 
               <div>
-                <label className="block text-sm text-(--muted) mb-2">Priority</label>
+                <label className="block text-sm text-(--muted) mb-2">
+                  Priority
+                </label>
                 <select
                   value={priority}
                   onChange={(event) =>
@@ -233,7 +242,9 @@ export default function DisputesPage() {
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-sm text-(--muted) mb-2">Description</label>
+                <label className="block text-sm text-(--muted) mb-2">
+                  Description
+                </label>
                 <textarea
                   rows={4}
                   value={description}
@@ -266,7 +277,9 @@ export default function DisputesPage() {
           <div className="space-y-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-(--text)">All Disputes</h2>
-              {loading && <Loader2 className="w-5 h-5 animate-spin text-(--accent)" />}
+              {loading && (
+                <Loader2 className="w-5 h-5 animate-spin text-(--accent)" />
+              )}
             </div>
 
             <div className="space-y-4">
@@ -292,7 +305,8 @@ export default function DisputesPage() {
                               </span>
                             </div>
                             <p className="text-(--text) text-sm leading-relaxed">
-                              {dispute.description || "No description provided."}
+                              {dispute.description ||
+                                "No description provided."}
                             </p>
                             <p className="text-xs text-(--muted) mt-2">
                               Job: {resolveJobLabel(dispute)}

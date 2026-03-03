@@ -10,36 +10,12 @@ export default function ReviewsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const loadReviews = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const [receivedResponse, sentResponse] = await Promise.all([
-          ReviewApi.fetchMyReceivedReviews(),
-          ReviewApi.fetchMySentReviews(),
-        ]);
-        setReceivedReviews(receivedResponse.data.reviews || []);
-        setSentReviews(sentResponse.data.reviews || []);
-      } catch (err) {
-        console.error("Failed to load reviews", err);
-        setError("Failed to load reviews. Please try again.");
-        setReceivedReviews([]);
-        setSentReviews([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadReviews();
-  }, []);
-
   const stats = useMemo(() => {
     const total = receivedReviews.length;
     const sum = receivedReviews.reduce((acc, r) => acc + (r.rating || 0), 0);
     const average = total ? (sum / total).toFixed(1) : "0.0";
-    const counts = [5, 4, 3, 2, 1].map((value) =>
-      receivedReviews.filter((r) => r.rating === value).length
+    const counts = [5, 4, 3, 2, 1].map(
+      (value) => receivedReviews.filter((r) => r.rating === value).length,
     );
     return { total, average, counts };
   }, [receivedReviews]);
@@ -76,7 +52,9 @@ export default function ReviewsPage() {
           <div className="flex-1">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-3">
               <div>
-                <h3 className="text-lg font-semibold text-(--text)">{personName}</h3>
+                <h3 className="text-lg font-semibold text-(--text)">
+                  {personName}
+                </h3>
                 {typeof review.jobId === "object" && review.jobId?.title && (
                   <p className="text-sm text-(--muted)">{review.jobId.title}</p>
                 )}
@@ -109,6 +87,30 @@ export default function ReviewsPage() {
       </div>
     );
   };
+
+  const loadReviews = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const [receivedResponse, sentResponse] = await Promise.all([
+        ReviewApi.fetchMyReceivedReviews(),
+        ReviewApi.fetchMySentReviews(),
+      ]);
+      setReceivedReviews(receivedResponse.data.reviews || []);
+      setSentReviews(sentResponse.data.reviews || []);
+    } catch (err) {
+      console.error("Failed to load reviews", err);
+      setError("Failed to load reviews. Please try again.");
+      setReceivedReviews([]);
+      setSentReviews([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadReviews();
+  }, []);
 
   return (
     <div className="flex min-h-screen ">
@@ -148,7 +150,9 @@ export default function ReviewsPage() {
                   <Users className="w-6 h-6 text-(--accent)" />
                 </div>
                 <div>
-                  <div className="text-3xl font-bold text-(--text)">{stats.total}</div>
+                  <div className="text-3xl font-bold text-(--text)">
+                    {stats.total}
+                  </div>
                   <div className="text-sm text-(--muted)">Total Reviews</div>
                 </div>
               </div>
@@ -233,9 +237,13 @@ export default function ReviewsPage() {
 
             {activeTab === "received" ? (
               <>
-                <h2 className="text-2xl font-bold text-(--text)">Reviews About You</h2>
+                <h2 className="text-2xl font-bold text-(--text)">
+                  Reviews About You
+                </h2>
 
-                {loading && <div className="text-(--muted)">Loading reviews...</div>}
+                {loading && (
+                  <div className="text-(--muted)">Loading reviews...</div>
+                )}
 
                 {error && <div className="text-red-600">{error}</div>}
 
@@ -243,18 +251,26 @@ export default function ReviewsPage() {
                   <div className="text-(--muted)">No reviews yet.</div>
                 )}
 
-                {receivedReviews.map((review) => renderReviewCard(review, "received"))}
+                {receivedReviews.map((review) =>
+                  renderReviewCard(review, "received"),
+                )}
               </>
             ) : (
               <>
-                <h2 className="text-2xl font-bold text-(--text)">Reviews You Sent</h2>
+                <h2 className="text-2xl font-bold text-(--text)">
+                  Reviews You Sent
+                </h2>
 
-                {loading && <div className="text-(--muted)">Loading reviews...</div>}
+                {loading && (
+                  <div className="text-(--muted)">Loading reviews...</div>
+                )}
 
                 {error && <div className="text-red-600">{error}</div>}
 
                 {!loading && !error && sentReviews.length === 0 && (
-                  <div className="text-(--muted)">You have not submitted any reviews yet.</div>
+                  <div className="text-(--muted)">
+                    You have not submitted any reviews yet.
+                  </div>
                 )}
 
                 {sentReviews.map((review) => renderReviewCard(review, "sent"))}

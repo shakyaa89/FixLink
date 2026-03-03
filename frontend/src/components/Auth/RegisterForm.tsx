@@ -41,7 +41,7 @@ function RegisterForm() {
     try {
       const { data } = await axios.post(
         "https://api.cloudinary.com/v1_1/diocl7ilu/image/upload",
-        formData
+        formData,
       );
       return data.secure_url;
     } catch (err) {
