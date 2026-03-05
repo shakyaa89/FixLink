@@ -2,7 +2,7 @@ import { Upload, Loader2, Check, Briefcase } from "lucide-react";
 import Sidebar from "../../components/Sidebar/Sidebar";
 import { useAuthStore } from "../../store/authStore";
 import { useState } from "react";
-import { JobApi } from "../../api/Apis";
+import { AiApi, JobApi } from "../../api/Apis";
 import toast from "react-hot-toast";
 import axios from "axios";
 
@@ -73,9 +73,25 @@ export default function CreateJobPage() {
     }
 
     try {
+      setLoading(true);
+      const verificationPayload = { title, description, userPrice }
+
+      const verifyJob = await AiApi.verifyJob(verificationPayload);
+
+      if (verifyJob.data.reply !== "VALID") {
+        toast.error(verifyJob.data.reply);
+        setTitle("");
+        setDescription("");
+        setJobCategory("");
+        setUserPrice(0);
+        setLocation("");
+        setLocationURL("");
+        setImages([]);
+        return;
+      }
+
       const imageUrls = await uploadMultipleToCloudinary(images);
 
-      setLoading(true);
       const payload = {
         userId: user?._id,
         title,
@@ -321,10 +337,10 @@ export default function CreateJobPage() {
                 !userPrice ||
                 !location ||
                 !images.length) && (
-                <p className="text-(--muted) text-sm text-center mt-3">
-                  Please complete all required fields to submit
-                </p>
-              )}
+                  <p className="text-(--muted) text-sm text-center mt-3">
+                    Please complete all required fields to submit
+                  </p>
+                )}
             </div>
           </form>
         </div>

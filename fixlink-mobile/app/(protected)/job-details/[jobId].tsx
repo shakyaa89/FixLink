@@ -528,7 +528,7 @@ export default function JobDetailsPage() {
                     {job.jobStatus === "completed" ? (
                       <Check size={16} color="#FFFFFF" />
                     ) : (
-                      <Loader2 size={16} color="#FFFFFF" />
+                      <Loader2 size={16} color="#FFF" className="animate-spin" />
                     )}
                   </View>
                   <Text className="text-xs text-text mt-2">In Progress</Text>

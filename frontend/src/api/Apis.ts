@@ -265,6 +265,9 @@ export const AiApi = {
 
   verifyProvider: (data: { verificationProofURL: string; category: string }) =>
     Api.post("/ai/verify", data),
+
+  verifyJob: (data: { title: string; description: string; userPrice: number }) =>
+    Api.post("/ai/verifyJob", data),
 };
 
 export const AdminApi = {

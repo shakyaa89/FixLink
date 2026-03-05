@@ -164,3 +164,43 @@ async function extractTextFromImage(imageUrl) {
     return "";
   }
 }
+
+export async function verifyJob(req, res) {
+  try {
+    const { title, description, userPrice } = req.body;
+
+    const prompt = `
+      You are FixLink’s AI Job Verification Assistant. Your task is to verify whether a job posted by a user is valid. You will be given a job title, job description, and the price provided by the user in Nepali Rupees. The job must belong to one of the supported categories: Plumbing, Electrical, Carpentry, Painting, Landscaping, or General Repairs. Check that the job title and description clearly describe a realistic service task and that they match each other. Also verify that the price entered by the user is valid; the price must be 500 NPR or higher, and any price below 500 NPR should be considered invalid. If all the provided fields are correct and meet these requirements, reply only with VALID. If any field is incorrect, unclear, unsupported, or the price is below 500 NPR, respond with a single-line explanation describing why the job is not valid so the user can understand and correct it.
+
+      Job Title:
+      ${title}
+
+      Job Description:
+      ${description}
+
+      User Price:
+      ${userPrice}
+      `;
+
+    const payload = {
+      contents: [
+        {
+          parts: [{ text: prompt }],
+        },
+      ]
+    };
+
+    const response = await axios.post(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`, payload, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+
+    const reply = response.data?.candidates?.[0]?.content?.parts?.[0]?.text || null;
+
+    return res.status(201).json({ reply: reply.trim() })
+
+  } catch (error) {
+
+  }
+}
