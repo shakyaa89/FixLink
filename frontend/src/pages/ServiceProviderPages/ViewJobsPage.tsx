@@ -39,9 +39,13 @@ export default function ViewJobsPage() {
       const response = await JobApi.fetchProviderJobsApi(user.providerCategory);
       const fetchedJobs = response.data.jobs || [];
       setJobs(fetchedJobs);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error fetching jobs:", err);
-      setError("Failed to load jobs. Please try again.");
+      if (err.response.data.message === "You have to be verified to complete this action!") {
+        setError("You have to be verified to view jobs.");
+      } else {
+        setError("Failed to load jobs. Please try again.");
+      }
       setJobs([]);
     } finally {
       setLoading(false);

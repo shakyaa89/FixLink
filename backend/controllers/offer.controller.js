@@ -55,8 +55,14 @@ export const acceptOffer = async (req, res) => {
   try {
     const { offerId } = req.body;
 
+    const userId = req.user._id;
+    
     if (!offerId) {
       return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    if(!userId){
+      return res.status(400).json({ message: "UserId is required" });
     }
 
     const offer = await Offer.findById(offerId);
@@ -66,10 +72,23 @@ export const acceptOffer = async (req, res) => {
       return res.status(400).json({ message: "Offer is not pending" });
     }
 
+    const job = await Job.findById(offer.jobId);
+
+    if(!job){
+      return res.status(404).json({message: "The job is not found!"})
+    }
+
+    if (job.jobStatus !== "open") {
+      return res.status(400).json({ message: "Job is not open" });
+    }
+
+    if(String(userId) !== String(job.userId)){
+      return res.status(403).json({message: "You are not authorized to accept this offer"})
+    }
+
     offer.status = "accepted";
     await offer.save();
 
-    const job = await Job.findById(offer.jobId);
     job.jobStatus = "in-progress";
     job.finalPrice = offer.offeredPrice;
     await job.save();

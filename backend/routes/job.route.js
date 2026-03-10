@@ -11,7 +11,7 @@ import {
   getJobsbyUserId,
   getJobsForProvider,
 } from "../controllers/jobs.controller.js";
-import { protectServiceProviderRoute } from "../middleware/serviceProvider.middleware.js";
+import { protectServiceProviderRoute, requireVerifiedProvider } from "../middleware/serviceProvider.middleware.js";
 
 router.post("/create", protectRoute, createJob);
 
@@ -25,6 +25,6 @@ router.get("/provider", protectServiceProviderRoute, getJobsForProvider);
 
 router.put("/cancel/:id", protectRoute, cancelJob);
 
-router.put("/complete/:id", protectServiceProviderRoute, completeJob);
+router.put("/complete/:id", protectServiceProviderRoute, requireVerifiedProvider, completeJob);
 
 export default router;

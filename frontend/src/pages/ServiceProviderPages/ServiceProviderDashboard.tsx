@@ -2,7 +2,6 @@ import {
   Briefcase,
   MessageSquare,
   FileText,
-  PlusCircle,
   Star,
   TrendingUp,
   CheckCircle,
@@ -37,19 +36,19 @@ export default function UserDashboard() {
 
   const quickActions = [
     {
-      to: "/user/create-job",
-      icon: PlusCircle,
-      title: "Create Job",
-      description: "Post a new service request",
+      to: "/serviceprovider/jobs",
+      icon: Briefcase,
+      title: "View Jobs",
+      description: "Browse jobs in your category",
       color: "text-blue-600",
       bgColor: "bg-(--secondary)",
       hoverColor: "hover:bg-(--secondary)",
     },
     {
-      to: "/my-jobs",
+      to: "/serviceprovider/jobs",
       icon: Briefcase,
-      title: "My Jobs",
-      description: "View and manage your job posts",
+      title: "Job Queue",
+      description: "Track active and pending work",
       color: "text-purple-600",
       bgColor: "bg-(--secondary)",
       hoverColor: "hover:bg-(--secondary)",
@@ -58,7 +57,7 @@ export default function UserDashboard() {
       to: "/messages",
       icon: MessageSquare,
       title: "Messages",
-      description: "Chat with service providers",
+      description: "Chat with users",
       color: "text-green-600",
       bgColor: "bg-(--secondary)",
       hoverColor: "hover:bg-(--secondary)",
@@ -67,7 +66,7 @@ export default function UserDashboard() {
       to: "/offers",
       icon: FileText,
       title: "Offers",
-      description: "Compare offers from providers",
+      description: "View your submitted offers",
       color: "text-orange-600",
       bgColor: "bg-(--secondary)",
       hoverColor: "hover:bg-(--secondary)",
@@ -290,38 +289,17 @@ export default function UserDashboard() {
                   <div className="bg-(--primary) rounded-xl border border-(--border) p-8 text-center">
                     <Briefcase className="w-12 h-12 text-gray-400 mx-auto mb-3" />
                     <p className="text-(--muted)">
-                      No jobs yet. Create your first job to get started!
+                      No jobs available right now in your category.
                     </p>
                     <Link
-                      to="/user/create-job"
+                      to="/serviceprovider/jobs"
                       className="inline-block mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition"
                     >
-                      Create Job
+                      View Available Jobs
                     </Link>
                   </div>
                 )}
-              </div>
-
-              {/* Reviews CTA */}
-              <div className="bg-linear-to-br from-blue-600 to-purple-600 rounded-xl p-8 shadow-lg">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-                  <div>
-                    <h2 className="text-2xl font-bold text-white">
-                      Share Your Experience
-                    </h2>
-                    <p className="text-blue-100 mt-2">
-                      Help others by rating users you've worked with.
-                    </p>
-                  </div>
-
-                  <Link
-                    to="/my-reviews"
-                    className="inline-block px-8 py-3 bg-(--primary) text-blue-600 rounded-lg font-medium hover:bg-blue-50 transition shadow-md hover:shadow-lg"
-                  >
-                    Leave a Review
-                  </Link>
-                </div>
-              </div>
+              </div>              
             </>
           )}
         </div>

@@ -13,9 +13,11 @@ export const createJob = async (req, res) => {
     images,
   } = req.body;
 
+  const user_id = req.user._id;
+
   try {
     const newJob = new Job({
-      userId,
+      userId: user_id,
       title,
       description,
       jobCategory,
@@ -129,18 +131,28 @@ export const cancelJob = async (req, res) => {
   try {
     const jobId = req.params.id;
 
+    const userId = req.user._id;
+
+    if(!userId){
+      return res.status(404).json({message: "User not found!"})
+    }
+
     const job = await Job.findById(jobId);
 
     if (!job) {
       return res.status(404).json({ message: "Job not found" });
     }
-    if (job.jobStatus === "cancelled") {
-      console.log(job.jobStatus);
 
+    if (job.jobStatus === "cancelled") {
       return res
         .status(400)
         .json({ message: "Job is not open for cancellation" });
     }
+
+    if(String(job.userId) !== String(userId)){
+      return res.status(403).json({message: "You are not permitted to cancel this job!"})
+    }
+
     job.jobStatus = "cancelled";
     await job.save();
     return res.status(200).json({ message: "Job cancelled successfully" });
@@ -154,14 +166,31 @@ export const completeJob = async (req, res) => {
   try {
     const jobId = req.params.id;
 
+    const userId = req.user._id;
+
+    if(!userId){
+      return res.status(404).json({message: "User not found!"})
+    }
+
     const job = await Job.findById(jobId);
 
     if (!job) {
       return res.status(404).json({ message: "Job not found" });
     }
 
-    if (job.jobStatus === "completed") {
-      return res.status(400).json({ message: "Job is already completed" });
+    if (job.jobStatus !== "in-progress") {
+      return res.status(400).json({ message: "Job is not in progress" });
+    }
+
+    const acceptedOffer = await Offer.findOne({ jobId, status: "accepted" });
+    if (!acceptedOffer) {
+      return res.status(400).json({ message: "No accepted offer for this job" });
+    }
+
+    if (String(acceptedOffer.serviceProviderId) !== String(userId)) {
+      return res.status(403).json({
+        message: "You are not permitted to complete this job!",
+      });
     }
 
     job.jobStatus = "completed";

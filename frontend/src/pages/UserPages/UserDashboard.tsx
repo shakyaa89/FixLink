@@ -123,8 +123,8 @@ export default function UserDashboard() {
         setStats({
           activeJobs: activeCount,
           completedJobs: completedCount,
-          offersReceived: 12, // Replace with actual data from API
-          totalReviews: 5, // Replace with actual data from API
+          offersReceived: 12, 
+          totalReviews: 5, 
         });
       } catch (err) {
         console.error("Error fetching jobs:", err);
@@ -297,28 +297,6 @@ export default function UserDashboard() {
                     </Link>
                   </div>
                 )}
-              </div>
-
-              {/* Reviews CTA */}
-              <div className="bg-linear-to-br from-blue-600 to-purple-600 rounded-xl p-8 shadow-lg">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-                  <div>
-                    <h2 className="text-2xl font-bold text-white">
-                      Share Your Experience
-                    </h2>
-                    <p className="text-blue-100 mt-2">
-                      Help others by rating service providers you've worked
-                      with.
-                    </p>
-                  </div>
-
-                  <Link
-                    to="/my-reviews"
-                    className="inline-block px-8 py-3 bg-(--primary) text-blue-600 rounded-lg font-medium hover:bg-blue-50 transition shadow-md hover:shadow-lg"
-                  >
-                    Leave a Review
-                  </Link>
-                </div>
               </div>
             </>
           )}

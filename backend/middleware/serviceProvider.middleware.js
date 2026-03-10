@@ -44,10 +44,24 @@ export async function protectServiceProviderRoute(req, res, next) {
 export function isServiceProviderProfileComplete(user) {
   return Boolean(
     user &&
-      user.role === "serviceProvider" &&
-      user.verificationProofURL &&
-      user.idProofURL &&
-      user.providerCategory &&
-      user.address
+    user.role === "serviceProvider" &&
+    user.verificationProofURL &&
+    user.idProofURL &&
+    user.providerCategory &&
+    user.address
   );
+}
+
+export function requireVerifiedProvider(req, res, next) {
+  const user = req.user;
+
+  if (!user || user.role !== "serviceProvider") {
+    return res.status(403).json({ message: "Service Provider access required" });
+  }
+
+  if (user.verificationStatus !== "verified") {
+    return res.status(403).json({ message: "You have to be verified to complete this action!" })
+  }
+
+  next();
 }
