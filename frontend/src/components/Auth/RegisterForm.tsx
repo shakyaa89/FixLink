@@ -14,6 +14,8 @@ import { useNavigate } from "react-router-dom";
 import { AuthApi } from "../../api/Apis";
 import { useState } from "react";
 
+const CITIES = ["Kathmandu", "Lalitpur", "Bhaktapur"];
+
 function RegisterForm() {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -22,6 +24,7 @@ function RegisterForm() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [city, setCity] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
@@ -62,6 +65,7 @@ function RegisterForm() {
       !fullName ||
       !email ||
       !phoneNumber ||
+      !city ||
       !password ||
       !address ||
       !addressDescription ||
@@ -93,6 +97,7 @@ function RegisterForm() {
         fullName,
         email,
         phoneNumber,
+        city,
         password,
         address,
         addressDescription,
@@ -105,6 +110,7 @@ function RegisterForm() {
       setFullName("");
       setEmail("");
       setPhoneNumber("");
+      setCity("");
       setPassword("");
       setConfirmPassword("");
       setProfilePicture(null);
@@ -175,6 +181,25 @@ function RegisterForm() {
               className="w-full pl-12 pr-4 py-3 border-2 border-(--border) rounded-xl focus:border-blue-600"
             />
           </div>
+        </div>
+
+        {/* City */}
+        <div>
+          <label className="block text-sm font-semibold text-(--text) mb-2">
+            City<span className="text-red-500">*</span>
+          </label>
+          <select
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
+            className="w-full px-4 py-3 border-2 border-(--border) rounded-xl focus:border-blue-600 bg-white"
+          >
+            <option value="">Select city</option>
+            {CITIES.map((cityOption) => (
+              <option key={cityOption} value={cityOption}>
+                {cityOption}
+              </option>
+            ))}
+          </select>
         </div>
 
         {/* Password */}

@@ -22,6 +22,7 @@ import {
   Link2,
   Upload,
 } from "lucide-react-native";
+import { Picker } from "@react-native-picker/picker";
 import colors from "@/app/_constants/theme";
 import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
@@ -29,6 +30,8 @@ import Toast from "react-native-toast-message";
 import { AuthApi } from "@/api/Apis";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useAuthStore } from "@/store/authStore";
+
+const CITIES = ["Kathmandu", "Lalitpur", "Bhaktapur"];
 
 export default function UserRegister() {
   const router = useRouter();
@@ -40,6 +43,7 @@ export default function UserRegister() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [city, setCity] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [profilePicture, setProfilePicture] = useState<ImagePicker.ImagePickerAsset | null>(null);
@@ -103,6 +107,7 @@ export default function UserRegister() {
       !fullName ||
       !email ||
       !phoneNumber ||
+      !city ||
       !password ||
       !confirmPassword ||
       !address ||
@@ -134,6 +139,7 @@ export default function UserRegister() {
         fullName,
         email,
         phoneNumber,
+        city,
         password,
         address,
         addressDescription,
@@ -152,6 +158,7 @@ export default function UserRegister() {
       setFullName("");
       setEmail("");
       setPhoneNumber("");
+      setCity("");
       setPassword("");
       setConfirmPassword("");
       setProfilePicture(null);
@@ -241,6 +248,23 @@ export default function UserRegister() {
                   value={phoneNumber}
                   onChangeText={setPhoneNumber}
                 />
+              </View>
+            </View>
+
+            <View className="gap-2">
+              <Text className="text-sm font-medium text-text">City</Text>
+              <View className="border border-border rounded-xl px-1 bg-secondary">
+                <Picker
+                  selectedValue={city}
+                  onValueChange={(itemValue) => setCity(itemValue)}
+                  style={{ color: colors.text }}
+                  dropdownIconColor={colors.muted}
+                >
+                  <Picker.Item label="Select city" value="" color={colors.muted} />
+                  {CITIES.map((cityOption) => (
+                    <Picker.Item key={cityOption} label={cityOption} value={cityOption} />
+                  ))}
+                </Picker>
               </View>
             </View>
 

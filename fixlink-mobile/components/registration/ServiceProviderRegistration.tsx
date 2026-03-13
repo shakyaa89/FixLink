@@ -39,6 +39,8 @@ const PROVIDER_CATEGORIES = [
     "General Repairs",
 ];
 
+const CITIES = ["Kathmandu", "Lalitpur", "Bhaktapur"];
+
 export default function ServiceProviderRegistration() {
     const router = useRouter();
     const { setUser } = useAuthStore();
@@ -51,6 +53,7 @@ export default function ServiceProviderRegistration() {
     const [fullName, setFullName] = useState("");
     const [email, setEmail] = useState("");
     const [phoneNumber, setPhoneNumber] = useState("");
+    const [city, setCity] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [profilePicture, setProfilePicture] = useState<ImagePicker.ImagePickerAsset | null>(null);
@@ -103,6 +106,7 @@ export default function ServiceProviderRegistration() {
             !fullName ||
             !email ||
             !phoneNumber ||
+            !city ||
             !password ||
             !confirmPassword ||
             !address ||
@@ -139,6 +143,7 @@ export default function ServiceProviderRegistration() {
                 fullName,
                 email,
                 phoneNumber,
+                city,
                 password,
                 role: "serviceProvider",
                 address,
@@ -159,6 +164,7 @@ export default function ServiceProviderRegistration() {
             setFullName("");
             setEmail("");
             setPhoneNumber("");
+            setCity("");
             setPassword("");
             setConfirmPassword("");
             setProfilePicture(null);
@@ -250,6 +256,23 @@ export default function ServiceProviderRegistration() {
                                     value={phoneNumber}
                                     onChangeText={setPhoneNumber}
                                 />
+                            </View>
+                        </View>
+
+                        <View className="gap-2">
+                            <Text className="text-sm font-medium text-text">City</Text>
+                            <View className="border border-border rounded-xl px-1 bg-secondary">
+                                <Picker
+                                    selectedValue={city}
+                                    onValueChange={(itemValue) => setCity(itemValue)}
+                                    style={{ color: colors.text }}
+                                    dropdownIconColor={colors.muted}
+                                >
+                                    <Picker.Item label="Select city" value="" color={colors.muted} />
+                                    {CITIES.map((cityOption) => (
+                                        <Picker.Item key={cityOption} label={cityOption} value={cityOption} />
+                                    ))}
+                                </Picker>
                             </View>
                         </View>
 

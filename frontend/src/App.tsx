@@ -37,7 +37,7 @@ import AdminDisputesPage from "./pages/AdminPages/AdminDisputesPage";
 import AdminProviderVerificationPage from "./pages/AdminPages/AdminProviderVerificationPage";
 
 function App() {
-  const { checkAuth, checking } = useAuthStore();
+  const { checkAuth, checking, user } = useAuthStore();
 
   const { theme } = useThemeStore();
 
@@ -63,7 +63,7 @@ function App() {
     >
       <Toaster position="top-center" />
       <Navbar />
-      <Chatbot />
+      {user && <Chatbot />}
       <main className="grow">
         <Routes>
           <Route path="/" element={<HomePage />} />

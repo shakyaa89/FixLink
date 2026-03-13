@@ -1,4 +1,38 @@
 import axios from "axios";
+import User from "../models/user.model.js";
+
+const PROVIDER_INTENT_REGEX =
+  /\b(list|show|find|recommend|suggest|get|nearby|available)\b.*\b(service provider|service providers|provider|providers|plumber|electrician|carpenter|painter|landscaper|repair)\b|\b(service provider|service providers|provider|providers|plumber|electrician|carpenter|painter|landscaper|repair)\b.*\b(list|show|find|recommend|suggest|get|nearby|available)\b/i;
+
+const isListProviderIntent = (message) => {
+  if (typeof message !== "string") {
+    return false;
+  }
+
+  return PROVIDER_INTENT_REGEX.test(message.trim());
+};
+
+const formatProviderReply = (providers, city) => {
+  if (!providers.length) {
+    if (city) {
+      return `I could not find verified service providers in ${city} right now.`;
+    }
+
+    return "I could not find verified service providers right now.";
+  }
+
+  const providerLines = providers.map((provider, index) => {
+    const category = provider.providerCategory || "General Repairs";
+    const rating =
+      typeof provider.ratingAverage === "number" && provider.ratingAverage > 0
+        ? `, rating ${provider.ratingAverage.toFixed(1)}`
+        : "";
+
+    return `${index + 1}. ${provider.fullName} (${category}${rating})`;
+  });
+
+  return providerLines.join(" ");
+};
 
 const buildContents = (history, message) => {
   const safeHistory = Array.isArray(history) ? history : [];
@@ -29,6 +63,30 @@ export async function chatWithAi(req, res) {
       return res.status(400).json({ message: "Message is required" });
     }
 
+    if (isListProviderIntent(userMessage)) {
+      const city = req.user?.city ? String(req.user.city) : "";
+      const query = {
+        role: "serviceProvider",
+        verificationStatus: "verified",
+      };
+
+      if (city) {
+        query.city = city;
+      }
+
+      const providers = await User.find(query)
+        .select("fullName providerCategory city ratingAverage profilePicture")
+        .sort({ ratingAverage: -1, createdAt: -1 })
+        .limit(5)
+        .lean();
+
+      const reply = formatProviderReply(providers, city);
+
+      return res.status(200).json({
+        reply,
+      });
+    }
+
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
@@ -40,8 +98,8 @@ export async function chatWithAi(req, res) {
     const systemPrompt =
       "You are FixLink's AI support assistant. Only answer questions about home service categories " +
       "Plumbing, Electrical, Carpentry, Painting, Landscaping, and General Repairs. " +
-      "Generate only plain text no markdown or other formattings, Keep answers concise, friendly, and professional" +
-      "If the user asks about anything else, reply exactly: I can help only with home service questions in these categories: Plumbing, Electrical, Carpentry, Painting, Landscaping, and General Repairs. Please ask about one of these."
+      "Generate only plain text no markdown or other formattings, Keep answers concise, friendly, and professional. Do not give users any fake service providers if asked" +
+      "If the user asks about anything else, reply exactly: I can help only with home service questions in these categories: Plumbing, Electrical, Carpentry, Painting, Landscaping, and General Repairs. Please ask about one of these." 
 
     const payload = {
       contents: [

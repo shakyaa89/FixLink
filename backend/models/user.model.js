@@ -16,6 +16,11 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    city: {
+      type: String,
+      enum: ["Kathmandu", "Lalitpur", "Bhaktapur"],
+      required: true,
+    },
     password: {
       type: String,
       required: true,

@@ -7,6 +7,7 @@ export async function registerController(req, res) {
     fullName,
     email,
     phoneNumber,
+    city,
     password,
     role,
     address,
@@ -23,6 +24,7 @@ export async function registerController(req, res) {
       fullName,
       email,
       phoneNumber,
+      city,
       password,
       role,
       address,
@@ -35,10 +37,15 @@ export async function registerController(req, res) {
     );
 
     const isServiceProvider = role === "serviceProvider";
+    const allowedCities = ["Kathmandu", "Lalitpur", "Bhaktapur"];
 
     // Required fields
-    if (!fullName || !email || !phoneNumber || !password || !profilePicture) {
+    if (!fullName || !email || !phoneNumber || !city || !password || !profilePicture) {
       return res.status(400).json({ message: "All fields are required" });
+    }
+
+    if (!allowedCities.includes(city)) {
+      return res.status(400).json({ message: "Invalid city selected" });
     }
 
     // Check duplicate email
@@ -59,6 +66,7 @@ export async function registerController(req, res) {
       fullName,
       email,
       phoneNumber,
+      city,
       password: hashedPassword,
       role: role || "user",
       address,

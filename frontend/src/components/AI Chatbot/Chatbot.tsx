@@ -83,60 +83,68 @@ export default function Chatbot() {
 
       {/* Chat Window */}
       {open && (
-        <div className="fixed bottom-22 right-6 w-80 bg-(--primary) border border-(--border) shadow-xl rounded-xl flex flex-col overflow-hidden z-100">
-          {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 bg-(--secondary) border-b border-(--border)">
-            <h2 className="text-(--text) font-semibold">Chat Support</h2>
-            <button
-              onClick={() => setOpen(false)}
-              className="text-(--muted) hover:text-(--text)"
-            >
-              <X size={20} />
-            </button>
-          </div>
-
-          {/* Messages */}
-          <div className="p-4 h-64 overflow-y-auto space-y-3 bg-(--primary)">
-            {messages.map((message, index) => (
-              <div
-                key={`${message.role}-${index}`}
-                className={
-                  message.role === "assistant"
-                    ? "bg-(--secondary) p-2 rounded-lg text-sm text-(--text) w-fit max-w-[80%]"
-                    : "bg-(--accent) text-white p-2 rounded-lg text-sm w-fit max-w-[80%] ml-auto"
-                }
+        <div
+          className="fixed inset-0 z-100 flex items-center justify-center bg-black/30 backdrop-blur-sm px-4"
+          onClick={() => setOpen(false)}
+        >
+          <div
+            className="w-full max-w-xl h-[70vh] max-h-[680px] bg-(--primary) border border-(--border) shadow-xl rounded-xl flex flex-col overflow-hidden"
+            onClick={(event) => event.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 py-3 bg-(--secondary) border-b border-(--border)">
+              <h2 className="text-(--text) font-semibold">Chat Support</h2>
+              <button
+                onClick={() => setOpen(false)}
+                className="text-(--muted) hover:text-(--text)"
               >
-                {message.content}
-              </div>
-            ))}
-            {loading && (
-              <div className="bg-(--secondary) p-2 rounded-lg text-sm text-(--text) w-fit max-w-[80%]">
-                Thinking...
-              </div>
-            )}
-          </div>
+                <X size={20} />
+              </button>
+            </div>
 
-          {/* Input */}
-          <div className="border-t border-(--border) p-3 bg-(--secondary) flex gap-2">
-            <input
-              type="text"
-              placeholder="Type a message..."
-              value={input}
-              onChange={(event) => setInput(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") {
-                  sendMessage();
-                }
-              }}
-              className="flex-1 px-3 py-2 text-sm rounded-lg border border-(--border) focus:outline-none focus:ring-1 focus:ring-(--accent) bg-(--primary) text-(--text)"
-            />
-            <button
-              onClick={sendMessage}
-              disabled={loading}
-              className="bg-(--accent) hover:bg-(--accent-hover) text-white px-4 py-2 rounded-lg text-sm disabled:opacity-60"
-            >
-              Send
-            </button>
+            {/* Messages */}
+            <div className="p-4 flex-1 overflow-y-auto space-y-3 bg-(--primary)">
+              {messages.map((message, index) => (
+                <div
+                  key={`${message.role}-${index}`}
+                  className={
+                    message.role === "assistant"
+                      ? "bg-(--secondary) p-2 rounded-lg text-sm text-(--text) w-fit max-w-[80%]"
+                      : "bg-(--accent) text-white p-2 rounded-lg text-sm w-fit max-w-[80%] ml-auto"
+                  }
+                >
+                  {message.content}
+                </div>
+              ))}
+              {loading && (
+                <div className="bg-(--secondary) p-2 rounded-lg text-sm text-(--text) w-fit max-w-[80%]">
+                  Thinking...
+                </div>
+              )}
+            </div>
+
+            {/* Input */}
+            <div className="border-t border-(--border) p-3 bg-(--secondary) flex gap-2">
+              <input
+                type="text"
+                placeholder="Type a message..."
+                value={input}
+                onChange={(event) => setInput(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    sendMessage();
+                  }
+                }}
+                className="flex-1 px-3 py-2 text-sm rounded-lg border border-(--border) focus:outline-none focus:ring-1 focus:ring-(--accent) bg-(--primary) text-(--text)"
+              />
+              <button
+                onClick={sendMessage}
+                disabled={loading}
+                className="bg-(--accent) hover:bg-(--accent-hover) text-white px-4 py-2 rounded-lg text-sm disabled:opacity-60"
+              >
+                Send
+              </button>
+            </div>
           </div>
         </div>
       )}
