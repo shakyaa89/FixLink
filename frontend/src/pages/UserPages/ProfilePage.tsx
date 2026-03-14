@@ -2,10 +2,11 @@ import { Mail, Phone, MapPin, Calendar, Edit2, Briefcase } from "lucide-react";
 import { useState } from "react";
 import Sidebar from "../../components/Sidebar/Sidebar";
 import { useAuthStore } from "../../store/authStore";
+import { Navigate, useNavigate } from "react-router-dom";
 
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState("overview");
-
+  const navigate = useNavigate();
   const { user } = useAuthStore();
 
   return (
@@ -50,7 +51,7 @@ export default function ProfilePage() {
                 </div>
 
                 {/* Action */}
-                <button className="px-6 py-3 bg-(--accent) text-white rounded-lg font-semibold hover:shadow-lg transition-all flex items-center gap-2">
+                <button onClick={() => navigate("/user/edit/profile")} className="px-6 py-3 bg-(--accent) text-white rounded-lg font-semibold hover:shadow-lg transition-all flex items-center gap-2">
                   <Edit2 className="w-4 h-4" />
                   Edit Profile
                 </button>

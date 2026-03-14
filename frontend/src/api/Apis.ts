@@ -21,6 +21,17 @@ interface User {
   idURL?: string;
 }
 
+interface UserEditData{
+  fullName: string;
+  email: string;
+  phoneNumber: string;
+  city: string;
+  address: string;
+  addressDescription: string;
+  addressURL?: string;
+  profilePicture: string;
+}
+
 interface ServiceProviderProfilePayload {
   verificationProofURL: string;
   providerCategory: string;
@@ -183,6 +194,10 @@ export const AuthApi = {
     Api.put("/auth/service-provider/complete-profile", data, {
       headers: getAuthHeader(),
     }),
+  
+  updateUserProfileApi: (updateData: UserEditData) => Api.put("/auth/update/user", updateData, {
+      headers: getAuthHeader(),
+    })
 };
 
 export const JobApi = {

@@ -35,6 +35,7 @@ import AdminUsersPage from "./pages/AdminPages/AdminUsersPage";
 import AdminJobsPage from "./pages/AdminPages/AdminJobsPage";
 import AdminDisputesPage from "./pages/AdminPages/AdminDisputesPage";
 import AdminProviderVerificationPage from "./pages/AdminPages/AdminProviderVerificationPage";
+import EditProfilePage from "./pages/UserPages/EditProfilePage";
 
 function App() {
   const { checkAuth, checking, user } = useAuthStore();
@@ -109,6 +110,15 @@ function App() {
             element={
               <UserProtectedRoute>
                 <JobDetailsPage />
+              </UserProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/user/edit/profile"
+            element={
+              <UserProtectedRoute>
+                <EditProfilePage />
               </UserProtectedRoute>
             }
           />

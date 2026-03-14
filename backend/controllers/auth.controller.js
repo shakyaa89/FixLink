@@ -208,3 +208,48 @@ export async function checkAuth(req, res) {
     return res.status(500).json({ message: "erorr in checkAuth" });
   }
 }
+
+export async function updateUserProfile(req, res){
+  try {
+    const {fullName, email,
+    phoneNumber,
+    city,
+    address,
+    addressDescription,
+    addressUrl,
+    profilePicture} = req.body;
+
+    const currentUser = req.user;
+
+    if(!fullName || !email || !phoneNumber || !city || !address || !addressDescription ){
+      return res.status(400).json({message: "All fields are required!"});
+    }
+
+    const emailCheck = await User.findOne({ email, _id: { $ne: currentUser._id } })
+
+    if(emailCheck){
+      return res.status(400).json({message: "User with this email already exists!"})
+    }
+
+    const phoneNumberCheck = await User.findOne({ phoneNumber,  _id: { $ne: currentUser._id } });
+
+    if(phoneNumberCheck){
+      return res.status(400).json({message: "User with this phone number already exists!"})
+    }
+
+    currentUser.fullName = fullName;
+    currentUser.email = email;
+    currentUser.phoneNumber = phoneNumber;
+    currentUser.city = city;
+    currentUser.address = address;
+    currentUser.addressDescription = addressDescription;
+    currentUser.addressURL = addressUrl;
+    currentUser.profilePicture = profilePicture;
+
+    await currentUser.save();
+
+    return res.status(200).json({message: "User updated successfully!", updatedUser: currentUser})
+
+  } catch (error) {
+    return res.status(500).json({message: "Server Error!"})
+  }}
