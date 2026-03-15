@@ -37,7 +37,7 @@ const jobSchema = mongoose.Schema(
     },
     finalPrice: {
       type: Number,
-      default: "",
+      default: 0,
     },
     location: {
       type: String,
