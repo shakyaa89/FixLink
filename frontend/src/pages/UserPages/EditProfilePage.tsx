@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
     Mail,
     Lock,
@@ -7,7 +7,6 @@ import {
     MapPin,
     Upload,
     Link2,
-    Save,
 } from "lucide-react";
 import Sidebar from "../../components/Sidebar/Sidebar";
 import { useAuthStore } from "../../store/authStore";
@@ -30,8 +29,8 @@ export default function EditProfilePage() {
     const [email, setEmail] = useState(user.email);
     const [phoneNumber, setPhoneNumber] = useState(user.phoneNumber);
     const [city, setCity] = useState(user.city);
-    const [password, setPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
+    // const [password, setPassword] = useState("");
+    // const [confirmPassword, setConfirmPassword] = useState("");
     const [address, setAddress] = useState(user.address);
     const [addressDescription, setAddressDescription] = useState(user.addressDescription);
     const [addressUrl, setAddressUrl] = useState(user.addressUrl);
@@ -311,7 +310,7 @@ export default function EditProfilePage() {
                                         <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-(--muted)" />
                                         <input
                                             type="password"
-                                            value={password}
+                                            // value={password}
                                             placeholder="Enter new password"
                                             className="w-full pl-12 pr-4 py-3 border-2 border-(--border) rounded-xl focus:border-(--accent) bg-(--secondary) text-(--text)"
                                         />
@@ -327,7 +326,7 @@ export default function EditProfilePage() {
                                         <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-(--muted)" />
                                         <input
                                             type="password"
-                                            value={confirmPassword}
+                                            // value={confirmPassword}
                                             placeholder="Confirm new password"
                                             className="w-full pl-12 pr-4 py-3 border-2 border-(--border) rounded-xl focus:border-(--accent) bg-(--secondary) text-(--text)"
                                         />

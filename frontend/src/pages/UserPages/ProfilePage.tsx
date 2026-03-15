@@ -2,7 +2,7 @@ import { Mail, Phone, MapPin, Calendar, Edit2, Briefcase } from "lucide-react";
 import { useState } from "react";
 import Sidebar from "../../components/Sidebar/Sidebar";
 import { useAuthStore } from "../../store/authStore";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState("overview");
