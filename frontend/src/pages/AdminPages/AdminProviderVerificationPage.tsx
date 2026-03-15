@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FileCheck2, ShieldCheck, ShieldX } from "lucide-react";
+import { FileCheck2, ShieldCheck, ShieldX, Loader2 } from "lucide-react";
 import AdminSidebar from "../../components/AdminSidebar/AdminSidebar";
 import { AdminApi, type AdminProviderData } from "../../api/Apis";
 
@@ -8,6 +8,11 @@ export default function AdminProviderVerificationPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [confirmation, setConfirmation] = useState<{
+    providerId: string;
+    providerName: string;
+    status: "verified" | "rejected";
+  } | null>(null);
 
   const fetchProviders = async () => {
     try {
@@ -44,6 +49,12 @@ export default function AdminProviderVerificationPage() {
     fetchProviders();
   }, []);
 
+  const handleConfirmUpdate = async () => {
+    if (!confirmation) return;
+    await handleUpdate(confirmation.providerId, confirmation.status);
+    setConfirmation(null);
+  };
+
   return (
     <div className="flex min-h-screen bg-(--primary)">
       <AdminSidebar />
@@ -73,131 +84,179 @@ export default function AdminProviderVerificationPage() {
             </div>
           )}
 
-          <div className="bg-(--primary) border border-(--border) rounded-2xl shadow-sm overflow-hidden">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-(--border) bg-(--secondary)">
-              <h2 className="text-lg font-semibold text-(--text)">
-                Service Providers
-              </h2>
-              <span className="text-sm text-(--muted)">
-                {loading ? "Loading" : `${providers.length} providers`}
-              </span>
+          {loading ? (
+            <div className="flex items-center justify-center py-20">
+              <Loader2 className="w-8 h-8 text-(--accent) animate-spin" />
             </div>
+          ) : (
+            <div className="bg-(--primary) border border-(--border) rounded-2xl shadow-sm overflow-hidden">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-(--border) bg-(--secondary)">
+                <h2 className="text-lg font-semibold text-(--text)">
+                  Service Providers
+                </h2>
+                <span className="text-sm text-(--muted)">
+                  {`${providers.length} providers`}
+                </span>
+              </div>
 
-            <div className="divide-y divide-(--border)">
-              {!loading && providers.length === 0 && (
-                <div className="px-6 py-6 text-sm text-(--muted)">
-                  No service providers found.
-                </div>
-              )}
+              <div className="divide-y divide-(--border)">
+                {providers.length === 0 && (
+                  <div className="px-6 py-6 text-sm text-(--muted)">
+                    No service providers found.
+                  </div>
+                )}
 
-              {providers.map((provider) => (
-                <div
-                  key={provider._id}
-                  className="grid grid-cols-1 lg:grid-cols-8 gap-4 px-6 py-4 items-center"
-                >
-                  <div className="lg:col-span-2 flex items-center gap-3">
-                    <img
-                      src={
-                        provider.profilePicture ||
-                        "https://via.placeholder.com/40"
-                      }
-                      alt={provider.fullName}
-                      className="w-10 h-10 rounded-full object-cover border border-(--border)"
-                    />
+                {providers.map((provider) => (
+                  <div
+                    key={provider._id}
+                    className="grid grid-cols-1 lg:grid-cols-8 gap-4 px-6 py-4 items-center"
+                  >
+                    <div className="lg:col-span-2 flex items-center gap-3">
+                      <img
+                        src={
+                          provider.profilePicture ||
+                          "https://via.placeholder.com/40"
+                        }
+                        alt={provider.fullName}
+                        className="w-10 h-10 rounded-full object-cover border border-(--border)"
+                      />
+                      <div>
+                        <p className="text-(--text) font-semibold">
+                          {provider.fullName}
+                        </p>
+                        <p className="text-xs text-(--muted)">{provider.email}</p>
+                        <p className="text-xs text-(--muted)">
+                          {provider.providerCategory || "-"}
+                        </p>
+                      </div>
+                    </div>
+
                     <div>
-                      <p className="text-(--text) font-semibold">
-                        {provider.fullName}
+                      <p className="text-xs text-(--muted)">Submitted</p>
+                      <p className="text-sm text-(--text)">
+                        {new Date(provider.createdAt!).toLocaleDateString()}
                       </p>
-                      <p className="text-xs text-(--muted)">{provider.email}</p>
+                    </div>
+
+                    <div>
+                      <span className="text-xs font-semibold px-3 py-1 rounded-full capitalize bg-(--secondary) text-(--muted) border border-(--border)">
+                        {provider.verificationStatus}
+                      </span>
+                    </div>
+
+                    <div>
+                      <p className="text-xs text-(--muted)">Address</p>
+                      <p className="text-sm text-(--text)">
+                        {provider.address || "-"}
+                      </p>
                       <p className="text-xs text-(--muted)">
-                        {provider.providerCategory || "-"}
+                        {provider.addressDescription || ""}
                       </p>
                     </div>
-                  </div>
 
-                  <div>
-                    <p className="text-xs text-(--muted)">Submitted</p>
-                    <p className="text-sm text-(--text)">
-                      {new Date(provider.createdAt!).toLocaleDateString()}
-                    </p>
-                  </div>
+                    <div>
+                      <p className="text-xs text-(--muted)">Documents</p>
+                      <div className="flex flex-col gap-2">
+                        {provider.verificationProofURL ? (
+                          <a
+                            href={provider.verificationProofURL}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-sm text-(--accent) underline"
+                          >
+                            Verification Proof
+                          </a>
+                        ) : (
+                          <span className="text-sm text-(--muted)">No proof</span>
+                        )}
+                        {provider.idProofURL ? (
+                          <a
+                            href={provider.idProofURL}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-sm text-(--accent) underline"
+                          >
+                            ID Proof
+                          </a>
+                        ) : (
+                          <span className="text-sm text-(--muted)">No ID</span>
+                        )}
+                      </div>
+                    </div>
 
-                  <div>
-                    <span className="text-xs font-semibold px-3 py-1 rounded-full capitalize bg-(--secondary) text-(--muted) border border-(--border)">
-                      {provider.verificationStatus}
-                    </span>
-                  </div>
-
-                  <div>
-                    <p className="text-xs text-(--muted)">Address</p>
-                    <p className="text-sm text-(--text)">
-                      {provider.address || "-"}
-                    </p>
-                    <p className="text-xs text-(--muted)">
-                      {provider.addressDescription || ""}
-                    </p>
-                  </div>
-
-                  <div>
-                    <p className="text-xs text-(--muted)">Documents</p>
-                    <div className="flex flex-col gap-2">
-                      {provider.verificationProofURL ? (
-                        <a
-                          href={provider.verificationProofURL}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-sm text-(--accent) underline"
-                        >
-                          Verification Proof
-                        </a>
-                      ) : (
-                        <span className="text-sm text-(--muted)">No proof</span>
-                      )}
-                      {provider.idProofURL ? (
-                        <a
-                          href={provider.idProofURL}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-sm text-(--accent) underline"
-                        >
-                          ID Proof
-                        </a>
-                      ) : (
-                        <span className="text-sm text-(--muted)">No ID</span>
-                      )}
+                    <div className="flex flex-wrap items-center gap-2 lg:justify-end lg:col-span-2">
+                      <button
+                        onClick={() =>
+                          provider._id &&
+                          setConfirmation({
+                            providerId: provider._id,
+                            providerName: provider.fullName,
+                            status: "verified",
+                          })
+                        }
+                        disabled={!provider._id || updatingId === provider._id}
+                        className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-(--success-bg) text-(--success) border border-(--border) transition disabled:opacity-60"
+                      >
+                        <span className="flex items-center gap-1">
+                          <ShieldCheck className="w-4 h-4" /> Approve
+                        </span>
+                      </button>
+                      <button
+                        onClick={() =>
+                          provider._id &&
+                          setConfirmation({
+                            providerId: provider._id,
+                            providerName: provider.fullName,
+                            status: "rejected",
+                          })
+                        }
+                        disabled={!provider._id || updatingId === provider._id}
+                        className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-(--danger-bg) text-(--danger) border border-(--border) transition disabled:opacity-60"
+                      >
+                        <span className="flex items-center gap-1">
+                          <ShieldX className="w-4 h-4" /> Reject
+                        </span>
+                      </button>
                     </div>
                   </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </main>
 
-                  <div className="flex flex-wrap items-center gap-2 lg:justify-end lg:col-span-2">
-                    <button
-                      onClick={() =>
-                        provider._id && handleUpdate(provider._id, "verified")
-                      }
-                      disabled={!provider._id || updatingId === provider._id}
-                      className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-(--success-bg) text-(--success) border border-(--border) transition disabled:opacity-60"
-                    >
-                      <span className="flex items-center gap-1">
-                        <ShieldCheck className="w-4 h-4" /> Approve
-                      </span>
-                    </button>
-                    <button
-                      onClick={() =>
-                        provider._id && handleUpdate(provider._id, "rejected")
-                      }
-                      disabled={!provider._id || updatingId === provider._id}
-                      className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-(--danger-bg) text-(--danger) border border-(--border) transition disabled:opacity-60"
-                    >
-                      <span className="flex items-center gap-1">
-                        <ShieldX className="w-4 h-4" /> Reject
-                      </span>
-                    </button>
-                  </div>
-                </div>
-              ))}
+      {confirmation && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="w-full max-w-md rounded-2xl border border-(--border) bg-(--primary) p-6 shadow-sm">
+            <h2 className="text-xl font-semibold text-(--text)">
+              Confirm {confirmation.status === "verified" ? "approval" : "rejection"}
+            </h2>
+            <p className="mt-3 text-sm text-(--muted)">
+              Are you sure you want to {confirmation.status === "verified" ? "approve" : "reject"}{" "}
+              {confirmation.providerName}?
+            </p>
+            <div className="mt-6 flex items-center justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setConfirmation(null)}
+                disabled={updatingId === confirmation.providerId}
+                className="px-4 py-2 text-sm font-medium rounded-lg bg-(--secondary) text-(--text) border border-(--border) disabled:opacity-60"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmUpdate}
+                disabled={updatingId === confirmation.providerId}
+                className="px-4 py-2 text-sm font-medium rounded-lg bg-(--accent) text-(--primary) hover:bg-(--accent-hover) transition disabled:opacity-60"
+              >
+                Confirm
+              </button>
             </div>
           </div>
         </div>
-      </main>
+      )}
     </div>
   );
 }

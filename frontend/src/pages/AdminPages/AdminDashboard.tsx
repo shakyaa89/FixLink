@@ -5,6 +5,7 @@ import {
   Briefcase,
   Flag,
   TrendingUp,
+  Loader2,
 } from "lucide-react";
 import AdminSidebar from "../../components/AdminSidebar/AdminSidebar";
 import {
@@ -110,135 +111,143 @@ export default function AdminDashboard() {
             </div>
           )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {stats.map((stat) => {
-              const Icon = stat.icon;
-              return (
-                <div
-                  key={stat.title}
-                  className="bg-(--primary) rounded-2xl border border-(--border) p-5 shadow-sm"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-(--secondary) flex items-center justify-center">
-                      <Icon className="w-6 h-6 text-(--accent)" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-(--muted)">{stat.title}</p>
-                      <p className="text-2xl font-bold text-(--text)">
-                        {loading ? "-" : stat.value}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <section className="bg-(--primary) border border-(--border) rounded-2xl p-6 shadow-sm">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-(--text)">
-                  Latest Users
-                </h2>
-                <TrendingUp className="w-5 h-5 text-(--accent)" />
-              </div>
-              <div className="space-y-4">
-                {!loading && users.length === 0 && (
-                  <p className="text-sm text-(--muted)">No users available.</p>
-                )}
-                {users.map((user) => (
-                  <div
-                    key={user._id}
-                    className="flex items-center justify-between gap-4 p-3 rounded-xl bg-(--secondary)"
-                  >
-                    <div>
-                      <p className="text-(--text) font-medium">
-                        {user.fullName}
-                      </p>
-                      <p className="text-xs text-(--muted)">
-                        {user.role === "serviceProvider"
-                          ? "Service Provider"
-                          : user.role === "user"
-                            ? "User"
-                            : "Admin"}{" "}
-                        • {new Date(user.createdAt!).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <span className="text-xs font-semibold px-3 py-1 rounded-full capitalize bg-(--secondary) text-(--muted) border border-(--border)">
-                      {user.verificationStatus ? user.verificationStatus : "-"}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </section>
-
-            <section className="bg-(--primary) border border-(--border) rounded-2xl p-6 shadow-sm">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-(--text)">
-                  Recent Jobs
-                </h2>
-                <Briefcase className="w-5 h-5 text-(--accent)" />
-              </div>
-              <div className="space-y-4">
-                {!loading && jobs.length === 0 && (
-                  <p className="text-sm text-(--muted)">No jobs available.</p>
-                )}
-                {jobs.map((job) => (
-                  <div
-                    key={job._id}
-                    className="flex items-center justify-between gap-4 p-3 rounded-xl bg-(--secondary)"
-                  >
-                    <div>
-                      <p className="text-(--text) font-medium">{job.title}</p>
-                      <p className="text-xs text-(--muted)">
-                        {job.jobCategory} •{" "}
-                        {new Date(job.createdAt!).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <span className="text-xs font-semibold px-3 py-1 rounded-full capitalize bg-(--secondary) text-(--muted) border border-(--border)">
-                      {job.jobStatus}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </section>
-
-            <section className="bg-(--primary) border border-(--border) rounded-2xl p-6 shadow-sm">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-(--text)">
-                  Dispute Queue
-                </h2>
-                <Flag className="w-5 h-5 text-(--accent)" />
-              </div>
-              <div className="space-y-4">
-                {!loading && disputes.length === 0 && (
-                  <p className="text-sm text-(--muted)">
-                    No disputes available.
-                  </p>
-                )}
-                {disputes.map((dispute) => (
-                  <div
-                    key={dispute._id}
-                    className="flex items-center justify-between gap-4 p-3 rounded-xl bg-(--secondary)"
-                  >
-                    <div>
-                      <p className="text-(--text) font-medium">
-                        {dispute.title}
-                      </p>
-                      <p className="text-xs text-(--muted)">
-                        Updated {dispute.updatedAt}
-                      </p>
-                    </div>
-                    <span
-                      className={`text-xs font-semibold px-3 py-1 rounded-full capitalize bg-(--secondary) text-(--muted) border border-(--border)`}
+          {loading ? (
+            <div className="flex items-center justify-center py-20">
+              <Loader2 className="w-8 h-8 text-(--accent) animate-spin" />
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {stats.map((stat) => {
+                  const Icon = stat.icon;
+                  return (
+                    <div
+                      key={stat.title}
+                      className="bg-(--primary) rounded-2xl border border-(--border) p-5 shadow-sm"
                     >
-                      {dispute.status}
-                    </span>
-                  </div>
-                ))}
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-xl bg-(--secondary) flex items-center justify-center">
+                          <Icon className="w-6 h-6 text-(--accent)" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-(--muted)">{stat.title}</p>
+                          <p className="text-2xl font-bold text-(--text)">
+                            {stat.value}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-            </section>
-          </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <section className="bg-(--primary) border border-(--border) rounded-2xl p-6 shadow-sm">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-lg font-semibold text-(--text)">
+                      Latest Users
+                    </h2>
+                    <TrendingUp className="w-5 h-5 text-(--accent)" />
+                  </div>
+                  <div className="space-y-4">
+                    {users.length === 0 && (
+                      <p className="text-sm text-(--muted)">No users available.</p>
+                    )}
+                    {users.map((user) => (
+                      <div
+                        key={user._id}
+                        className="flex items-center justify-between gap-4 p-3 rounded-xl bg-(--secondary)"
+                      >
+                        <div>
+                          <p className="text-(--text) font-medium">
+                            {user.fullName}
+                          </p>
+                          <p className="text-xs text-(--muted)">
+                            {user.role === "serviceProvider"
+                              ? "Service Provider"
+                              : user.role === "user"
+                                ? "User"
+                                : "Admin"}{" "}
+                            • {new Date(user.createdAt!).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <span className="text-xs font-semibold px-3 py-1 rounded-full capitalize bg-(--secondary) text-(--muted) border border-(--border)">
+                          {user.verificationStatus ? user.verificationStatus : "-"}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                <section className="bg-(--primary) border border-(--border) rounded-2xl p-6 shadow-sm">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-lg font-semibold text-(--text)">
+                      Recent Jobs
+                    </h2>
+                    <Briefcase className="w-5 h-5 text-(--accent)" />
+                  </div>
+                  <div className="space-y-4">
+                    {jobs.length === 0 && (
+                      <p className="text-sm text-(--muted)">No jobs available.</p>
+                    )}
+                    {jobs.map((job) => (
+                      <div
+                        key={job._id}
+                        className="flex items-center justify-between gap-4 p-3 rounded-xl bg-(--secondary)"
+                      >
+                        <div>
+                          <p className="text-(--text) font-medium">{job.title}</p>
+                          <p className="text-xs text-(--muted)">
+                            {job.jobCategory} •{" "}
+                            {new Date(job.createdAt!).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <span className="text-xs font-semibold px-3 py-1 rounded-full capitalize bg-(--secondary) text-(--muted) border border-(--border)">
+                          {job.jobStatus}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                <section className="bg-(--primary) border border-(--border) rounded-2xl p-6 shadow-sm">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-lg font-semibold text-(--text)">
+                      Dispute Queue
+                    </h2>
+                    <Flag className="w-5 h-5 text-(--accent)" />
+                  </div>
+                  <div className="space-y-4">
+                    {disputes.length === 0 && (
+                      <p className="text-sm text-(--muted)">
+                        No disputes available.
+                      </p>
+                    )}
+                    {disputes.map((dispute) => (
+                      <div
+                        key={dispute._id}
+                        className="flex items-center justify-between gap-4 p-3 rounded-xl bg-(--secondary)"
+                      >
+                        <div>
+                          <p className="text-(--text) font-medium">
+                            {dispute.title}
+                          </p>
+                          <p className="text-xs text-(--muted)">
+                            Updated {dispute.updatedAt}
+                          </p>
+                        </div>
+                        <span
+                          className={`text-xs font-semibold px-3 py-1 rounded-full capitalize bg-(--secondary) text-(--muted) border border-(--border)`}
+                        >
+                          {dispute.status}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              </div>
+            </>
+          )}
         </div>
       </main>
     </div>

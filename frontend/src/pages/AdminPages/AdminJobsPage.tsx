@@ -1,5 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
-import { Briefcase, CheckCircle2, XCircle, Clock, Hammer } from "lucide-react";
+import {
+  Briefcase,
+  CheckCircle2,
+  XCircle,
+  Clock,
+  Hammer,
+  Loader2,
+} from "lucide-react";
 import AdminSidebar from "../../components/AdminSidebar/AdminSidebar";
 import { AdminApi, type AdminJobData } from "../../api/Apis";
 
@@ -71,78 +78,86 @@ export default function AdminJobsPage() {
             </div>
           )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            {stats.map((stat) => {
-              const Icon = stat.icon;
-              return (
-                <div
-                  key={stat.title}
-                  className="bg-(--primary) border border-(--border) rounded-2xl p-5 shadow-sm"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-(--secondary) flex items-center justify-center">
-                      <Icon className="w-6 h-6 text-(--accent)" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-(--muted)">{stat.title}</p>
-                      <p className="text-2xl font-bold text-(--text)">
-                        {loading ? "-" : stat.value}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="bg-(--primary) border border-(--border) rounded-2xl shadow-sm overflow-hidden">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-(--border) bg-(--secondary)">
-              <h2 className="text-lg font-semibold text-(--text)">All Jobs</h2>
-              <button className="px-4 py-2 text-sm font-medium rounded-lg bg-(--accent) text-(--primary) hover:bg-(--accent-hover) transition">
-                Export Report
-              </button>
+          {loading ? (
+            <div className="flex items-center justify-center py-20">
+              <Loader2 className="w-8 h-8 text-(--accent) animate-spin" />
             </div>
-
-            <div className="divide-y divide-(--border)">
-              {!loading && jobs.length === 0 && (
-                <div className="px-6 py-6 text-sm text-(--muted)">
-                  No jobs found.
-                </div>
-              )}
-              {jobs.map((job) => (
-                <div
-                  key={job._id}
-                  className="grid grid-cols-1 lg:grid-cols-6 gap-4 px-6 py-4 items-center"
-                >
-                  <div className="lg:col-span-2">
-                    <p className="text-(--text) font-semibold">{job.title}</p>
-                    <p className="text-xs text-(--muted)">{job.jobCategory}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-(--text)">
-                      {job.userId?.fullName}
-                    </p>
-                    <p className="text-xs text-(--muted)">{job._id}</p>
-                  </div>
-                  <div>
-                    <span
-                      className={`text-xs font-semibold px-3 py-1 rounded-full capitalize bg-(--secondary) text-(--muted) border border-(--border)`}
+          ) : (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                {stats.map((stat) => {
+                  const Icon = stat.icon;
+                  return (
+                    <div
+                      key={stat.title}
+                      className="bg-(--primary) border border-(--border) rounded-2xl p-5 shadow-sm"
                     >
-                      {job.jobStatus}
-                    </span>
-                  </div>
-                  <div>
-                    <p className="text-sm text-(--text)">{job.createdAt}</p>
-                  </div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <button className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-(--secondary) text-(--text) border border-(--border) transition">
-                      View Details
-                    </button>
-                  </div>
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-xl bg-(--secondary) flex items-center justify-center">
+                          <Icon className="w-6 h-6 text-(--accent)" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-(--muted)">{stat.title}</p>
+                          <p className="text-2xl font-bold text-(--text)">
+                            {stat.value}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="bg-(--primary) border border-(--border) rounded-2xl shadow-sm overflow-hidden">
+                <div className="flex items-center justify-between px-6 py-4 border-b border-(--border) bg-(--secondary)">
+                  <h2 className="text-lg font-semibold text-(--text)">All Jobs</h2>
+                  <button className="px-4 py-2 text-sm font-medium rounded-lg bg-(--accent) text-(--primary) hover:bg-(--accent-hover) transition">
+                    Export Report
+                  </button>
                 </div>
-              ))}
-            </div>
-          </div>
+
+                <div className="divide-y divide-(--border)">
+                  {jobs.length === 0 && (
+                    <div className="px-6 py-6 text-sm text-(--muted)">
+                      No jobs found.
+                    </div>
+                  )}
+                  {jobs.map((job) => (
+                    <div
+                      key={job._id}
+                      className="grid grid-cols-1 lg:grid-cols-6 gap-4 px-6 py-4 items-center"
+                    >
+                      <div className="lg:col-span-2">
+                        <p className="text-(--text) font-semibold">{job.title}</p>
+                        <p className="text-xs text-(--muted)">{job.jobCategory}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-(--text)">
+                          {job.userId?.fullName}
+                        </p>
+                        <p className="text-xs text-(--muted)">{job._id}</p>
+                      </div>
+                      <div>
+                        <span
+                          className={`text-xs font-semibold px-3 py-1 rounded-full capitalize bg-(--secondary) text-(--muted) border border-(--border)`}
+                        >
+                          {job.jobStatus}
+                        </span>
+                      </div>
+                      <div>
+                        <p className="text-sm text-(--text)">{job.createdAt}</p>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <button className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-(--secondary) text-(--text) border border-(--border) transition">
+                          View Details
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </main>
     </div>

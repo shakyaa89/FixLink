@@ -1,5 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
-import { Flag, CheckCircle2, Timer, AlertTriangle } from "lucide-react";
+import {
+  Flag,
+  CheckCircle2,
+  Timer,
+  AlertTriangle,
+  Loader2,
+} from "lucide-react";
 import AdminSidebar from "../../components/AdminSidebar/AdminSidebar";
 import { AdminApi, type AdminDisputeData } from "../../api/Apis";
 
@@ -136,96 +142,104 @@ export default function AdminDisputesPage() {
             </div>
           )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {stats.map((stat) => {
-              const Icon = stat.icon;
-              return (
-                <div
-                  key={stat.title}
-                  className="bg-(--primary) border border-(--border) rounded-2xl p-5 shadow-sm"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-(--secondary) flex items-center justify-center">
-                      <Icon className="w-6 h-6 text-(--accent)" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-(--muted)">{stat.title}</p>
-                      <p className="text-2xl font-bold text-(--text)">
-                        {loading ? "-" : stat.value}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="bg-(--primary) border border-(--border) rounded-2xl shadow-sm overflow-hidden">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-(--border) bg-(--secondary)">
-              <h2 className="text-lg font-semibold text-(--text)">
-                Active Disputes
-              </h2>
-              <button className="px-4 py-2 text-sm font-medium rounded-lg bg-(--accent) text-(--primary) hover:bg-(--accent-hover) transition">
-                Create Resolution Plan
-              </button>
+          {loading ? (
+            <div className="flex items-center justify-center py-20">
+              <Loader2 className="w-8 h-8 text-(--accent) animate-spin" />
             </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {stats.map((stat) => {
+                  const Icon = stat.icon;
+                  return (
+                    <div
+                      key={stat.title}
+                      className="bg-(--primary) border border-(--border) rounded-2xl p-5 shadow-sm"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-xl bg-(--secondary) flex items-center justify-center">
+                          <Icon className="w-6 h-6 text-(--accent)" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-(--muted)">{stat.title}</p>
+                          <p className="text-2xl font-bold text-(--text)">
+                            {stat.value}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
 
-            <div className="divide-y divide-(--border)">
-              {!loading && disputes.length === 0 && (
-                <div className="px-6 py-6 text-sm text-(--muted)">
-                  No disputes found.
+              <div className="bg-(--primary) border border-(--border) rounded-2xl shadow-sm overflow-hidden">
+                <div className="flex items-center justify-between px-6 py-4 border-b border-(--border) bg-(--secondary)">
+                  <h2 className="text-lg font-semibold text-(--text)">
+                    Active Disputes
+                  </h2>
+                  <button className="px-4 py-2 text-sm font-medium rounded-lg bg-(--accent) text-(--primary) hover:bg-(--accent-hover) transition">
+                    Create Resolution Plan
+                  </button>
                 </div>
-              )}
-              {disputes.map((dispute) => (
-                <div
-                  key={dispute._id}
-                  className="grid grid-cols-1 lg:grid-cols-6 gap-4 px-6 py-4 items-center"
-                >
-                  <div className="lg:col-span-2">
-                    <p className="text-(--text) font-semibold">
-                      {dispute.title}
-                    </p>
-                    <p className="text-xs text-(--muted)">{dispute._id}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-(--text)">{dispute.jobLabel}</p>
-                    <p className="text-xs text-(--muted)">Job reference</p>
-                  </div>
-                  <div>
-                    <span
-                      className={`text-xs font-semibold px-3 py-1 rounded-full ${statusClass(
-                        dispute.statusLabel,
-                      )}`}
+
+                <div className="divide-y divide-(--border)">
+                  {disputes.length === 0 && (
+                    <div className="px-6 py-6 text-sm text-(--muted)">
+                      No disputes found.
+                    </div>
+                  )}
+                  {disputes.map((dispute) => (
+                    <div
+                      key={dispute._id}
+                      className="grid grid-cols-1 lg:grid-cols-6 gap-4 px-6 py-4 items-center"
                     >
-                      {dispute.statusLabel}
-                    </span>
-                  </div>
-                  <div>
-                    <span
-                      className={`text-xs font-semibold px-3 py-1 rounded-full ${priorityClass(
-                        dispute.priorityLabel,
-                      )}`}
-                    >
-                      {dispute.priorityLabel} Priority
-                    </span>
-                  </div>
-                  <div>
-                    <p className="text-sm text-(--text)">
-                      {dispute.updatedLabel}
-                    </p>
-                  </div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <button className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-(--secondary) text-(--text) border border-(--border) transition">
-                      Review
-                    </button>
-                    <button className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-(--success-bg) text-(--success) border border-(--border) transition">
-                      Resolve
-                    </button>
-                  </div>
+                      <div className="lg:col-span-2">
+                        <p className="text-(--text) font-semibold">
+                          {dispute.title}
+                        </p>
+                        <p className="text-xs text-(--muted)">{dispute._id}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-(--text)">{dispute.jobLabel}</p>
+                        <p className="text-xs text-(--muted)">Job reference</p>
+                      </div>
+                      <div>
+                        <span
+                          className={`text-xs font-semibold px-3 py-1 rounded-full ${statusClass(
+                            dispute.statusLabel,
+                          )}`}
+                        >
+                          {dispute.statusLabel}
+                        </span>
+                      </div>
+                      <div>
+                        <span
+                          className={`text-xs font-semibold px-3 py-1 rounded-full ${priorityClass(
+                            dispute.priorityLabel,
+                          )}`}
+                        >
+                          {dispute.priorityLabel} Priority
+                        </span>
+                      </div>
+                      <div>
+                        <p className="text-sm text-(--text)">
+                          {dispute.updatedLabel}
+                        </p>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <button className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-(--secondary) text-(--text) border border-(--border) transition">
+                          Review
+                        </button>
+                        <button className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-(--success-bg) text-(--success) border border-(--border) transition">
+                          Resolve
+                        </button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
+              </div>
+            </>
+          )}
         </div>
       </main>
     </div>

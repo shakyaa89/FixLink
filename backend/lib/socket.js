@@ -8,6 +8,7 @@ const allowedOrigins = [
   "http://192.168.1.70:3000",
   "http://localhost:3000",
   "http://100.64.234.28:5173",
+  "https://fix-link.netlify.app"
 ];
 
 export const initSocket = (httpServer) => {
