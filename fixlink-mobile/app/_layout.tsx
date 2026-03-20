@@ -1,10 +1,9 @@
 import { Stack } from "expo-router";
 import "../global.css"
-import { SafeAreaView } from "react-native-safe-area-context";
 import NavBar from "@/components/Navbar";
 import { useAuthStore } from "@/store/authStore";
 import { useEffect } from "react";
-import { ActivityIndicator } from "react-native";
+import { ActivityIndicator, View } from "react-native";
 import Toast from "react-native-toast-message";
 
 export default function RootLayout() {
@@ -18,15 +17,15 @@ export default function RootLayout() {
 
   if (checking) {
     return (
-      <SafeAreaView style={{ flex: 1 }}>
+      <View style={{ flex: 1 }}>
         <ActivityIndicator />
-      </SafeAreaView>);
+      </View>);
   }
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <View style={{ flex: 1 }}>
       <Stack screenOptions={{ headerShown: false }} />
-      {user && <NavBar />}
+      {user && user.role !== "admin" && <NavBar />}
       <Toast />
-    </SafeAreaView>);
+    </View>);
 }

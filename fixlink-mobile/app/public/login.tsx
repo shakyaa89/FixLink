@@ -30,6 +30,8 @@ export default function Login() {
         router.replace("/user/dashboard");
       } else if (currentUser?.role === "serviceProvider") {
         router.replace("/service-provider/dashboard");
+      } else if (currentUser?.role === "admin") {
+        router.replace("/admin-mobile");
       } else {
         router.replace("/jobs");
       }

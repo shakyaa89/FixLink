@@ -51,6 +51,8 @@ export default function JobDetailsPage() {
   const [reviewComment, setReviewComment] = useState("");
   const [reviewSubmitting, setReviewSubmitting] = useState(false);
   const [reviewSubmitted, setReviewSubmitted] = useState(false);
+  const [cancelingJob, setCancelingJob] = useState(false);
+  const [acceptingOffer, setAcceptingOffer] = useState(false);
 
   const [offeredPrice, setOfferedPrice] = useState("");
   const [offerSubmitting, setOfferSubmitting] = useState(false);
@@ -119,6 +121,7 @@ export default function JobDetailsPage() {
 
   const handleCancelJob = async (id: string) => {
     try {
+      setCancelingJob(true);
       const response = await JobApi.cancelJobApi(id);
       Toast.show({
         type: "success",
@@ -131,12 +134,15 @@ export default function JobDetailsPage() {
         type: "error",
         text1: err?.response?.data?.message || "Error cancelling the job",
       });
+    } finally {
+      setCancelingJob(false);
     }
   };
 
   const handleOfferAccept = async (offerId: string) => {
     if (!offerId) return;
     try {
+      setAcceptingOffer(true);
       const response = await OfferApi.acceptOffer({ offerId });
       Toast.show({
         type: "success",
@@ -150,6 +156,8 @@ export default function JobDetailsPage() {
         type: "error",
         text1: err?.response?.data?.message || "Failed to accept offer",
       });
+    } finally {
+      setAcceptingOffer(false);
     }
   };
 
@@ -246,10 +254,19 @@ export default function JobDetailsPage() {
 
   if (loading) {
     return (
-      <SafeAreaView className="flex-1 bg-primary items-center justify-center">
-        <Loader2 size={28} color={colors.accent} />
-        <ActivityIndicator size="large" color={colors.accent} />
-        <Text className="text-muted mt-3">Loading job details...</Text>
+      <SafeAreaView className="flex-1 bg-primary px-6 py-6">
+        <Pressable
+          onPress={() => router.back()}
+          className="w-10 h-10 border border-border rounded-xl items-center justify-center active:bg-secondary"
+        >
+          <ArrowLeft size={20} color={colors.text} />
+        </Pressable>
+
+        <View className="flex-1 items-center justify-center">
+          <Loader2 size={28} color={colors.accent} />
+          <ActivityIndicator size="large" color={colors.accent} />
+          <Text className="text-muted mt-3">Loading job details...</Text>
+        </View>
       </SafeAreaView>
     );
   }
@@ -287,10 +304,9 @@ export default function JobDetailsPage() {
         <View className="px-6 py-6 gap-5">
           <Pressable
             onPress={() => router.back()}
-            className="flex-row items-center gap-2 self-start"
+            className="w-10 h-10 border border-border rounded-xl items-center justify-center active:bg-secondary"
           >
-            <ArrowLeft size={18} color={colors.muted} />
-            <Text className="text-muted">Back</Text>
+            <ArrowLeft size={20} color={colors.text} />
           </Pressable>
 
           <View className="flex-row items-start justify-between gap-3">
@@ -400,7 +416,8 @@ export default function JobDetailsPage() {
 
           {user?.role === "user" && (job.jobStatus === "open" || job.jobStatus === "in-progress") && (
             <Pressable
-              className="bg-red-600 rounded-xl py-3 items-center active:opacity-90"
+              className="bg-red-600 rounded-xl py-3 items-center active:opacity-90 disabled:opacity-60"
+              disabled={cancelingJob}
               onPress={() =>
                 Alert.alert("Cancel Job", "Are you sure you want to cancel this job?", [
                   { text: "No", style: "cancel" },
@@ -412,7 +429,14 @@ export default function JobDetailsPage() {
                 ])
               }
             >
-              <Text className="text-white font-semibold">Cancel Job</Text>
+              {cancelingJob ? (
+                <View className="flex-row items-center gap-2">
+                  <ActivityIndicator size="small" color="#fff" />
+                  <Text className="text-white font-semibold">Cancelling...</Text>
+                </View>
+              ) : (
+                <Text className="text-white font-semibold">Cancel Job</Text>
+              )}
             </Pressable>
           )}
 
@@ -600,10 +624,18 @@ export default function JobDetailsPage() {
                 <Text className="text-text font-medium">Cancel</Text>
               </Pressable>
               <Pressable
-                className="flex-1 bg-green-600 rounded-xl py-2.5 items-center"
+                className="flex-1 bg-green-600 rounded-xl py-2.5 items-center disabled:opacity-60"
+                disabled={acceptingOffer}
                 onPress={() => handleOfferAccept(acceptOfferId)}
               >
-                <Text className="text-white font-semibold">Accept</Text>
+                {acceptingOffer ? (
+                  <View className="flex-row items-center gap-2">
+                    <ActivityIndicator size="small" color="#fff" />
+                    <Text className="text-white font-semibold">Accepting...</Text>
+                  </View>
+                ) : (
+                  <Text className="text-white font-semibold">Accept</Text>
+                )}
               </Pressable>
             </View>
           </View>

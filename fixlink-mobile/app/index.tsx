@@ -28,6 +28,11 @@ export default function Index() {
       return;
     }
 
+    if (user.role === "admin") {
+      router.replace("/admin-mobile");
+      return;
+    }
+
     router.replace("/jobs");
   }, [user, router]);
 

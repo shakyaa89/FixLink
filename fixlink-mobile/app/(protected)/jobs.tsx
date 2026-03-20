@@ -197,9 +197,16 @@ function Jobs() {
                         {job.jobCategory}
                       </Text>
                     </View>
-                    <Text className="text-base font-semibold text-accent">
-                      Rs. {(job.jobStatus === "open" ? job.userPrice : job.finalPrice ?? job.userPrice)?.toLocaleString()}
-                    </Text>
+                    <View className="items-end gap-1.5">
+                      <Text className="text-base font-semibold text-accent">
+                        Rs. {(job.jobStatus === "open" ? job.userPrice : job.finalPrice ?? job.userPrice)?.toLocaleString()}
+                      </Text>
+                      <View
+                        className={`rounded-full border px-3 py-1 ${getStatusStyles(job.jobStatus)}`}
+                      >
+                        <Text className="text-xs text-text capitalize">{job.jobStatus || "unknown"}</Text>
+                      </View>
+                    </View>
                   </View>
 
                   <Text className="text-sm text-muted mt-3">
@@ -219,12 +226,6 @@ function Jobs() {
                           : "N/A"}
                       </Text>
                     </View>
-                  </View>
-
-                  <View
-                    className={`mt-3 self-start rounded-full border px-3 py-1 ${getStatusStyles(job.jobStatus)}`}
-                  >
-                    <Text className="text-xs text-text capitalize">{job.jobStatus || "unknown"}</Text>
                   </View>
 
                   <Pressable

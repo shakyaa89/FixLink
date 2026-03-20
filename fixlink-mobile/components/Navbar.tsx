@@ -1,14 +1,13 @@
 import { View, Text, Pressable } from "react-native";
-import { Home, Menu, BriefcaseBusiness, LogOut } from "lucide-react-native";
+import { Home, User, BriefcaseBusiness, MessageCircle } from "lucide-react-native";
 import colors from "../app/_constants/theme";
 import { useRouter } from "expo-router";
 import { useAuthStore } from "@/store/authStore";
-import Toast from "react-native-toast-message";
 
 
 export default function NavBar() {
     const router = useRouter();
-    const {logout, user} = useAuthStore();
+    const { user } = useAuthStore();
 
     function goToDashboard() {
         if (user?.role === "user") {
@@ -21,16 +20,12 @@ export default function NavBar() {
             return;
         }
 
-        router.push("/jobs");
-    }
+        if (user?.role === "admin") {
+            router.push("/admin-mobile");
+            return;
+        }
 
-    function HandleLogout(){
-        logout();
-        Toast.show({
-            type: 'success',
-            text2: "Logged out successfully!"
-        })
-        router.push("/");
+        router.push("/jobs");
     }
 
     return (
@@ -72,9 +67,10 @@ export default function NavBar() {
                 </Pressable>
                 <Pressable
                     className="flex-1 items-center gap-1 py-2 active:opacity-70"
+                    onPress={() => router.push("/(protected)/messages")}
                 >
                     <View className={`p-2 rounded-xl`}>
-                        <Menu
+                        <MessageCircle
                             size={24}
                             color={colors.muted}
                             strokeWidth={2}
@@ -83,15 +79,15 @@ export default function NavBar() {
                     <Text
                         className={`text-xs font-medium `}
                     >
-                        Menu
+                        Messages
                     </Text>
                 </Pressable>
                 <Pressable
                     className="flex-1 items-center gap-1 py-2 active:opacity-70"
-                    onPress={HandleLogout}
+                    onPress={() => router.push("/profile")}
                 >
                     <View className={`p-2 rounded-xl`}>
-                        <LogOut
+                        <User
                             size={24}
                             color={colors.muted}
                             strokeWidth={2}
@@ -100,7 +96,7 @@ export default function NavBar() {
                     <Text
                         className={`text-xs font-medium `}
                     >
-                        Logout
+                        Profile
                     </Text>
                 </Pressable>
             </View>

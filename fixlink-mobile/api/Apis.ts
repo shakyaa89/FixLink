@@ -36,6 +36,17 @@ interface ServiceProviderProfilePayload {
     addressURL?: string;
 }
 
+interface UpdateUserProfilePayload {
+    fullName: string;
+    email: string;
+    phoneNumber: string;
+    city: string;
+    address: string;
+    addressDescription: string;
+    addressUrl?: string;
+    profilePicture?: string;
+}
+
 interface UserLoginData {
     email: string;
     password: string;
@@ -128,6 +139,11 @@ export const AuthApi = {
             data,
             { headers }
         );
+    },
+
+    updateUserProfile: async (data: UpdateUserProfilePayload) => {
+        const headers = await getAuthHeader();
+        return Api.put('/auth/update/user', data, { headers });
     },
 };
 

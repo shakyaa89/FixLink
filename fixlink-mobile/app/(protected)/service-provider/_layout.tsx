@@ -1,5 +1,4 @@
 import { Redirect, Stack } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuthStore } from "@/store/authStore";
 
 export default function RootLayout() {
@@ -14,11 +13,12 @@ export default function RootLayout() {
       return <Redirect href="/user/dashboard" />;
     }
 
+    if (user.role === "admin") {
+      return <Redirect href="/admin-mobile" />;
+    }
+
     return <Redirect href="/jobs" />;
   }
 
-  return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <Stack screenOptions={{ headerShown: false }} />
-    </SafeAreaView>);
+  return <Stack screenOptions={{ headerShown: false }} />;
 }

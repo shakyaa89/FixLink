@@ -11,7 +11,7 @@ export default function ProfilePage() {
 
   return (
     <div className="flex min-h-screen">
-      <Sidebar />
+     <Sidebar />
 
       <main className="flex-1 px-6 md:px-12 py-10 bg-(--primary)">
         <div className="max-w-6xl mx-auto">
