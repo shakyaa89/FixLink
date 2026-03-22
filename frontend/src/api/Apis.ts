@@ -1,7 +1,7 @@
 import axios from "axios";
 
-// export const API_BASE_URL = "http://192.168.1.66:3005";
-export const API_BASE_URL = "https://fixlink-n7rz.onrender.com";
+export const API_BASE_URL = "http://192.168.1.66:3005";
+// export const API_BASE_URL = "https://fixlink-n7rz.onrender.com";
 const baseURL = `${API_BASE_URL}/api`;
 
 interface User {

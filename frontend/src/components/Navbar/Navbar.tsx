@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { useAuthStore } from "../../store/authStore";
 import { useThemeStore } from "../../store/themeStore";
 import { isServiceProviderProfileComplete } from "../../utils/serviceProviderProfile";
+import logo from "../../assets/logo.png";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -28,7 +29,8 @@ export default function Navbar() {
           <div className="flex items-center gap-5">
             <div className="flex items-center gap-2">
               <span className="text-3xl font-bold text-(--text)">
-                <a href="/">FixLink</a>
+                {/* <a href="/">FixLink</a> */}
+                <img src={logo} alt="Application Logo" width={65} />
               </span>
             </div>
             <p className="text-(--muted)">|</p>

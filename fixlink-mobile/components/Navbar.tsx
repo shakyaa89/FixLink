@@ -1,31 +1,43 @@
 import { View, Text, Pressable } from "react-native";
-import { Home, User, BriefcaseBusiness, MessageCircle } from "lucide-react-native";
+import { Home, User, BriefcaseBusiness, MessageCircle, Bot } from "lucide-react-native";
 import colors from "../app/_constants/theme";
-import { useRouter } from "expo-router";
+import { usePathname, useRouter } from "expo-router";
 import { useAuthStore } from "@/store/authStore";
 
 
 export default function NavBar() {
     const router = useRouter();
+    const pathname = usePathname();
     const { user } = useAuthStore();
+
+    const navigateIfNeeded = (target: string, aliases: string[] = []) => {
+        const currentPath = pathname || "";
+        const candidates = [target, ...aliases];
+
+        if (candidates.includes(currentPath)) {
+            return;
+        }
+
+        router.push(target as never);
+    };
 
     function goToDashboard() {
         if (user?.role === "user") {
-            router.push("/user/dashboard");
+            navigateIfNeeded("/user/dashboard", ["/(protected)/user/dashboard"]);
             return;
         }
 
         if (user?.role === "serviceProvider") {
-            router.push("/service-provider/dashboard");
+            navigateIfNeeded("/service-provider/dashboard", ["/(protected)/service-provider/dashboard"]);
             return;
         }
 
         if (user?.role === "admin") {
-            router.push("/admin-mobile");
+            navigateIfNeeded("/admin-mobile", ["/(protected)/admin-mobile"]);
             return;
         }
 
-        router.push("/jobs");
+        navigateIfNeeded("/jobs", ["/(protected)/jobs"]);
     }
 
     return (
@@ -50,7 +62,7 @@ export default function NavBar() {
                 </Pressable>
                 <Pressable
                     className="flex-1 items-center gap-1 py-2 active:opacity-70"
-                    onPress={() => router.push("/jobs")}
+                    onPress={() => navigateIfNeeded("/jobs", ["/(protected)/jobs"])}
                 >
                     <View className={`p-2 rounded-xl`}>
                         <BriefcaseBusiness
@@ -67,7 +79,24 @@ export default function NavBar() {
                 </Pressable>
                 <Pressable
                     className="flex-1 items-center gap-1 py-2 active:opacity-70"
-                    onPress={() => router.push("/(protected)/messages")}
+                    onPress={() => navigateIfNeeded("/ai-chat", ["/(protected)/ai-chat"])}
+                >
+                    <View className={`p-2 rounded-xl`}>
+                        <Bot
+                            size={24}
+                            color={colors.muted}
+                            strokeWidth={2}
+                        />
+                    </View>
+                    <Text
+                        className={`text-xs font-medium `}
+                    >
+                        AI Chat
+                    </Text>
+                </Pressable>
+                <Pressable
+                    className="flex-1 items-center gap-1 py-2 active:opacity-70"
+                    onPress={() => navigateIfNeeded("/messages", ["/(protected)/messages"])}
                 >
                     <View className={`p-2 rounded-xl`}>
                         <MessageCircle
@@ -84,7 +113,7 @@ export default function NavBar() {
                 </Pressable>
                 <Pressable
                     className="flex-1 items-center gap-1 py-2 active:opacity-70"
-                    onPress={() => router.push("/profile")}
+                    onPress={() => navigateIfNeeded("/profile", ["/(protected)/profile"])}
                 >
                     <View className={`p-2 rounded-xl`}>
                         <User

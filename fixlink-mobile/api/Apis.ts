@@ -99,6 +99,11 @@ export interface ReviewData {
     updatedAt?: string;
 }
 
+export interface AiChatMessage {
+    role: 'user' | 'assistant';
+    content: string;
+}
+
 const Api = axios.create({
     baseURL,
     headers: {
@@ -188,4 +193,9 @@ export const ReviewApi = {
 
     fetchMyReceivedReviews: async () =>
         Api.get("/reviews/received", { headers: await getAuthHeader() }),
+};
+
+export const AiApi = {
+    chat: async (data: { message: string; history?: AiChatMessage[]; category?: string }) =>
+        Api.post('/ai/chat', data, { headers: await getAuthHeader() }),
 };
