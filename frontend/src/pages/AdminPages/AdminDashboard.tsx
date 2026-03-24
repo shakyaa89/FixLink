@@ -14,6 +14,25 @@ import {
   type AdminJobData,
   type AdminUserData,
 } from "../../api/Apis";
+import {
+  ArcElement,
+  BarElement,
+  CategoryScale,
+  Chart as ChartJS,
+  Legend,
+  LinearScale,
+  Tooltip,
+} from "chart.js";
+import { Bar, Doughnut } from "react-chartjs-2";
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  ArcElement,
+  Tooltip,
+  Legend,
+);
 
 export default function AdminDashboard() {
   const [users, setUsers] = useState<AdminUserData[]>([]);
@@ -55,6 +74,58 @@ export default function AdminDashboard() {
       },
     ];
   }, [users, jobs, disputes]);
+
+  const userRoleChartData = useMemo(() => {
+    const userCount = users.filter((user) => user.role === "user").length;
+    const providerCount = users.filter(
+      (user) => user.role === "serviceProvider",
+    ).length;
+    const adminCount = users.filter((user) => user.role === "admin").length;
+
+    return {
+      labels: ["Users", "Providers", "Admins"],
+      datasets: [
+        {
+          data: [userCount, providerCount, adminCount],
+          backgroundColor: [
+            "rgba(59, 130, 246, 0.8)",
+            "rgba(34, 197, 94, 0.8)",
+            "rgba(245, 158, 11, 0.8)",
+          ],
+          borderWidth: 1,
+        },
+      ],
+    };
+  }, [users]);
+
+  const disputeStatusChartData = useMemo(() => {
+    const openCount = disputes.filter((dispute) => dispute.status === "open").length;
+    const resolvedCount = disputes.filter(
+      (dispute) => dispute.status === "resolved",
+    ).length;
+    const otherCount = disputes.length - openCount - resolvedCount;
+
+    return {
+      labels: ["Open", "Resolved", "Other"],
+      datasets: [
+        {
+          label: "Disputes",
+          data: [openCount, resolvedCount, otherCount],
+          backgroundColor: [
+            "rgba(239, 68, 68, 0.8)",
+            "rgba(34, 197, 94, 0.8)",
+            "rgba(107, 114, 128, 0.8)",
+          ],
+          borderColor: [
+            "rgba(239, 68, 68, 1)",
+            "rgba(34, 197, 94, 1)",
+            "rgba(107, 114, 128, 1)",
+          ],
+          borderWidth: 1,
+        },
+      ],
+    };
+  }, [disputes]);
 
   const fetchOverview = async () => {
     try {
@@ -139,6 +210,30 @@ export default function AdminDashboard() {
                     </div>
                   );
                 })}
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <section className="bg-(--primary) border border-(--border) rounded-2xl p-6 shadow-sm">
+                  <h2 className="text-lg font-semibold text-(--text) mb-4">
+                    User Role Distribution
+                  </h2>
+                  <div className="max-w-sm mx-auto">
+                    <Doughnut data={userRoleChartData} />
+                  </div>
+                </section>
+
+                <section className="bg-(--primary) border border-(--border) rounded-2xl p-6 shadow-sm">
+                  <h2 className="text-lg font-semibold text-(--text) mb-4">
+                    Dispute Status
+                  </h2>
+                  <Bar
+                    data={disputeStatusChartData}
+                    options={{
+                      responsive: true,
+                      plugins: { legend: { display: false } },
+                    }}
+                  />
+                </section>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

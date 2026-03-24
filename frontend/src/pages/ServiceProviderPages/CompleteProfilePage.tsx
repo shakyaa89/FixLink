@@ -6,6 +6,8 @@ import { useNavigate } from "react-router-dom";
 import { AiApi, AuthApi } from "../../api/Apis";
 import { useAuthStore } from "../../store/authStore";
 
+const MAX_IMAGE_SIZE_BYTES = 2 * 1024 * 1024;
+
 export default function CompleteProfilePage() {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -23,6 +25,10 @@ export default function CompleteProfilePage() {
   const navigate = useNavigate();
 
   const uploadToCloudinary = async (file: File, preset: string) => {
+    if (file.size > MAX_IMAGE_SIZE_BYTES) {
+      throw new Error("Image must be 2MB or smaller");
+    }
+
     setUploading(true);
     const formData = new FormData();
     formData.append("file", file);
@@ -208,9 +214,18 @@ export default function CompleteProfilePage() {
                 <input
                   id="verification-input"
                   type="file"
-                  onChange={(e) =>
-                    setVerificationProofFile(e.target.files?.[0] || null)
-                  }
+                  onChange={(e) => {
+                    const selectedFile = e.target.files?.[0] || null;
+
+                    if (selectedFile && selectedFile.size > MAX_IMAGE_SIZE_BYTES) {
+                      toast.error("Image must be 2MB or smaller");
+                      setVerificationProofFile(null);
+                      e.target.value = "";
+                      return;
+                    }
+
+                    setVerificationProofFile(selectedFile);
+                  }}
                   accept="image/*"
                   className="hidden"
                 />
@@ -235,7 +250,18 @@ export default function CompleteProfilePage() {
                 <input
                   id="id-input"
                   type="file"
-                  onChange={(e) => setIdProofFile(e.target.files?.[0] || null)}
+                  onChange={(e) => {
+                    const selectedFile = e.target.files?.[0] || null;
+
+                    if (selectedFile && selectedFile.size > MAX_IMAGE_SIZE_BYTES) {
+                      toast.error("Image must be 2MB or smaller");
+                      setIdProofFile(null);
+                      e.target.value = "";
+                      return;
+                    }
+
+                    setIdProofFile(selectedFile);
+                  }}
                   accept="image/*"
                   className="hidden"
                 />

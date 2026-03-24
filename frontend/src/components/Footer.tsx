@@ -31,33 +31,6 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Company */}
-          <div>
-            <h3 className=" font-semibold mb-4">Company</h3>
-            <ul className="space-y-2 text-sm ">
-              <li>
-                <a href="#" className="hover:text-(--accent) transition">
-                  About Us
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-(--accent) transition">
-                  Blog
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-(--accent) transition">
-                  Careers
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-(--accent) transition">
-                  Contact
-                </a>
-              </li>
-            </ul>
-          </div>
-
           {/* Legal */}
           <div>
             <h3 className=" font-semibold mb-4">Legal</h3>

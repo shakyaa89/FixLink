@@ -6,6 +6,8 @@ import { AiApi, JobApi } from "../../api/Apis";
 import toast from "react-hot-toast";
 import axios from "axios";
 
+const MAX_IMAGE_SIZE_BYTES = 2 * 1024 * 1024;
+
 export default function CreateJobPage() {
   const { user } = useAuthStore();
 
@@ -15,6 +17,8 @@ export default function CreateJobPage() {
   const [userPrice, setUserPrice] = useState(0);
   const [location, setLocation] = useState("");
   const [locationURL, setLocationURL] = useState("");
+  const [postType, setPostType] = useState<"now" | "scheduled">("now");
+  const [scheduledFor, setScheduledFor] = useState("");
   const [loading, setLoading] = useState(false);
   const [images, setImages] = useState<File[]>([]);
 
@@ -25,6 +29,13 @@ export default function CreateJobPage() {
 
     const files = Array.from(e.target.files);
 
+    const oversizedFiles = files.filter((file) => file.size > MAX_IMAGE_SIZE_BYTES);
+    if (oversizedFiles.length > 0) {
+      toast.error("Each image must be 2MB or smaller");
+      e.target.value = "";
+      return;
+    }
+
     setImages(files);
   };
 
@@ -34,6 +45,10 @@ export default function CreateJobPage() {
 
     try {
       for (const file of files) {
+        if (file.size > MAX_IMAGE_SIZE_BYTES) {
+          throw new Error("Each image must be 2MB or smaller");
+        }
+
         const formData = new FormData();
         formData.append("file", file);
         formData.append("upload_preset", "job_image_upload");
@@ -72,6 +87,11 @@ export default function CreateJobPage() {
       return;
     }
 
+    if (postType === "scheduled" && !scheduledFor) {
+      toast.error("Please select a schedule date and time");
+      return;
+    }
+
     try {
       setLoading(true);
       const verificationPayload = { title, description, userPrice }
@@ -101,9 +121,16 @@ export default function CreateJobPage() {
         location,
         locationURL,
         images: imageUrls,
+        scheduledFor:
+          postType === "scheduled" && scheduledFor
+            ? new Date(scheduledFor).toISOString()
+            : undefined,
       };
 
-      const response = await JobApi.createJobApi(payload);
+      const response =
+        postType === "scheduled"
+          ? await JobApi.scheduleJobApi(payload)
+          : await JobApi.createJobApi(payload);
 
       toast.success(response?.data?.message);
 
@@ -113,6 +140,8 @@ export default function CreateJobPage() {
       setUserPrice(0);
       setLocation("");
       setLocationURL("");
+      setPostType("now");
+      setScheduledFor("");
       setImages([]);
     } catch (error) {
       console.log(error);
@@ -121,6 +150,14 @@ export default function CreateJobPage() {
       setLoading(false);
     }
   }
+
+  const minScheduleDate = new Date(Date.now() + 60 * 1000)
+    .toISOString()
+    .slice(0, 16);
+
+  const maxScheduleDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+    .toISOString()
+    .slice(0, 16);
 
   return (
     <div className="flex min-h-screen bg-(--primary)">
@@ -239,6 +276,57 @@ export default function CreateJobPage() {
                 placeholder="https://www.google.com/maps/@?api=1&map_action=map"
                 className="w-full p-3 rounded-lg border border-(--border) focus:ring-2 focus:ring-(--accent) focus:border-transparent outline-none bg-(--secondary) text-(--text)"
               />
+            </div>
+
+            {/* Schedule */}
+            <div className="bg-(--primary) border border-(--border) rounded-xl p-5">
+              <label className="block text-(--text) font-semibold mb-3">
+                Posting Option<span className="text-red-500 ml-1">*</span>
+              </label>
+
+              <div className="flex flex-col sm:flex-row gap-3">
+                <label className="flex items-center gap-2 text-(--text)">
+                  <input
+                    type="radio"
+                    name="postType"
+                    checked={postType === "now"}
+                    onChange={() => {
+                      setPostType("now");
+                      setScheduledFor("");
+                    }}
+                  />
+                  Post Now
+                </label>
+
+                <label className="flex items-center gap-2 text-(--text)">
+                  <input
+                    type="radio"
+                    name="postType"
+                    checked={postType === "scheduled"}
+                    onChange={() => setPostType("scheduled")}
+                  />
+                  Schedule for Later
+                </label>
+              </div>
+
+              {postType === "scheduled" && (
+                <div className="mt-4">
+                  <label className="block text-(--text) font-semibold mb-2">
+                    Schedule For{" "}
+                    <span className="text-(--muted) font-normal text-sm">
+                      (Up to 1 week)
+                    </span>
+                  </label>
+                  <input
+                    type="datetime-local"
+                    value={scheduledFor}
+                    min={minScheduleDate}
+                    max={maxScheduleDate}
+                    onChange={(e) => setScheduledFor(e.target.value)}
+                    className="w-full p-3 rounded-lg border border-(--border) focus:ring-2 focus:ring-(--accent) focus:border-transparent outline-none bg-(--secondary) text-(--text)"
+                  />
+                </div>
+              )}
             </div>
 
             {/* Image Upload */}

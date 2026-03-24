@@ -1,12 +1,41 @@
 import Job from "../models/job.model.js";
 import Offer from "../models/offer.model.js";
 
+const MIN_PRICE = 1;
+const MAX_PRICE = 1000000;
+
+const isValidPrice = (value) =>
+  typeof value === "number" &&
+  Number.isFinite(value) &&
+  value >= MIN_PRICE &&
+  value <= MAX_PRICE;
+
+const getValidatedScheduleDate = (scheduledFor) => {
+  const parsedScheduledFor = new Date(scheduledFor);
+
+  if (Number.isNaN(parsedScheduledFor.getTime())) {
+    return { error: "Invalid schedule date" };
+  }
+
+  const now = new Date();
+  const maxScheduleDate = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+  if (parsedScheduledFor <= now) {
+    return { error: "Scheduled time must be in the future" };
+  }
+
+  if (parsedScheduledFor > maxScheduleDate) {
+    return { error: "Jobs can only be scheduled up to 1 week ahead" };
+  }
+
+  return { parsedScheduledFor };
+};
+
 export const createJob = async (req, res) => {
   const {
     title,
     description,
     jobCategory,
-    userId,
     userPrice,
     location,
     locationURL,
@@ -16,6 +45,12 @@ export const createJob = async (req, res) => {
   const user_id = req.user._id;
 
   try {
+    if (!isValidPrice(userPrice)) {
+      return res.status(400).json({
+        message: `Price must be a number between ${MIN_PRICE} and ${MAX_PRICE}`,
+      });
+    }
+
     const newJob = new Job({
       userId: user_id,
       title,
@@ -25,10 +60,68 @@ export const createJob = async (req, res) => {
       location,
       locationURL,
       images,
+      scheduledFor: null,
+      jobStatus: "open",
     });
 
     await newJob.save();
+
     res.status(200).json({ message: "Job created successfully" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const scheduleJob = async (req, res) => {
+  const {
+    title,
+    description,
+    jobCategory,
+    userPrice,
+    location,
+    locationURL,
+    images,
+    scheduledFor,
+  } = req.body;
+
+  const user_id = req.user._id;
+
+  try {
+    if (!isValidPrice(userPrice)) {
+      return res.status(400).json({
+        message: `Price must be a number between ${MIN_PRICE} and ${MAX_PRICE}`,
+      });
+    }
+
+    if (!scheduledFor) {
+      return res.status(400).json({ message: "Scheduled time is required" });
+    }
+
+    const { parsedScheduledFor, error } = getValidatedScheduleDate(
+      scheduledFor,
+    );
+
+    if (error) {
+      return res.status(400).json({ message: error });
+    }
+
+    const newJob = new Job({
+      userId: user_id,
+      title,
+      description,
+      jobCategory,
+      userPrice,
+      location,
+      locationURL,
+      images,
+      scheduledFor: parsedScheduledFor,
+      jobStatus: "scheduled",
+    });
+
+    await newJob.save();
+
+    res.status(200).json({ message: "Job scheduled successfully" });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Server error" });
@@ -39,7 +132,7 @@ export const getJobsbyUserId = async (req, res) => {
   try {
     const userId = req.user.id;
     const jobs = await Job.find({ userId }).sort({ createdAt: -1 });
-    return res.status(200).json({ jobs });
+    return res.status(200).json({ jobs }); 
   } catch (err) {
     console.log(err);
     return res.status(500).json({ message: "Failed to fetch jobs" });
@@ -83,6 +176,7 @@ export const getJobsForProvider = async (req, res) => {
   try {
     const { category } = req.query;
     const serviceProviderId = req.user?.id || req.user?._id;
+    const now = new Date();
 
     if (!category) {
       return res.status(400).json({
@@ -104,7 +198,11 @@ export const getJobsForProvider = async (req, res) => {
 
     const jobs = await Job.find({
       jobCategory: category,
-      $or: [{ jobStatus: "open" }, { _id: { $in: providerJobIds } }],
+      $or: [
+        { jobStatus: "open" },
+        { jobStatus: "scheduled", scheduledFor: { $lte: now } },
+        { _id: { $in: providerJobIds } },
+      ],
     })
       .populate({
         path: "offers",

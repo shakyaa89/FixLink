@@ -2,6 +2,21 @@ import User from "../models/user.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PHONE_REGEX = /^\+?[0-9]{10,15}$/;
+const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
+
+const isValidEmail = (value) =>
+  typeof value === "string" && EMAIL_REGEX.test(value.trim());
+
+const isValidPhoneNumber = (value) =>
+  typeof value === "string" && PHONE_REGEX.test(value.trim());
+
+const isValidPassword = (value) =>
+  typeof value === "string" && PASSWORD_REGEX.test(value);
+
+const ALLOWED_REGISTRATION_ROLES = ["user", "serviceProvider"];
+
 export async function registerController(req, res) {
   const {
     fullName,
@@ -20,23 +35,13 @@ export async function registerController(req, res) {
   } = req.body;
 
   try {
-    console.log(
-      fullName,
-      email,
-      phoneNumber,
-      city,
-      password,
-      role,
-      address,
-      addressDescription,
-      addressURL,
-      profilePicture,
-      verificationProofURL,
-      providerCategory,
-      idURL
-    );
+    const allowedRole = role || "user";
 
-    const isServiceProvider = role === "serviceProvider";
+    if (!ALLOWED_REGISTRATION_ROLES.includes(allowedRole)) {
+      return res.status(400).json({ message: "Invalid role selected" });
+    }
+
+    const isServiceProvider = allowedRole === "serviceProvider";
     const allowedCities = ["Kathmandu", "Lalitpur", "Bhaktapur"];
 
     // Required fields
@@ -46,6 +51,20 @@ export async function registerController(req, res) {
 
     if (!allowedCities.includes(city)) {
       return res.status(400).json({ message: "Invalid city selected" });
+    }
+
+    if (!isValidEmail(email)) {
+      return res.status(400).json({ message: "Invalid email format" });
+    }
+
+    if (!isValidPhoneNumber(phoneNumber)) {
+      return res.status(400).json({ message: "Invalid phone number format" });
+    }
+
+    if (!isValidPassword(password)) {
+      return res
+        .status(400)
+        .json({ message: "Password must be at least 8 characters and include letters and numbers" });
     }
 
     // Check duplicate email
@@ -68,7 +87,7 @@ export async function registerController(req, res) {
       phoneNumber,
       city,
       password: hashedPassword,
-      role: role || "user",
+      role: allowedRole,
       address,
       addressDescription,
       addressURL,
@@ -163,6 +182,10 @@ export async function loginController(req, res) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
+    if (!isValidEmail(email)) {
+      return res.status(400).json({ message: "Invalid email format" });
+    }
+
     const user = await User.findOne({ email }).select("+password");
 
     if (!user) {
@@ -216,6 +239,7 @@ export async function updateUserProfile(req, res){
     city,
     address,
     addressDescription,
+    addressURL,
     addressUrl,
     profilePicture} = req.body;
 
@@ -223,6 +247,14 @@ export async function updateUserProfile(req, res){
 
     if(!fullName || !email || !phoneNumber || !city || !address || !addressDescription ){
       return res.status(400).json({message: "All fields are required!"});
+    }
+
+    if (!isValidEmail(email)) {
+      return res.status(400).json({ message: "Invalid email format" });
+    }
+
+    if (!isValidPhoneNumber(phoneNumber)) {
+      return res.status(400).json({ message: "Invalid phone number format" });
     }
 
     const emailCheck = await User.findOne({ email, _id: { $ne: currentUser._id } })
@@ -243,7 +275,10 @@ export async function updateUserProfile(req, res){
     currentUser.city = city;
     currentUser.address = address;
     currentUser.addressDescription = addressDescription;
-    currentUser.addressURL = addressUrl;
+    const normalizedAddressURL = addressURL ?? addressUrl;
+    if (normalizedAddressURL !== undefined) {
+      currentUser.addressURL = normalizedAddressURL;
+    }
     currentUser.profilePicture = profilePicture;
 
     await currentUser.save();

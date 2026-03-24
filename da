@@ -1,0 +1,218 @@
+[33mcommit 815ccf5d17bac91be2de2fa8c95ebd6bb8ff4d80[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: shakyaa89 <shashwatshakya89@gmail.com>
+Date:   Sun Mar 22 09:07:10 2026 +0545
+
+    Added AI chat in mobile and added logo in the navbar in web
+
+[33mcommit 2a05a88d4160750295ff31025f66bfb6ff659e83[m
+Author: shakyaa89 <shashwatshakya89@gmail.com>
+Date:   Fri Mar 20 14:47:02 2026 +0545
+
+    Updated the mobile UI, created profile page for mobile, created update profile in mobile
+
+[33mcommit 50e04f1410a46c17d705f451a0ec8f8d9a16bc6f[m
+Author: shakyaa89 <shashwatshakya89@gmail.com>
+Date:   Sun Mar 15 11:47:17 2026 +0545
+
+    Added loaders in admin pages, added confirmation modal in admin pages
+
+[33mcommit b4571487bcd7bc8e0dab4b6105fade5cf47e0847[m
+Author: shakyaa89 <shashwatshakya89@gmail.com>
+Date:   Sun Mar 15 10:39:10 2026 +0545
+
+    added style for deployment
+
+[33mcommit c65f546ca6923fbdace246bb01e3e851929a04c3[m
+Author: shakyaa89 <shashwatshakya89@gmail.com>
+Date:   Sun Mar 15 10:29:20 2026 +0545
+
+    Fixed bugs for deployment
+
+[33mcommit c1e3aa3c1d23b616d7d5a6239f946a4f04f0c92b[m
+Author: shakyaa89 <shashwatshakya89@gmail.com>
+Date:   Sun Mar 15 10:27:27 2026 +0545
+
+    Added render link for backend
+
+[33mcommit 3cef6eff487fe0b2292741e89b8521dc41623d94[m
+Author: shakyaa89 <shashwatshakya89@gmail.com>
+Date:   Sat Mar 14 11:14:02 2026 +0545
+
+    Added update user functionality
+
+[33mcommit 1b0928bb9909051f2ed06d48b7aba59fc127dbd3[m
+Author: shakyaa89 <shashwatshakya89@gmail.com>
+Date:   Fri Mar 13 18:00:39 2026 +0545
+
+    Added service provider suggestion in AI chatbot
+
+[33mcommit 8ace4aa39bc0d1ba9f7fc93c72505efe045f5d0b[m
+Author: shakyaa89 <shashwatshakya89@gmail.com>
+Date:   Tue Mar 10 19:39:34 2026 +0545
+
+    remove user create-job action and fix provider CTA, corrected service provider actions: made it so that only verified service providers can send offers.
+
+[33mcommit a31075510bcbd58556d87ca5ebf524b69da7ef0d[m
+Author: shakyaa89 <shashwatshakya89@gmail.com>
+Date:   Thu Mar 5 21:06:55 2026 +0545
+
+    Added AI job review in webapp
+
+[33mcommit 9f16db913a0132018b7ee421449fdb880a8873ee[m
+Author: shakyaa89 <shashwatshakya89@gmail.com>
+Date:   Tue Mar 3 14:13:47 2026 +0545
+
+    Updated the code structure of all files for the frontend folder.
+
+[33mcommit cebb50b6b6554f4a9cabb36f085b6df5c464c3cc[m
+Author: shakyaa89 <shashwatshakya89@gmail.com>
+Date:   Sat Feb 21 12:53:14 2026 +0545
+
+    Added AI service provider review, using OCR Space for text extraction, and Gemini AI API for verification
+
+[33mcommit cb0d16f457f7397b93d80d4b442e2fad53292a91[m
+Author: shakyaa89 <shashwatshakya89@gmail.com>
+Date:   Thu Feb 19 13:12:41 2026 +0545
+
+    Updated route for protected routes, and fixed file names to be more straightforward
+
+[33mcommit 8cbb3087be8cf02503859bafee7e771da67d8e22[m
+Author: shakyaa89 <shashwatshakya89@gmail.com>
+Date:   Tue Feb 17 18:24:47 2026 +0545
+
+    Added dispute functionality in webapp, added jobs, jobsdetails and role based access in mobile app.
+
+[33mcommit a0d7dd860a4c23a8d92199745170ec5eae79a56a[m
+Author: shakyaa89 <shashwatshakya89@gmail.com>
+Date:   Mon Feb 16 20:43:28 2026 +0545
+
+    Added service provider registration UI and logic both
+
+[33mcommit 196084c5507d288cbb883d2a248e73a598c9294f[m
+Author: shakyaa89 <shashwatshakya89@gmail.com>
+Date:   Mon Feb 16 13:06:50 2026 +0545
+
+    Added packages, added login functionality
+
+[33mcommit b15d0a7fba7af84cf0b9acd904eab51283174d14[m
+Author: shakyaa89 <shashwatshakya89@gmail.com>
+Date:   Sun Feb 15 18:06:49 2026 +0545
+
+    Added admin page in webapp, created a mobile app using expo framework, created UI of home, login, register, jobs page for mobile.
+
+[33mcommit 8084e49d667a57e0511bcfe4f777882850426ffd[m
+Author: shakyaa89 <shashwatshakya89@gmail.com>
+Date:   Thu Feb 12 10:44:13 2026 +0545
+
+    Added AI chatbot using gemini API
+
+[33mcommit 2fe46b99a706ee087f496c1de89f47c5e9c65cb7[m
+Author: shakyaa89 <shashwatshakya89@gmail.com>
+Date:   Wed Feb 11 11:09:33 2026 +0545
+
+    Updated the service provider registration to two step, first basic details then the documents.
+
+[33mcommit 94c9ba643f22eb136dbb8e3b97bc67e63f521d02[m
+Author: shakyaa89 <shashwatshakya89@gmail.com>
+Date:   Mon Feb 9 12:08:02 2026 +0545
+
+    added reviewing feature for both users and service providers
+
+[33mcommit 2c4db4e82ae2132bfb77316f78263c2150dd998e[m
+Author: shakyaa89 <shashwatshakya89@gmail.com>
+Date:   Thu Feb 5 19:03:25 2026 +0545
+
+    Updated provider UI made it similar to users.
+
+[33mcommit 83602f58e669b0f9aa2f4d3c5fe905deb1846b6c[m
+Merge: ca55c96 b59a010
+Author: shakyaa89 <shashwatshakya89@gmail.com>
+Date:   Fri Jan 16 11:07:25 2026 +0545
+
+    Merge branch 'main' of https://github.com/shakyaa89/FixLink
+
+[33mcommit ca55c96b69613e3f41090c4524368567afc6352f[m
+Author: shakyaa89 <shashwatshakya89@gmail.com>
+Date:   Fri Jan 16 11:07:02 2026 +0545
+
+    Made messaging realtime using socket.io
+
+[33mcommit b59a0107250610f3b384fcf3b43b312e5befd686[m
+Author: Shashwat Shakya <100222660+shakyaa89@users.noreply.github.com>
+Date:   Mon Jan 12 12:58:14 2026 +0545
+
+    Remove readme content
+    
+    Removed detailed setup instructions for React, TypeScript, and Vite from the README.
+
+[33mcommit 747e81cace714482df9adb6c098559d115681a56[m
+Author: shakyaa89 <shashwatshakya89@gmail.com>
+Date:   Mon Jan 12 12:57:20 2026 +0545
+
+    removed old sidebar code
+
+[33mcommit 655f10ac8dac6c02ca379c7e30a24a4e63b11418[m
+Author: shakyaa89 <shashwatshakya89@gmail.com>
+Date:   Mon Jan 12 12:55:26 2026 +0545
+
+    Added concurrently to start the frontend and backend from the root, created messages APIs and endpoints, created functionality of sending messages and receiving messages
+
+[33mcommit 95076edac228bc8d92e2bc55a204d8fd0ddf4dd1[m
+Author: shakyaa89 <shashwatshakya89@gmail.com>
+Date:   Sat Jan 3 10:10:25 2026 +0545
+
+    Updated the css variables for the rest of the pages
+
+[33mcommit f7dda850e60666cb539d31a145030be2c087a7a2[m
+Author: shakyaa89 <shashwatshakya89@gmail.com>
+Date:   Fri Jan 2 20:56:11 2026 +0545
+
+    Updated the hardcoded colors of text, background, and borders to variables and added a dark mode toggle
+
+[33mcommit e8f45377cfb0b46be9e079dc8bbb89fc1d9c22c4[m
+Author: shakyaa89 <shashwatshakya89@gmail.com>
+Date:   Thu Jan 1 20:46:23 2026 +0545
+
+    Minor UI and UX improvments: changed jobs listing viewing for users and service providers, added multiple images uploading, added images in jobs listing and jobs details and sending max and min limit is 20%
+
+[33mcommit 2105b7a1d00da8508624e1a82e881138926bdff1[m
+Author: shakyaa89 <shashwatshakya89@gmail.com>
+Date:   Sat Dec 20 00:49:12 2025 +0545
+
+    Added send offers feature
+
+[33mcommit 6331ce41b9bded5cf411179d1c8cfcbf488f9767[m
+Author: shakyaa89 <shashwatshakya89@gmail.com>
+Date:   Fri Dec 19 16:57:34 2025 +0545
+
+    Created job details pages
+
+[33mcommit 952d412fcbcf1717f658d1ec05f051e7e51eb9b5[m
+Author: shakyaa89 <shashwatshakya89@gmail.com>
+Date:   Wed Dec 17 12:00:04 2025 +0545
+
+    updated service provider address input
+
+[33mcommit b45354eec67c39f74749fb85c4f7ea07897f0bf3[m
+Author: shakyaa89 <shashwatshakya89@gmail.com>
+Date:   Wed Dec 17 10:15:13 2025 +0545
+
+    Updated pages and added job post functionality
+
+[33mcommit 6d92c26856ee5590686cf7f405e701e14a80f6e6[m
+Author: shakyaa89 <shashwatshakya89@gmail.com>
+Date:   Sat Dec 13 18:17:21 2025 +0545
+
+    Updated sidebar, added pages
+
+[33mcommit d3d96daa4a8203e1278ab2d6c5335596398a1dfc[m
+Author: shakyaa89 <shashwatshakya89@gmail.com>
+Date:   Fri Dec 12 17:47:42 2025 +0545
+
+    Minor UI fixes and created messages page and my jobs page
+
+[33mcommit be9a7e12905f941228ca54411c64858e51ab2af0[m
+Author: shakyaa89 <shashwatshakya89@gmail.com>
+Date:   Wed Dec 10 17:55:30 2025 +0545
+
+    Initial Commit, added UI pages, User login and registration

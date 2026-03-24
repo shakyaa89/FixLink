@@ -41,7 +41,7 @@ export default function ViewJobsPage() {
       setJobs(fetchedJobs);
     } catch (err: any) {
       console.error("Error fetching jobs:", err);
-      if (err.response.data.message === "You have to be verified to complete this action!") {
+      if (err?.response?.data?.message === "You have to be verified to complete this action!") {
         setError("You have to be verified to view jobs.");
       } else {
         setError("Failed to load jobs. Please try again.");
@@ -70,9 +70,8 @@ export default function ViewJobsPage() {
   const getStatusStyles = (status?: string) => {
     switch (status?.toLowerCase()) {
       case "open":
-      case "pending":
         return "bg-green-100 text-green-700 border border-green-200";
-      case "closed":
+      case "cancelled":
         return "bg-red-100 text-red-700 border border-red-200";
       default:
         return "bg-(--secondary) text-(--text) border border-(--border)";

@@ -39,9 +39,9 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
   },
 
-  logout: () => {
+  logout: async () => {
     try {
-      AuthApi.logoutApi();
+      await AuthApi.logoutApi();
       localStorage.removeItem("jwtToken");
       set({ user: null });
       toast.success("Logged out successfully");

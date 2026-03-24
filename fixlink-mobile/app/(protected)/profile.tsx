@@ -31,6 +31,7 @@ import axios from "axios";
 import { Picker } from "@react-native-picker/picker";
 
 const CITIES = ["Kathmandu", "Lalitpur", "Bhaktapur"];
+const MAX_IMAGE_SIZE_BYTES = 2 * 1024 * 1024;
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -93,11 +94,28 @@ export default function ProfileScreen() {
     });
 
     if (!result.canceled && result.assets.length > 0) {
-      setSelectedImage(result.assets[0]);
+      const selectedAsset = result.assets[0];
+
+      if (
+        typeof selectedAsset.fileSize === "number" &&
+        selectedAsset.fileSize > MAX_IMAGE_SIZE_BYTES
+      ) {
+        Toast.show({ type: "error", text1: "Image must be 2MB or smaller" });
+        return;
+      }
+
+      setSelectedImage(selectedAsset);
     }
   };
 
   const uploadToCloudinary = async (asset: ImagePicker.ImagePickerAsset) => {
+    if (
+      typeof asset.fileSize === "number" &&
+      asset.fileSize > MAX_IMAGE_SIZE_BYTES
+    ) {
+      throw new Error("Image must be 2MB or smaller");
+    }
+
     setUploading(true);
     const formData = new FormData();
 
@@ -167,7 +185,7 @@ export default function ProfileScreen() {
         city: cityInput.trim(),
         address: addressInput.trim(),
         addressDescription: addressDescriptionInput.trim(),
-        addressUrl: addressUrlInput.trim(),
+        addressURL: addressUrlInput.trim(),
         profilePicture: profilePictureUrl,
       });
 

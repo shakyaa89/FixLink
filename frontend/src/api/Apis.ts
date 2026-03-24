@@ -1,5 +1,6 @@
 import axios from "axios";
 
+
 export const API_BASE_URL = "http://192.168.1.66:3005";
 // export const API_BASE_URL = "https://fixlink-n7rz.onrender.com";
 const baseURL = `${API_BASE_URL}/api`;
@@ -58,6 +59,7 @@ export interface JobData {
   finalPrice?: number;
   location: string;
   locationURL: string;
+  scheduledFor?: string;
   jobStatus?: string;
   images: string[];
   offers?: OfferData[];
@@ -203,6 +205,9 @@ export const AuthApi = {
 export const JobApi = {
   createJobApi: (jobData: JobData) =>
     Api.post("/job/create", jobData, { headers: getAuthHeader() }),
+
+  scheduleJobApi: (jobData: JobData) =>
+    Api.post("/job/schedule", jobData, { headers: getAuthHeader() }),
 
   fetchUserJobsApi: () =>
     Api.get("/job/fetch-user-jobs", { headers: getAuthHeader() }),

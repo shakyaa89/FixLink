@@ -13,6 +13,25 @@ import Sidebar from "../../components/Sidebar/Sidebar";
 import { useEffect, useState } from "react";
 import { JobApi, type JobData } from "../../api/Apis";
 import { useAuthStore } from "../../store/authStore";
+import {
+  ArcElement,
+  BarElement,
+  CategoryScale,
+  Chart as ChartJS,
+  Legend,
+  LinearScale,
+  Tooltip,
+} from "chart.js";
+import { Bar, Doughnut } from "react-chartjs-2";
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  ArcElement,
+  Tooltip,
+  Legend,
+);
 
 interface DashboardStats {
   activeJobs: number;
@@ -103,6 +122,57 @@ export default function UserDashboard() {
       bgColor: "bg-amber-50",
     },
   ];
+
+  const providerJobStatusChartData = {
+    labels: ["Open", "In Progress", "Scheduled", "Completed", "Cancelled"],
+    datasets: [
+      {
+        data: [
+          jobs.filter((job) => job.jobStatus === "open").length,
+          jobs.filter((job) => job.jobStatus === "in-progress").length,
+          jobs.filter((job) => job.jobStatus === "scheduled").length,
+          jobs.filter((job) => job.jobStatus === "completed").length,
+          jobs.filter((job) => job.jobStatus === "cancelled").length,
+        ],
+        backgroundColor: [
+          "rgba(59, 130, 246, 0.8)",
+          "rgba(245, 158, 11, 0.8)",
+          "rgba(139, 92, 246, 0.8)",
+          "rgba(34, 197, 94, 0.8)",
+          "rgba(239, 68, 68, 0.8)",
+        ],
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const providerJobsByCategoryMap = jobs.reduce<Record<string, number>>(
+    (acc, job) => {
+      const category = job.jobCategory || "Uncategorized";
+      acc[category] = (acc[category] || 0) + 1;
+      return acc;
+    },
+    {},
+  );
+
+  const providerCategoryLabels = Object.keys(providerJobsByCategoryMap);
+  const providerJobsByCategoryChartData = {
+    labels: providerCategoryLabels.length > 0 ? providerCategoryLabels : ["No Data"],
+    datasets: [
+      {
+        label: "Jobs",
+        data:
+          providerCategoryLabels.length > 0
+            ? providerCategoryLabels.map(
+                (label) => providerJobsByCategoryMap[label],
+              )
+            : [0],
+        backgroundColor: "rgba(34, 197, 94, 0.7)",
+        borderColor: "rgba(34, 197, 94, 1)",
+        borderWidth: 1,
+      },
+    ],
+  };
 
   useEffect(() => {
     const fetchJobs = async () => {
@@ -245,6 +315,30 @@ export default function UserDashboard() {
                 </div>
               </div>
 
+              <div className="mb-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="bg-(--primary) rounded-xl border border-(--border) p-5">
+                  <h3 className="text-lg font-semibold text-(--text) mb-4">
+                    Job Status Distribution
+                  </h3>
+                  <div className="max-w-sm mx-auto">
+                    <Doughnut data={providerJobStatusChartData} />
+                  </div>
+                </div>
+
+                <div className="bg-(--primary) rounded-xl border border-(--border) p-5">
+                  <h3 className="text-lg font-semibold text-(--text) mb-4">
+                    Jobs by Category
+                  </h3>
+                  <Bar
+                    data={providerJobsByCategoryChartData}
+                    options={{
+                      responsive: true,
+                      plugins: { legend: { display: false } },
+                    }}
+                  />
+                </div>
+              </div>
+
               {/* Recent Activity Section */}
               <div className="mb-8">
                 <h2 className="text-xl font-bold text-(--text) mb-4">
@@ -256,7 +350,7 @@ export default function UserDashboard() {
                       {jobs.slice(0, 5).map((job) => (
                         <Link
                           key={job._id}
-                          to={`/jobs/${job._id}`}
+                          to={`/serviceprovider/job/${job._id}`}
                           className="block p-4 hover:bg-(--secondary) transition-colors"
                         >
                           <div className="flex items-center justify-between">

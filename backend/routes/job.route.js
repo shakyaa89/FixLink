@@ -10,10 +10,13 @@ import {
   getJobs,
   getJobsbyUserId,
   getJobsForProvider,
+  scheduleJob,
 } from "../controllers/jobs.controller.js";
 import { protectServiceProviderRoute, requireVerifiedProvider } from "../middleware/serviceProvider.middleware.js";
 
 router.post("/create", protectRoute, createJob);
+
+router.post("/schedule", protectRoute, scheduleJob);
 
 router.get("/fetch-user-jobs", protectRoute, getJobsbyUserId);
 

@@ -12,7 +12,26 @@ import {
 import { Link } from "react-router-dom";
 import Sidebar from "../../components/Sidebar/Sidebar";
 import { useEffect, useState } from "react";
-import { JobApi, type JobData } from "../../api/Apis";
+import { JobApi, ReviewApi, type JobData } from "../../api/Apis";
+import {
+  ArcElement,
+  BarElement,
+  CategoryScale,
+  Chart as ChartJS,
+  Legend,
+  LinearScale,
+  Tooltip,
+} from "chart.js";
+import { Bar, Doughnut } from "react-chartjs-2";
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  ArcElement,
+  Tooltip,
+  Legend,
+);
 
 interface DashboardStats {
   activeJobs: number;
@@ -102,30 +121,98 @@ export default function UserDashboard() {
     },
   ];
 
+  const jobStatusChartData = {
+    labels: ["Open", "In Progress", "Scheduled", "Completed", "Cancelled"],
+    datasets: [
+      {
+        data: [
+          jobs.filter((job) => job.jobStatus === "open").length,
+          jobs.filter((job) => job.jobStatus === "in-progress").length,
+          jobs.filter((job) => job.jobStatus === "scheduled").length,
+          jobs.filter((job) => job.jobStatus === "completed").length,
+          jobs.filter((job) => job.jobStatus === "cancelled").length,
+        ],
+        backgroundColor: [
+          "rgba(59, 130, 246, 0.8)",
+          "rgba(245, 158, 11, 0.8)",
+          "rgba(139, 92, 246, 0.8)",
+          "rgba(34, 197, 94, 0.8)",
+          "rgba(239, 68, 68, 0.8)",
+        ],
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const jobsByCategoryMap = jobs.reduce<Record<string, number>>((acc, job) => {
+    const category = job.jobCategory || "Uncategorized";
+    acc[category] = (acc[category] || 0) + 1;
+    return acc;
+  }, {});
+
+  const categoryLabels = Object.keys(jobsByCategoryMap);
+  const jobsByCategoryChartData = {
+    labels: categoryLabels.length > 0 ? categoryLabels : ["No Data"],
+    datasets: [
+      {
+        label: "Jobs",
+        data:
+          categoryLabels.length > 0
+            ? categoryLabels.map((label) => jobsByCategoryMap[label])
+            : [0],
+        backgroundColor: "rgba(59, 130, 246, 0.7)",
+        borderColor: "rgba(59, 130, 246, 1)",
+        borderWidth: 1,
+      },
+    ],
+  };
+
   useEffect(() => {
     const fetchJobs = async () => {
       try {
         setLoading(true);
         setError(null);
-        const response = await JobApi.fetchUserJobsApi();
+        const [jobsResult, reviewsResult] = await Promise.allSettled([
+          JobApi.fetchUserJobsApi(),
+          ReviewApi.fetchMyReceivedReviews(),
+        ]);
+
+        if (jobsResult.status !== "fulfilled") {
+          throw jobsResult.reason;
+        }
+
+        const response = jobsResult.value;
 
         const fetchedJobs: JobData[] = response.data.jobs || [];
         setJobs(fetchedJobs);
 
         // Calculate stats
         const activeCount = fetchedJobs.filter(
-          (job) => job.jobStatus === "pending",
+          (job) => job.jobStatus === "open",
         ).length;
         const completedCount = fetchedJobs.filter(
           (job) => job.jobStatus === "completed",
         ).length;
 
+        const offersCount = fetchedJobs.reduce((accumulator, job) => {
+          return accumulator + (Array.isArray(job.offers) ? job.offers.length : 0);
+        }, 0);
+
+        const totalReviews =
+          reviewsResult.status === "fulfilled"
+            ? (reviewsResult.value.data?.reviews || []).length
+            : 0;
+
         setStats({
           activeJobs: activeCount,
           completedJobs: completedCount,
-          offersReceived: 12, 
-          totalReviews: 5, 
+          offersReceived: offersCount,
+          totalReviews,
         });
+
+        if (reviewsResult.status !== "fulfilled") {
+          console.warn("Failed to fetch reviews count for dashboard stats");
+        }
       } catch (err) {
         console.error("Error fetching jobs:", err);
         setError("Failed to load dashboard data. Please try again.");
@@ -243,6 +330,30 @@ export default function UserDashboard() {
                 </div>
               </div>
 
+              <div className="mb-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="bg-(--primary) rounded-xl border border-(--border) p-5">
+                  <h3 className="text-lg font-semibold text-(--text) mb-4">
+                    Job Status Distribution
+                  </h3>
+                  <div className="max-w-sm mx-auto">
+                    <Doughnut data={jobStatusChartData} />
+                  </div>
+                </div>
+
+                <div className="bg-(--primary) rounded-xl border border-(--border) p-5">
+                  <h3 className="text-lg font-semibold text-(--text) mb-4">
+                    Jobs by Category
+                  </h3>
+                  <Bar
+                    data={jobsByCategoryChartData}
+                    options={{
+                      responsive: true,
+                      plugins: { legend: { display: false } },
+                    }}
+                  />
+                </div>
+              </div>
+
               {/* Recent Activity Section */}
               <div className="mb-8">
                 <h2 className="text-xl font-bold text-(--text) mb-4">
@@ -254,7 +365,7 @@ export default function UserDashboard() {
                       {jobs.slice(0, 5).map((job) => (
                         <Link
                           key={job._id}
-                          to={`/jobs/${job._id}`}
+                          to={`/user/job/${job._id}`}
                           className="block p-4 hover:bg-(--secondary) transition-colors"
                         >
                           <div className="flex items-center justify-between">

@@ -128,7 +128,7 @@ export default function MyJobs() {
               <div className="bg-(--primary) border border-(--border) rounded-xl p-4">
                 <p className="text-sm text-(--muted) mb-1">Closed</p>
                 <p className="text-2xl font-bold text-red-600">
-                  {jobs.filter((j) => j.jobStatus === "closed").length}
+                  {jobs.filter((j) => j.jobStatus === "cancelled").length}
                 </p>
               </div>
               <div className="bg-(--primary) border border-(--border) rounded-xl p-4">

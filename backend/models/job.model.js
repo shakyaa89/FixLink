@@ -51,9 +51,13 @@ const jobSchema = mongoose.Schema(
       type: [String],
       default: [],
     },
+    scheduledFor: {
+      type: Date,
+      default: null,
+    },
     jobStatus: {
       type: String,
-      enum: ["open", "in-progress", "cancelled", "completed"],
+      enum: ["open", "scheduled", "in-progress", "cancelled", "completed"],
       default: "open",
     },
   },

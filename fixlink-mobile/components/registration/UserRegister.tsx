@@ -32,6 +32,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useAuthStore } from "@/store/authStore";
 
 const CITIES = ["Kathmandu", "Lalitpur", "Bhaktapur"];
+const MAX_IMAGE_SIZE_BYTES = 2 * 1024 * 1024;
 
 export default function UserRegister() {
   const router = useRouter();
@@ -70,11 +71,28 @@ export default function UserRegister() {
     });
 
     if (!result.canceled && result.assets.length > 0) {
-      setProfilePicture(result.assets[0]);
+      const selectedAsset = result.assets[0];
+
+      if (
+        typeof selectedAsset.fileSize === "number" &&
+        selectedAsset.fileSize > MAX_IMAGE_SIZE_BYTES
+      ) {
+        Toast.show({ type: "error", text1: "Image must be 2MB or smaller" });
+        return;
+      }
+
+      setProfilePicture(selectedAsset);
     }
   };
 
   const uploadToCloudinary = async (asset: ImagePicker.ImagePickerAsset) => {
+    if (
+      typeof asset.fileSize === "number" &&
+      asset.fileSize > MAX_IMAGE_SIZE_BYTES
+    ) {
+      throw new Error("Image must be 2MB or smaller");
+    }
+
     setUploading(true);
     const formData = new FormData();
 

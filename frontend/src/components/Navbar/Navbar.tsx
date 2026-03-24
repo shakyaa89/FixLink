@@ -14,8 +14,8 @@ export default function Navbar() {
   const { user, logout } = useAuthStore();
   const isProviderComplete = isServiceProviderProfileComplete(user);
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
   };
 
   const handleThemeChange = () => {

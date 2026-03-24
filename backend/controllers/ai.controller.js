@@ -189,7 +189,13 @@ export async function verifyServiceProvider(req, res) {
     return res.status(201).json({ reply: reply.trim() })
 
   } catch (error) {
+    if (error.response) {
+      console.log("AI verify provider error:", error.response.data);
+      return res.status(502).json({ message: "AI service error" });
+    }
 
+    console.log(error);
+    return res.status(500).json({ message: "Server error" });
   }
 }
 
@@ -259,6 +265,12 @@ export async function verifyJob(req, res) {
     return res.status(201).json({ reply: reply.trim() })
 
   } catch (error) {
+    if (error.response) {
+      console.log("AI verify job error:", error.response.data);
+      return res.status(502).json({ message: "AI service error" });
+    }
 
+    console.log(error);
+    return res.status(500).json({ message: "Server error" });
   }
 }

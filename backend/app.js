@@ -16,6 +16,7 @@ import adminRouter from "./routes/admin.route.js";
 import disputeRouter from "./routes/dispute.route.js";
 import connectDB from "./lib/db.js";
 import { initSocket } from "./lib/socket.js";
+import { startJobScheduler } from "./lib/jobScheduler.js";
 import { setServers } from "node:dns/promises";
 
 setServers(["1.1.1.1", "8.8.8.8"]);
@@ -77,5 +78,6 @@ server.listen(process.env.PORT, "0.0.0.0", () => {
 });
 
 connectDB();
+startJobScheduler();
 
 export default app;

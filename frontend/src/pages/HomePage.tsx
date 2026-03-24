@@ -287,13 +287,13 @@ export default function HomePage() {
       </section>
 
       {/* How It Works Section */}
-      <section id="about" className="bg-gray-50 py-16">
+      <section id="about" className="bg-(--secondary) py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl lg:text-4xl font-bold text-(--text) mb-4">
               How It Works
             </h2>
-            <p className="text-lg text-gray-600">
+            <p className="text-lg text-(--muted)">
               Get started in three simple steps
             </p>
           </div>
@@ -303,7 +303,7 @@ export default function HomePage() {
             <div className="relative">
               {/* Progress Bar Background */}
               <div
-                className="absolute top-8 left-0 right-0 h-1 bg-gray-200 hidden md:block"
+                className="absolute top-8 left-0 right-0 h-1 hidden md:block"
                 style={{ left: "10%", right: "10%" }}
               />
 
@@ -320,11 +320,11 @@ export default function HomePage() {
                   <div className="relative z-10 w-16 h-16 bg-linear-to-br from-blue-600 to-blue-400 rounded-full flex items-center justify-center mb-4 shadow-lg ring-4 ring-white">
                     <span className="text-2xl font-bold text-white">1</span>
                   </div>
-                  <div className="bg-white rounded-lg p-6 shadow-md hover:shadow-xl transition-shadow duration-300 w-full">
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  <div className=" bg-(--secondary) border border-(--border) rounded-lg p-6 shadow-md hover:shadow-xl transition-shadow duration-300 w-full">
+                    <h3 className="text-xl font-semibold text-(--text) mb-2">
                       Post Your Job
                     </h3>
-                    <p className="text-gray-600">
+                    <p className="text-(--muted)">
                       Describe your service needs with details and photos
                     </p>
                   </div>
@@ -335,11 +335,11 @@ export default function HomePage() {
                   <div className="relative z-10 w-16 h-16 bg-linear-to-br from-purple-600 to-purple-400 rounded-full flex items-center justify-center mb-4 shadow-lg ring-4 ring-white">
                     <span className="text-2xl font-bold text-white">2</span>
                   </div>
-                  <div className="bg-white rounded-lg p-6 shadow-md hover:shadow-xl transition-shadow duration-300 w-full">
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  <div className="bg-(--secondary) border border-(--border) rounded-lg p-6 shadow-md hover:shadow-xl transition-shadow duration-300 w-full">
+                    <h3 className="text-xl font-semibold text-(--text) mb-2">
                       Compare Offers
                     </h3>
-                    <p className="text-gray-600">
+                    <p className="text-(--muted)">
                       Review proposals from verified providers nearby
                     </p>
                   </div>
@@ -350,11 +350,11 @@ export default function HomePage() {
                   <div className="relative z-10 w-16 h-16 bg-linear-to-br from-green-600 to-green-400 rounded-full flex items-center justify-center mb-4 shadow-lg ring-4 ring-white">
                     <span className="text-2xl font-bold text-white">3</span>
                   </div>
-                  <div className="bg-white rounded-lg p-6 shadow-md hover:shadow-xl transition-shadow duration-300 w-full">
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  <div className="bg-(--secondary) border border-(--border) rounded-lg p-6 shadow-md hover:shadow-xl transition-shadow duration-300 w-full">
+                    <h3 className="text-xl font-semibold text-(--text) mb-2">
                       Get It Done
                     </h3>
-                    <p className="text-gray-600">
+                    <p className="text-(--muted)">
                       Track progress and pay securely upon completion
                     </p>
                   </div>

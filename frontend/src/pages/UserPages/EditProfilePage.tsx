@@ -16,6 +16,7 @@ import { AuthApi } from "../../api/Apis";
 import { useNavigate } from "react-router-dom";
 
 const CITIES = ["Kathmandu", "Lalitpur", "Bhaktapur"];
+const MAX_IMAGE_SIZE_BYTES = 2 * 1024 * 1024;
 
 export default function EditProfilePage() {
     const { user, setUser } = useAuthStore();
@@ -33,10 +34,14 @@ export default function EditProfilePage() {
     // const [confirmPassword, setConfirmPassword] = useState("");
     const [address, setAddress] = useState(user.address);
     const [addressDescription, setAddressDescription] = useState(user.addressDescription);
-    const [addressUrl, setAddressUrl] = useState(user.addressUrl);
+    const [addressUrl, setAddressUrl] = useState(user.addressURL || user.addressUrl || "");
     const [profilePicture, setProfilePicture] = useState<File | null>();
 
     const uploadToCloudinary = async (file: File) => {
+        if (file.size > MAX_IMAGE_SIZE_BYTES) {
+            throw new Error("Image must be 2MB or smaller");
+        }
+
         setUploading(true);
         const formData = new FormData();
         formData.append("file", file);
@@ -82,6 +87,7 @@ export default function EditProfilePage() {
                 city,
                 address,
                 addressDescription,
+                addressURL: addressUrl,
                 profilePicture: profilePictureUrl
             }
 
@@ -147,7 +153,18 @@ export default function EditProfilePage() {
                                             type="file"
                                             accept="image/*"
                                             className="hidden"
-                                            onChange={(e) => setProfilePicture(e.target.files?.[0] || null)}
+                                            onChange={(e) => {
+                                                const selectedFile = e.target.files?.[0] || null;
+
+                                                if (selectedFile && selectedFile.size > MAX_IMAGE_SIZE_BYTES) {
+                                                    toast.error("Image must be 2MB or smaller");
+                                                    setProfilePicture(null);
+                                                    e.target.value = "";
+                                                    return;
+                                                }
+
+                                                setProfilePicture(selectedFile);
+                                            }}
                                         />
                                     </label>
                                 </div>

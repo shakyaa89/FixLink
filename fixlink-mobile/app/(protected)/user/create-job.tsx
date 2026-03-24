@@ -32,6 +32,7 @@ const categories = [
   "Landscaping",
   "General Repairs",
 ];
+const MAX_IMAGE_SIZE_BYTES = 2 * 1024 * 1024;
 
 export default function CreateJobPage() {
   const router = useRouter();
@@ -62,6 +63,17 @@ export default function CreateJobPage() {
     });
 
     if (result.canceled) return;
+
+    const oversizedAsset = result.assets.find(
+      (asset) =>
+        typeof asset.fileSize === "number" &&
+        asset.fileSize > MAX_IMAGE_SIZE_BYTES
+    );
+
+    if (oversizedAsset) {
+      Toast.show({ type: "error", text1: "Each image must be 2MB or smaller" });
+      return;
+    }
 
     const uris = result.assets.map((asset) => asset.uri);
     setImages(uris);

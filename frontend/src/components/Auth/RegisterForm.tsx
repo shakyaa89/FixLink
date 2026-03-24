@@ -15,6 +15,7 @@ import { AuthApi } from "../../api/Apis";
 import { useState } from "react";
 
 const CITIES = ["Kathmandu", "Lalitpur", "Bhaktapur"];
+const MAX_IMAGE_SIZE_BYTES = 2 * 1024 * 1024;
 
 function RegisterForm() {
   const [loading, setLoading] = useState(false);
@@ -36,6 +37,10 @@ function RegisterForm() {
   const navigate = useNavigate();
 
   const uploadToCloudinary = async (file: File) => {
+    if (file.size > MAX_IMAGE_SIZE_BYTES) {
+      throw new Error("Image must be 2MB or smaller");
+    }
+
     setUploading(true);
     const formData = new FormData();
     formData.append("file", file);
@@ -250,7 +255,18 @@ function RegisterForm() {
             <input
               id="profile-input"
               type="file"
-              onChange={(e) => setProfilePicture(e.target.files?.[0] || null)}
+              onChange={(e) => {
+                const selectedFile = e.target.files?.[0] || null;
+
+                if (selectedFile && selectedFile.size > MAX_IMAGE_SIZE_BYTES) {
+                  toast.error("Image must be 2MB or smaller");
+                  setProfilePicture(null);
+                  e.target.value = "";
+                  return;
+                }
+
+                setProfilePicture(selectedFile);
+              }}
               accept="image/*"
               className="hidden"
             />

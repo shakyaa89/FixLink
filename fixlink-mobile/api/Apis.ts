@@ -43,7 +43,7 @@ interface UpdateUserProfilePayload {
     city: string;
     address: string;
     addressDescription: string;
-    addressUrl?: string;
+    addressURL?: string;
     profilePicture?: string;
 }
 
