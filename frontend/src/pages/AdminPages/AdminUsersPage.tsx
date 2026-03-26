@@ -1,12 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Users, UserCheck, UserX, ShieldCheck, Loader2 } from "lucide-react";
 import AdminSidebar from "../../components/AdminSidebar/AdminSidebar";
 import { AdminApi, type AdminUserData } from "../../api/Apis";
 
 export default function AdminUsersPage() {
+  const navigate = useNavigate();
   const [users, setUsers] = useState<AdminUserData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const stats = useMemo(() => {
     const total = users.length;
@@ -44,6 +48,45 @@ export default function AdminUsersPage() {
   useEffect(() => {
     fetchUsers();
   }, []);
+
+  const handleRoleUpdate = async (
+    userId: string,
+    role: "user" | "serviceProvider" | "admin",
+  ) => {
+    try {
+      setUpdatingId(userId);
+      setError(null);
+      await AdminApi.updateUser(userId, { role });
+      await fetchUsers();
+    } catch (err) {
+      console.error("Failed to update user role", err);
+      setError("Unable to update user role.");
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
+  const handleDeleteUser = async (userId: string, fullName: string) => {
+    const confirmed = window.confirm(
+      `Delete ${fullName}? This action cannot be undone.`,
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      setDeletingId(userId);
+      setError(null);
+      await AdminApi.deleteUser(userId);
+      await fetchUsers();
+    } catch (err) {
+      console.error("Failed to delete user", err);
+      setError("Unable to delete user.");
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   return (
     <div className="flex min-h-screen bg-(--primary)">
@@ -111,7 +154,7 @@ export default function AdminUsersPage() {
                   {users.map((user) => (
                     <div
                       key={user._id}
-                      className="grid grid-cols-1 md:grid-cols-4 gap-4 px-6 py-4 items-center"
+                      className="grid grid-cols-1 md:grid-cols-5 gap-4 px-6 py-4 items-center"
                     >
                       <div>
                         <p className="text-(--text) font-semibold">
@@ -120,17 +163,29 @@ export default function AdminUsersPage() {
                         <p className="text-xs text-(--muted)">{user.email}</p>
                       </div>
                       <div>
-                        <span className="text-xs font-semibold px-3 py-1 rounded-full bg-(--secondary) text-(--muted) border border-(--border)">
-                          {user.role === "serviceProvider"
-                            ? "Service Provider"
-                            : user.role === "user"
-                              ? "User"
-                              : "Admin"}
-                        </span>
+                        <select
+                          value={user.role}
+                          disabled={!user._id || updatingId === user._id}
+                          onChange={(event) =>
+                            user._id &&
+                            handleRoleUpdate(
+                              user._id,
+                              event.target.value as
+                                | "user"
+                                | "serviceProvider"
+                                | "admin",
+                            )
+                          }
+                          className="w-full text-xs font-semibold px-3 py-2 rounded-lg bg-(--secondary) text-(--muted) border border-(--border)"
+                        >
+                          <option value="user">User</option>
+                          <option value="serviceProvider">Service Provider</option>
+                          <option value="admin">Admin</option>
+                        </select>
                       </div>
                       <div>
-                        <span className="text-xs font-semibold px-3 py-1 rounded-full bg-(--secondary) text-(--muted) border border-(--border) capitalize">
-                          {user.verificationStatus ? user.verificationStatus : "-"}
+                        <span className="inline-flex text-xs font-semibold px-3 py-1 rounded-full bg-(--secondary) text-(--muted) border border-(--border) capitalize">
+                          {user.verificationStatus || "-"}
                         </span>
                       </div>
                       <div>
@@ -138,6 +193,30 @@ export default function AdminUsersPage() {
                           {new Date(user.createdAt!).toLocaleDateString()}
                         </p>
                         <p className="text-xs text-(--muted)">{user._id}</p>
+                      </div>
+                      <div className="flex justify-start md:justify-end">
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            disabled={!user._id}
+                            onClick={() =>
+                              user._id && navigate(`/admin/users/${user._id}`)
+                            }
+                            className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-(--secondary) text-(--text) border border-(--border) transition disabled:opacity-60"
+                          >
+                            View
+                          </button>
+                          <button
+                            type="button"
+                            disabled={!user._id || deletingId === user._id}
+                            onClick={() =>
+                              user._id && handleDeleteUser(user._id, user.fullName)
+                            }
+                            className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-(--danger-bg) text-(--danger) border border-(--border) transition disabled:opacity-60"
+                          >
+                            {deletingId === user._id ? "Deleting..." : "Delete"}
+                          </button>
+                        </div>
                       </div>
                     </div>
                   ))}

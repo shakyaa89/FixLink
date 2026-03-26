@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Briefcase,
   CheckCircle2,
@@ -10,10 +11,15 @@ import {
 import AdminSidebar from "../../components/AdminSidebar/AdminSidebar";
 import { AdminApi, type AdminJobData } from "../../api/Apis";
 
+type JobStatus = "open" | "scheduled" | "in-progress" | "cancelled" | "completed";
+
 export default function AdminJobsPage() {
+  const navigate = useNavigate();
   const [jobs, setJobs] = useState<AdminJobData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const stats = useMemo(() => {
     const total = jobs.length;
@@ -55,6 +61,42 @@ export default function AdminJobsPage() {
   useEffect(() => {
     fetchJobs();
   }, []);
+
+  const handleStatusUpdate = async (jobId: string, jobStatus: JobStatus) => {
+    try {
+      setUpdatingId(jobId);
+      setError(null);
+      await AdminApi.updateJob(jobId, { jobStatus });
+      await fetchJobs();
+    } catch (err) {
+      console.error("Failed to update job status", err);
+      setError("Unable to update job status.");
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
+  const handleDeleteJob = async (jobId: string, title: string) => {
+    const confirmed = window.confirm(
+      `Delete job \"${title}\"? This action cannot be undone.`,
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      setDeletingId(jobId);
+      setError(null);
+      await AdminApi.deleteJob(jobId);
+      await fetchJobs();
+    } catch (err) {
+      console.error("Failed to delete job", err);
+      setError("Unable to delete job.");
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   return (
     <div className="flex min-h-screen bg-(--primary)">
@@ -111,9 +153,16 @@ export default function AdminJobsPage() {
               <div className="bg-(--primary) border border-(--border) rounded-2xl shadow-sm overflow-hidden">
                 <div className="flex items-center justify-between px-6 py-4 border-b border-(--border) bg-(--secondary)">
                   <h2 className="text-lg font-semibold text-(--text)">All Jobs</h2>
-                  <button className="px-4 py-2 text-sm font-medium rounded-lg bg-(--accent) text-(--primary) hover:bg-(--accent-hover) transition">
-                    Export Report
-                  </button>
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm text-(--muted)">{jobs.length} jobs</span>
+                    <button
+                      type="button"
+                      onClick={() => navigate("/admin/jobs/create")}
+                      className="px-4 py-2 text-sm font-semibold rounded-lg bg-(--accent) text-(--primary) hover:bg-(--accent-hover) transition"
+                    >
+                      Create Job
+                    </button>
+                  </div>
                 </div>
 
                 <div className="divide-y divide-(--border)">
@@ -138,18 +187,49 @@ export default function AdminJobsPage() {
                         <p className="text-xs text-(--muted)">{job._id}</p>
                       </div>
                       <div>
-                        <span
-                          className={`text-xs font-semibold px-3 py-1 rounded-full capitalize bg-(--secondary) text-(--muted) border border-(--border)`}
+                        <select
+                          value={(job.jobStatus || "open") as JobStatus}
+                          disabled={!job._id || updatingId === job._id}
+                          onChange={(event) =>
+                            job._id &&
+                            handleStatusUpdate(job._id, event.target.value as JobStatus)
+                          }
+                          className="text-xs font-semibold px-3 py-2 rounded-lg capitalize bg-(--secondary) text-(--muted) border border-(--border)"
                         >
-                          {job.jobStatus}
-                        </span>
+                          <option value="open">open</option>
+                          <option value="scheduled">scheduled</option>
+                          <option value="in-progress">in-progress</option>
+                          <option value="cancelled">cancelled</option>
+                          <option value="completed">completed</option>
+                        </select>
                       </div>
                       <div>
-                        <p className="text-sm text-(--text)">{job.createdAt}</p>
+                        <p className="text-sm text-(--text)">
+                          {job.createdAt
+                            ? new Date(job.createdAt).toLocaleDateString()
+                            : "-"}
+                        </p>
                       </div>
                       <div className="flex flex-wrap items-center gap-2">
-                        <button className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-(--secondary) text-(--text) border border-(--border) transition">
+                        <button
+                          type="button"
+                          disabled={!job._id}
+                          onClick={() =>
+                            job._id && navigate(`/admin/jobs/${job._id}`)
+                          }
+                          className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-(--secondary) text-(--text) border border-(--border) transition disabled:opacity-60"
+                        >
                           View Details
+                        </button>
+                        <button
+                          type="button"
+                          disabled={!job._id || deletingId === job._id}
+                          onClick={() =>
+                            job._id && handleDeleteJob(job._id, job.title)
+                          }
+                          className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-(--danger-bg) text-(--danger) border border-(--border) transition disabled:opacity-60"
+                        >
+                          {deletingId === job._id ? "Deleting..." : "Delete"}
                         </button>
                       </div>
                     </div>

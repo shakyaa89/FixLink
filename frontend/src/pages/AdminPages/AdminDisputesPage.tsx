@@ -20,6 +20,8 @@ export default function AdminDisputesPage() {
   const [disputes, setDisputes] = useState<AdminDispute[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const formatDate = (value?: string) => {
     if (!value) return "-";
@@ -66,32 +68,6 @@ export default function AdminDisputesPage() {
     ];
   }, [disputes]);
 
-  const statusClass = (status: string) => {
-    if (status === "Open") {
-      return "bg-(--warning-bg) text-(--warning)";
-    }
-    if (status === "In Review") {
-      return "bg-(--info-bg) text-(--info)";
-    }
-    if (status === "Resolved") {
-      return "bg-(--success-bg) text-(--success)";
-    }
-    return "bg-(--secondary) text-(--muted)";
-  };
-
-  const priorityClass = (priority: string) => {
-    if (priority === "High") {
-      return "bg-(--danger-bg) text-(--danger)";
-    }
-    if (priority === "Medium") {
-      return "bg-(--warning-bg) text-(--warning)";
-    }
-    if (priority === "Low") {
-      return "bg-(--success-bg) text-(--success)";
-    }
-    return "bg-(--secondary) text-(--muted)";
-  };
-
   const fetchDisputes = async () => {
     try {
       setLoading(true);
@@ -119,6 +95,45 @@ export default function AdminDisputesPage() {
   useEffect(() => {
     fetchDisputes();
   }, []);
+
+  const handleDisputeUpdate = async (
+    disputeId: string,
+    data: Partial<{ status: "open" | "resolved"; priority: "low" | "medium" | "high" }>,
+  ) => {
+    try {
+      setUpdatingId(disputeId);
+      setError(null);
+      await AdminApi.updateDispute(disputeId, data);
+      await fetchDisputes();
+    } catch (err) {
+      console.error("Failed to update dispute", err);
+      setError("Unable to update dispute.");
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
+  const handleDeleteDispute = async (disputeId: string, title: string) => {
+    const confirmed = window.confirm(
+      `Delete dispute \"${title}\"? This action cannot be undone.`,
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      setDeletingId(disputeId);
+      setError(null);
+      await AdminApi.deleteDispute(disputeId);
+      await fetchDisputes();
+    } catch (err) {
+      console.error("Failed to delete dispute", err);
+      setError("Unable to delete dispute.");
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   return (
     <div className="flex min-h-screen bg-(--primary)">
@@ -177,9 +192,9 @@ export default function AdminDisputesPage() {
                   <h2 className="text-lg font-semibold text-(--text)">
                     Active Disputes
                   </h2>
-                  <button className="px-4 py-2 text-sm font-medium rounded-lg bg-(--accent) text-(--primary) hover:bg-(--accent-hover) transition">
-                    Create Resolution Plan
-                  </button>
+                  <span className="text-sm text-(--muted)">
+                    {disputes.length} disputes
+                  </span>
                 </div>
 
                 <div className="divide-y divide-(--border)">
@@ -204,22 +219,37 @@ export default function AdminDisputesPage() {
                         <p className="text-xs text-(--muted)">Job reference</p>
                       </div>
                       <div>
-                        <span
-                          className={`text-xs font-semibold px-3 py-1 rounded-full ${statusClass(
-                            dispute.statusLabel,
-                          )}`}
+                        <select
+                          value={dispute.status === "resolved" ? "resolved" : "open"}
+                          disabled={!dispute._id || updatingId === dispute._id}
+                          onChange={(event) =>
+                            dispute._id &&
+                            handleDisputeUpdate(dispute._id, {
+                              status: event.target.value as "open" | "resolved",
+                            })
+                          }
+                          className="text-xs font-semibold px-3 py-2 rounded-lg bg-(--secondary) text-(--muted) border border-(--border) capitalize"
                         >
-                          {dispute.statusLabel}
-                        </span>
+                          <option value="open">open</option>
+                          <option value="resolved">resolved</option>
+                        </select>
                       </div>
                       <div>
-                        <span
-                          className={`text-xs font-semibold px-3 py-1 rounded-full ${priorityClass(
-                            dispute.priorityLabel,
-                          )}`}
+                        <select
+                          value={(dispute.priority || "medium") as "low" | "medium" | "high"}
+                          disabled={!dispute._id || updatingId === dispute._id}
+                          onChange={(event) =>
+                            dispute._id &&
+                            handleDisputeUpdate(dispute._id, {
+                              priority: event.target.value as "low" | "medium" | "high",
+                            })
+                          }
+                          className="text-xs font-semibold px-3 py-2 rounded-lg bg-(--secondary) text-(--muted) border border-(--border) capitalize"
                         >
-                          {dispute.priorityLabel} Priority
-                        </span>
+                          <option value="low">low</option>
+                          <option value="medium">medium</option>
+                          <option value="high">high</option>
+                        </select>
                       </div>
                       <div>
                         <p className="text-sm text-(--text)">
@@ -227,11 +257,27 @@ export default function AdminDisputesPage() {
                         </p>
                       </div>
                       <div className="flex flex-wrap items-center gap-2">
-                        <button className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-(--secondary) text-(--text) border border-(--border) transition">
-                          Review
-                        </button>
-                        <button className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-(--success-bg) text-(--success) border border-(--border) transition">
+                        <button
+                          type="button"
+                          disabled={!dispute._id || updatingId === dispute._id}
+                          onClick={() =>
+                            dispute._id &&
+                            handleDisputeUpdate(dispute._id, { status: "resolved" })
+                          }
+                          className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-(--success-bg) text-(--success) border border-(--border) transition disabled:opacity-60"
+                        >
                           Resolve
+                        </button>
+                        <button
+                          type="button"
+                          disabled={!dispute._id || deletingId === dispute._id}
+                          onClick={() =>
+                            dispute._id &&
+                            handleDeleteDispute(dispute._id, dispute.title)
+                          }
+                          className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-(--danger-bg) text-(--danger) border border-(--border) transition disabled:opacity-60"
+                        >
+                          {deletingId === dispute._id ? "Deleting..." : "Delete"}
                         </button>
                       </div>
                     </div>

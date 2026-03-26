@@ -35,6 +35,12 @@ import AdminUsersPage from "./pages/AdminPages/AdminUsersPage";
 import AdminJobsPage from "./pages/AdminPages/AdminJobsPage";
 import AdminDisputesPage from "./pages/AdminPages/AdminDisputesPage";
 import AdminProviderVerificationPage from "./pages/AdminPages/AdminProviderVerificationPage";
+import AdminOffersPage from "./pages/AdminPages/AdminOffersPage";
+import AdminReviewsPage from "./pages/AdminPages/AdminReviewsPage";
+import AdminMessagesPage from "./pages/AdminPages/AdminMessagesPage";
+import AdminUserDetailsPage from "./pages/AdminPages/AdminUserDetailsPage";
+import AdminJobDetailsPage from "./pages/AdminPages/AdminJobDetailsPage";
+import AdminCreateJobPage from "./pages/AdminPages/AdminCreateJobPage";
 import EditProfilePage from "./pages/UserPages/EditProfilePage";
 
 function App() {
@@ -178,10 +184,37 @@ function App() {
           />
 
           <Route
+            path="/admin/users/:userId"
+            element={
+              <AdminProtectedRoute>
+                <AdminUserDetailsPage />
+              </AdminProtectedRoute>
+            }
+          />
+
+          <Route
             path="/admin/jobs"
             element={
               <AdminProtectedRoute>
                 <AdminJobsPage />
+              </AdminProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/jobs/create"
+            element={
+              <AdminProtectedRoute>
+                <AdminCreateJobPage />
+              </AdminProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/jobs/:jobId"
+            element={
+              <AdminProtectedRoute>
+                <AdminJobDetailsPage />
               </AdminProtectedRoute>
             }
           />
@@ -200,6 +233,33 @@ function App() {
             element={
               <AdminProtectedRoute>
                 <AdminDisputesPage />
+              </AdminProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/offers"
+            element={
+              <AdminProtectedRoute>
+                <AdminOffersPage />
+              </AdminProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/reviews"
+            element={
+              <AdminProtectedRoute>
+                <AdminReviewsPage />
+              </AdminProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/messages"
+            element={
+              <AdminProtectedRoute>
+                <AdminMessagesPage />
               </AdminProtectedRoute>
             }
           />

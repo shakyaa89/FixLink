@@ -17,6 +17,8 @@ interface User {
   addressURL?: string;
   profilePicture: string;
   role?: string;
+  verificationStatus?: "pending" | "verified" | "rejected" | "";
+  rejectionReason?: string;
   verificationProofURL?: string;
   providerCategory?: string;
   idURL?: string;
@@ -149,6 +151,33 @@ export interface AdminProviderData {
   address?: string;
   addressDescription?: string;
   addressURL?: string;
+  createdAt?: string;
+}
+
+export interface AdminOfferData {
+  _id?: string;
+  jobId?: { _id?: string; title?: string } | string;
+  serviceProviderId?: { _id?: string; fullName?: string; email?: string } | string;
+  offeredPrice?: number;
+  status?: "pending" | "accepted" | "rejected";
+  createdAt?: string;
+}
+
+export interface AdminReviewData {
+  _id?: string;
+  jobId?: { _id?: string; title?: string } | string;
+  reviewerId?: { _id?: string; fullName?: string; email?: string } | string;
+  revieweeId?: { _id?: string; fullName?: string; email?: string } | string;
+  rating?: number;
+  comment?: string;
+  createdAt?: string;
+}
+
+export interface AdminMessageData {
+  _id?: string;
+  senderId?: { _id?: string; fullName?: string; email?: string } | string;
+  receiverId?: { _id?: string; fullName?: string; email?: string } | string;
+  content?: string;
   createdAt?: string;
 }
 
@@ -296,9 +325,98 @@ export const AdminApi = {
 
   fetchUsers: () => Api.get("/admin/users", { headers: getAuthHeader() }),
 
+  fetchUserById: (userId: string) =>
+    Api.get(`/admin/users/${userId}`, { headers: getAuthHeader() }),
+
+  updateUser: (userId: string, data: Partial<User>) =>
+    Api.put(`/admin/users/${userId}`, data, { headers: getAuthHeader() }),
+
+  deleteUser: (userId: string) =>
+    Api.delete(`/admin/users/${userId}`, { headers: getAuthHeader() }),
+
   fetchJobs: () => Api.get("/admin/jobs", { headers: getAuthHeader() }),
 
+  fetchJobById: (jobId: string) =>
+    Api.get(`/admin/jobs/${jobId}`, { headers: getAuthHeader() }),
+
+  createJob: (data: {
+    userId: string;
+    title: string;
+    description: string;
+    jobCategory: string;
+    userPrice: number;
+    location: string;
+    locationURL?: string;
+    images?: string[];
+    scheduledFor?: string;
+    jobStatus?: "open" | "scheduled" | "in-progress" | "cancelled" | "completed";
+    finalPrice?: number;
+  }) => Api.post("/admin/jobs", data, { headers: getAuthHeader() }),
+
+  updateJob: (
+    jobId: string,
+    data: Partial<{
+      userId: string;
+      title: string;
+      description: string;
+      jobCategory: string;
+      userPrice: number;
+      finalPrice: number;
+      location: string;
+      locationURL: string;
+      images: string[];
+      scheduledFor: string;
+      offers: string[];
+      jobStatus: "open" | "scheduled" | "in-progress" | "cancelled" | "completed";
+    }>,
+  ) =>
+    Api.put(`/admin/jobs/${jobId}`, data, { headers: getAuthHeader() }),
+
+  deleteJob: (jobId: string) =>
+    Api.delete(`/admin/jobs/${jobId}`, { headers: getAuthHeader() }),
+
+  fetchOffers: () => Api.get("/admin/offers", { headers: getAuthHeader() }),
+
+  updateOffer: (
+    offerId: string,
+    data: Partial<{ offeredPrice: number; status: "pending" | "accepted" | "rejected" }>
+  ) => Api.put(`/admin/offers/${offerId}`, data, { headers: getAuthHeader() }),
+
+  deleteOffer: (offerId: string) =>
+    Api.delete(`/admin/offers/${offerId}`, { headers: getAuthHeader() }),
+
   fetchDisputes: () => Api.get("/admin/disputes", { headers: getAuthHeader() }),
+
+  updateDispute: (
+    disputeId: string,
+    data: Partial<{
+      title: string;
+      description: string;
+      status: "open" | "resolved";
+      priority: "low" | "medium" | "high";
+    }>
+  ) => Api.put(`/admin/disputes/${disputeId}`, data, { headers: getAuthHeader() }),
+
+  deleteDispute: (disputeId: string) =>
+    Api.delete(`/admin/disputes/${disputeId}`, { headers: getAuthHeader() }),
+
+  fetchReviews: () => Api.get("/admin/reviews", { headers: getAuthHeader() }),
+
+  updateReview: (
+    reviewId: string,
+    data: Partial<{ rating: number; comment: string }>
+  ) => Api.put(`/admin/reviews/${reviewId}`, data, { headers: getAuthHeader() }),
+
+  deleteReview: (reviewId: string) =>
+    Api.delete(`/admin/reviews/${reviewId}`, { headers: getAuthHeader() }),
+
+  fetchMessages: () => Api.get("/admin/messages", { headers: getAuthHeader() }),
+
+  updateMessage: (messageId: string, data: { content: string }) =>
+    Api.put(`/admin/messages/${messageId}`, data, { headers: getAuthHeader() }),
+
+  deleteMessage: (messageId: string) =>
+    Api.delete(`/admin/messages/${messageId}`, { headers: getAuthHeader() }),
 
   fetchServiceProviders: () =>
     Api.get("/admin/service-providers", { headers: getAuthHeader() }),

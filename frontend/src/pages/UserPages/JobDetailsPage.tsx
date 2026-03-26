@@ -17,6 +17,7 @@ import {
   AlertCircle,
   ArrowLeft,
   ExternalLink,
+  ShieldCheck,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -430,7 +431,15 @@ export default function JobDetailsPage() {
                               </div>
                               <div className="min-w-0 flex-1">
                                 <h4 className="font-semibold text-(--text) text-lg">
-                                  {provider.fullName}
+                                  <span className="inline-flex items-center gap-2">
+                                    {provider.fullName}
+                                    {provider?.verificationStatus === "verified" && (
+                                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-xs font-medium border border-green-200">
+                                        <ShieldCheck className="w-3.5 h-3.5" />
+                                        Verified
+                                      </span>
+                                    )}
+                                  </span>
                                 </h4>
                                 <p className="text-sm text-(--muted)">
                                   {provider.providerCategory ||
