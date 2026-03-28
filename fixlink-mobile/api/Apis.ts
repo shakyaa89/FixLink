@@ -88,6 +88,19 @@ export interface MessageData {
     updatedAt?: string;
 }
 
+export interface MessageContact {
+    _id: string;
+    fullName: string;
+    jobId?: string;
+    jobTitle?: string;
+    profilePicture?: string;
+}
+
+export interface SendMessagePayload {
+    receiverId: string;
+    content: string;
+}
+
 export interface ReviewData {
     _id?: string;
     jobId: { _id?: string; title?: string } | string;
@@ -187,15 +200,40 @@ export const OfferApi = {
         Api.put("/offer/accept", data, { headers: await getAuthHeader() }),
 };
 
+export const DisputeApi = {
+    getDisputableJobs: async () =>
+        Api.get("/disputes/jobs", { headers: await getAuthHeader() }),
+
+    createDispute: async (data: { jobId: string; title: string; description: string; priority?: string }) =>
+        Api.post("/disputes/create", data, { headers: await getAuthHeader() }),
+
+    getMyDisputes: async () =>
+        Api.get("/disputes/my", { headers: await getAuthHeader() }),
+};
+
 export const ReviewApi = {
     createReview: async (data: { jobId: string; rating: number; comment?: string }) =>
         Api.post("/reviews/create", data, { headers: await getAuthHeader() }),
 
     fetchMyReceivedReviews: async () =>
         Api.get("/reviews/received", { headers: await getAuthHeader() }),
+
+    fetchMyReviews: async () =>
+        Api.get("/reviews/sent", { headers: await getAuthHeader() }),
 };
 
 export const AiApi = {
     chat: async (data: { message: string; history?: AiChatMessage[]; category?: string }) =>
         Api.post('/ai/chat', data, { headers: await getAuthHeader() }),
+};
+
+export const MessageApi = {
+    fetchContacts: async () =>
+        Api.get('/messages/contacts', { headers: await getAuthHeader() }),
+
+    sendMessage: async (data: SendMessagePayload) =>
+        Api.post('/messages', data, { headers: await getAuthHeader() }),
+
+    fetchMessages: async (userId: string) =>
+        Api.get(`/messages/user/${userId}`, { headers: await getAuthHeader() }),
 };

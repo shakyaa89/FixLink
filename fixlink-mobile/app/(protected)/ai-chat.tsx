@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Keyboard,
@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { ArrowLeft } from "lucide-react-native";
+import { ArrowLeft, Send } from "lucide-react-native";
 import colors from "@/app/_constants/theme";
 import { AiApi, type AiChatMessage } from "@/api/Apis";
 import { useAuthStore } from "@/store/authStore";
@@ -26,6 +26,7 @@ interface ChatMessage {
 export default function AiChatScreen() {
   const router = useRouter();
   const { user } = useAuthStore();
+  const scrollViewRef = useRef<ScrollView>(null);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
@@ -55,6 +56,16 @@ export default function AiChatScreen() {
       hideSubscription.remove();
     };
   }, []);
+
+  const scrollToBottom = (animated = true) => {
+    requestAnimationFrame(() => {
+      scrollViewRef.current?.scrollToEnd({ animated });
+    });
+  };
+
+  useEffect(() => {
+    scrollToBottom(messages.length > 1);
+  }, [messages.length, loading]);
 
   const sendMessage = async () => {
     const trimmed = input.trim();
@@ -116,77 +127,89 @@ export default function AiChatScreen() {
         behavior={Platform.OS === "ios" ? "padding" : "padding"}
         keyboardVerticalOffset={Platform.OS === "ios" ? 20 : 0}
       >
-        <View className="flex-1 px-6 py-6 gap-4">
-          <View className="flex-row items-center gap-3">
-            <Pressable
-              onPress={() => router.back()}
-              className="w-10 h-10 border border-border rounded-xl items-center justify-center active:bg-secondary"
-            >
-              <ArrowLeft size={20} color={colors.text} />
-            </Pressable>
-            <View className="gap-1">
-              <Text className="text-2xl font-bold text-text">AI Chat</Text>
-              <Text className="text-sm text-muted">Ask about FixLink services</Text>
-            </View>
+        <View className="px-6 py-4 border-b border-border bg-primary flex-row items-center gap-3">
+          <Pressable
+            onPress={() => router.back()}
+            className="w-10 h-10 border border-border rounded-xl items-center justify-center active:bg-secondary"
+          >
+            <ArrowLeft size={20} color={colors.text} />
+          </Pressable>
+          <View className="flex-1">
+            <Text className="text-base font-semibold text-text" numberOfLines={1}>
+              AI Chat
+            </Text>
+            <Text className="text-xs text-muted" numberOfLines={1}>
+              Ask about FixLink services
+            </Text>
           </View>
+        </View>
 
-          <View className="flex-1 border border-border bg-secondary rounded-2xl overflow-hidden">
-            <ScrollView
-              className="flex-1 px-4 py-4"
-              contentContainerStyle={{ gap: 10 }}
-              showsVerticalScrollIndicator={false}
-              keyboardShouldPersistTaps="handled"
-            >
-              {messages.map((message, index) => (
-                <View
-                  key={`${message.role}-${index}`}
-                  className={
-                    message.role === "assistant"
-                      ? "self-start max-w-[85%] bg-primary border border-border rounded-xl px-3 py-2"
-                      : "self-end max-w-[85%] bg-accent rounded-xl px-3 py-2"
-                  }
-                >
-                  <Text
-                    className={
-                      message.role === "assistant" ? "text-text text-sm" : "text-white text-sm"
-                    }
-                  >
-                    {message.content}
-                  </Text>
-                </View>
-              ))}
-
-              {loading && (
-                <View className="self-start max-w-[85%] bg-primary border border-border rounded-xl px-3 py-2 flex-row items-center gap-2">
-                  <ActivityIndicator size="small" color={colors.accent} />
-                  <Text className="text-sm text-text">Thinking...</Text>
-                </View>
-              )}
-            </ScrollView>
-
+        <ScrollView
+          ref={scrollViewRef}
+          className="flex-1 px-6 pt-4 bg-secondary"
+          contentContainerStyle={{ paddingBottom: 16, gap: 8 }}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          onContentSizeChange={() => scrollToBottom(messages.length > 1)}
+        >
+          {messages.map((message, index) => (
             <View
-              className="border-t border-border p-3 bg-primary flex-row items-center gap-2"
-              style={Platform.OS === "android" ? { marginBottom: keyboardHeight > 0 ? 8 : 0 } : undefined}
+              key={`${message.role}-${index}`}
+              className={`w-full flex-row ${
+                message.role === "assistant" ? "justify-start" : "justify-end"
+              }`}
             >
-              <TextInput
-                className="flex-1 text-base text-text border border-border rounded-xl px-3 py-2.5 bg-secondary"
-                placeholder="Type a message..."
-                placeholderTextColor={colors.muted}
-                value={input}
-                onChangeText={setInput}
-                onSubmitEditing={sendMessage}
-                editable={!loading}
-                returnKeyType="send"
-              />
-              <Pressable
-                onPress={sendMessage}
-                disabled={loading}
-                className="bg-accent rounded-xl px-4 py-2.5 active:opacity-90 disabled:opacity-60"
+              <View
+                className={`max-w-[80%] px-3 py-2 rounded-2xl ${
+                  message.role === "assistant"
+                    ? "bg-primary border border-border rounded-bl-md"
+                    : "bg-accent rounded-br-md"
+                }`}
               >
-                <Text className="text-white font-semibold text-sm">Send</Text>
-              </Pressable>
+                <Text className={`text-sm ${message.role === "assistant" ? "text-text" : "text-white"}`}>
+                  {message.content}
+                </Text>
+              </View>
             </View>
-          </View>
+          ))}
+
+          {loading && (
+            <View className="w-full flex-row justify-start">
+              <View className="max-w-[80%] px-3 py-2 rounded-2xl bg-primary border border-border rounded-bl-md flex-row items-center gap-2">
+                <ActivityIndicator size="small" color={colors.accent} />
+                <Text className="text-sm text-text">Thinking...</Text>
+              </View>
+            </View>
+          )}
+        </ScrollView>
+
+        <View
+          className="px-6 py-4 border-t border-border bg-primary flex-row items-center gap-2"
+          style={Platform.OS === "android" ? { marginBottom: keyboardHeight > 0 ? 8 : 0 } : undefined}
+        >
+          <TextInput
+            className="flex-1 border border-border rounded-xl px-4 py-3 text-text bg-secondary"
+            placeholder="Type a message"
+            placeholderTextColor={colors.muted}
+            value={input}
+            onChangeText={setInput}
+            onSubmitEditing={sendMessage}
+            editable={!loading}
+            returnKeyType="send"
+          />
+          <Pressable
+            onPress={sendMessage}
+            disabled={loading || !input.trim()}
+            className={`w-12 h-12 rounded-xl items-center justify-center ${
+              loading || !input.trim() ? "bg-border" : "bg-accent"
+            }`}
+          >
+            {loading ? (
+              <ActivityIndicator size="small" color={colors.primary} />
+            ) : (
+              <Send size={18} color={colors.primary} />
+            )}
+          </Pressable>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>

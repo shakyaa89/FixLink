@@ -1,11 +1,37 @@
 import { useRouter } from "expo-router";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ArrowLeft, MessageCircleMore } from "lucide-react-native";
+import {
+  ArrowLeft,
+  ChevronRight,
+  MessageCircleMore,
+} from "lucide-react-native";
 import colors from "@/app/_constants/theme";
+import { useMessageStore } from "@/store/messageStore";
+import { useAuthStore } from "@/store/authStore";
+import { useEffect } from "react";
 
 export default function MessagesScreen() {
   const router = useRouter();
+  const { user } = useAuthStore();
+  const {
+    recentChats,
+    contactsLoading,
+    loadContacts,
+  } = useMessageStore();
+
+  const loggedInId = user?._id || user?.id;
+
+  useEffect(() => {
+    if (!loggedInId) return;
+    loadContacts();
+  }, [loggedInId, loadContacts]);
 
   return (
     <SafeAreaView className="flex-1 bg-primary">
@@ -20,20 +46,77 @@ export default function MessagesScreen() {
             </Pressable>
             <View className="gap-1">
               <Text className="text-2xl font-bold text-text">Messages</Text>
-              <Text className="text-sm text-muted">Your conversations</Text>
+              <Text className="text-sm text-muted">Select a contact to chat</Text>
             </View>
           </View>
 
-          <View className="bg-secondary border border-border rounded-2xl p-8 items-center gap-3">
-            <View className="w-14 h-14 rounded-2xl bg-border items-center justify-center">
-              <MessageCircleMore size={28} color={colors.muted} />
+          {contactsLoading && (
+            <View className="py-12 items-center justify-center">
+              <ActivityIndicator size="large" color={colors.accent} />
+              <Text className="text-sm text-muted mt-3">Loading contacts...</Text>
             </View>
-            <Text className="text-base font-semibold text-text">No messages yet</Text>
-            <Text className="text-sm text-muted text-center">
-              Your chats will appear here once you start a conversation.
-            </Text>
+          )}
+
+          {!contactsLoading && recentChats.length === 0 && (
+            <View className="bg-secondary border border-border rounded-2xl p-8 items-center gap-3">
+              <View className="w-14 h-14 rounded-2xl bg-border items-center justify-center">
+                <MessageCircleMore size={28} color={colors.muted} />
+              </View>
+              <Text className="text-base font-semibold text-text">No contacts yet</Text>
+              <Text className="text-sm text-muted text-center">
+                Your contacts appear here when you have an in-progress job.
+              </Text>
+            </View>
+          )}
+
+          {!contactsLoading && recentChats.length > 0 && (
+            <View className="gap-3">
+              {recentChats.map((chat) => (
+                <Pressable
+                  key={chat._id}
+                  onPress={() =>
+                    router.push({
+                      pathname: "/message-chat",
+                      params: {
+                        contactId: chat._id,
+                        fullName: chat.fullName,
+                        profilePicture: chat.profilePicture || "",
+                        jobTitle: chat.jobTitle || "",
+                        jobId: chat.jobId || "",
+                      },
+                    })
+                  }
+                  className="bg-secondary border border-border rounded-2xl p-4"
+                >
+                  <View className="flex-row items-center gap-3">
+                    <View className="w-12 h-12 rounded-full bg-border items-center justify-center">
+                      <MessageCircleMore size={22} color={colors.muted} />
+                    </View>
+                    <View className="flex-1">
+                      <Text className="text-base font-semibold text-text" numberOfLines={1}>
+                        {chat.fullName}
+                      </Text>
+                      <Text className="text-xs text-muted" numberOfLines={1}>
+                        {chat.jobTitle ? `Job: ${chat.jobTitle}` : chat.jobId || "Conversation"}
+                      </Text>
+                    </View>
+                    <ChevronRight size={18} color={colors.muted} />
+                  </View>
+                </Pressable>
+              ))}
+            </View>
+          )}
+
+          <View className="pt-2">
+            <Pressable
+              onPress={() => loadContacts()}
+              className="border border-border rounded-xl py-3 items-center"
+            >
+              <Text className="text-sm font-semibold text-text">Refresh Contacts</Text>
+            </Pressable>
           </View>
         </View>
+
       </ScrollView>
     </SafeAreaView>
   );
