@@ -28,6 +28,7 @@ import {
   Tag,
   User,
   Mail,
+  Star,
 } from "lucide-react-native";
 import Toast from "react-native-toast-message";
 import colors from "@/app/_constants/theme";
@@ -186,6 +187,22 @@ export default function JobDetailsPage() {
     } finally {
       setReviewSubmitting(false);
     }
+  };
+
+  const renderReviewStars = (rating: number) => {
+    return (
+      <View className="flex-row gap-2">
+        {[1, 2, 3, 4, 5].map((value) => (
+          <Pressable key={value} onPress={() => setReviewRating(value)}>
+            <Star
+              size={28}
+              color={value <= rating ? colors.accent : colors.border}
+              fill={value <= rating ? colors.accent : "transparent"}
+            />
+          </Pressable>
+        ))}
+      </View>
+    );
   };
 
   const handleCreateOffer = async () => {
@@ -571,6 +588,88 @@ export default function JobDetailsPage() {
                   <Text className="text-xs text-text mt-2">Completed</Text>
                 </View>
               </View>
+            </View>
+          )}
+
+          {user?.role === "user" && job.jobStatus === "completed" && acceptedProvider && (
+            <View className="bg-secondary border border-border rounded-2xl p-4 gap-3">
+              <Text className="text-lg font-semibold text-text">Leave a Review</Text>
+              <Text className="text-sm text-muted">
+                Share your experience with {acceptedProvider.fullName || "the provider"}.
+              </Text>
+
+              <View className="gap-2">
+                <Text className="text-sm text-text font-semibold">Rating</Text>
+                {renderReviewStars(reviewRating)}
+              </View>
+
+              <View className="gap-2">
+                <Text className="text-sm text-text font-semibold">Comment (optional)</Text>
+                <TextInput
+                  value={reviewComment}
+                  onChangeText={setReviewComment}
+                  placeholder="Share details about the service"
+                  placeholderTextColor={colors.muted}
+                  className="border border-border rounded-xl px-3 py-3 text-text bg-primary min-h-[96px]"
+                  multiline
+                  textAlignVertical="top"
+                />
+              </View>
+
+              <Pressable
+                onPress={handleSubmitReview}
+                disabled={reviewSubmitting || reviewSubmitted}
+                className="bg-accent rounded-xl py-3 items-center disabled:opacity-60"
+              >
+                <Text className="text-white font-semibold">
+                  {reviewSubmitted
+                    ? "Review submitted"
+                    : reviewSubmitting
+                      ? "Submitting..."
+                      : "Submit Review"}
+                </Text>
+              </Pressable>
+            </View>
+          )}
+
+          {user?.role === "serviceProvider" && job.jobStatus === "completed" && isAcceptedProvider && (
+            <View className="bg-secondary border border-border rounded-2xl p-4 gap-3">
+              <Text className="text-lg font-semibold text-text">Leave a Review</Text>
+              <Text className="text-sm text-muted">
+                Share your experience with {(job.userId as any)?.fullName || "the client"}.
+              </Text>
+
+              <View className="gap-2">
+                <Text className="text-sm text-text font-semibold">Rating</Text>
+                {renderReviewStars(reviewRating)}
+              </View>
+
+              <View className="gap-2">
+                <Text className="text-sm text-text font-semibold">Comment (optional)</Text>
+                <TextInput
+                  value={reviewComment}
+                  onChangeText={setReviewComment}
+                  placeholder="Share details about the client"
+                  placeholderTextColor={colors.muted}
+                  className="border border-border rounded-xl px-3 py-3 text-text bg-primary min-h-[96px]"
+                  multiline
+                  textAlignVertical="top"
+                />
+              </View>
+
+              <Pressable
+                onPress={handleSubmitReview}
+                disabled={reviewSubmitting || reviewSubmitted}
+                className="bg-accent rounded-xl py-3 items-center disabled:opacity-60"
+              >
+                <Text className="text-white font-semibold">
+                  {reviewSubmitted
+                    ? "Review submitted"
+                    : reviewSubmitting
+                      ? "Submitting..."
+                      : "Submit Review"}
+                </Text>
+              </Pressable>
             </View>
           )}
 

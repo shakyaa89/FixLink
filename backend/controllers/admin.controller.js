@@ -749,7 +749,7 @@ export const getAdminServiceProviders = async (req, res) => {
 export const updateServiceProviderVerification = async (req, res) => {
   try {
     const { providerId } = req.params;
-    const { status } = req.body;
+    const { status, rejectionReason } = req.body;
 
     if (!providerId) {
       return res.status(400).json({ message: "Provider id is required" });
@@ -759,6 +759,12 @@ export const updateServiceProviderVerification = async (req, res) => {
       return res
         .status(400)
         .json({ message: "Status must be verified or rejected" });
+    }
+
+    if (status === "rejected" && (!rejectionReason || !rejectionReason.trim())) {
+      return res
+        .status(400)
+        .json({ message: "Rejection reason is required" });
     }
 
     const provider = await User.findById(providerId);
@@ -772,6 +778,11 @@ export const updateServiceProviderVerification = async (req, res) => {
     }
 
     provider.verificationStatus = status;
+    if (status === "rejected") {
+      provider.rejectionReason = rejectionReason.trim();
+    } else {
+      provider.rejectionReason = "";
+    }
     await provider.save();
 
     return res.status(200).json({

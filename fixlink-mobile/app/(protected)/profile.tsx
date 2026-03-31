@@ -21,6 +21,7 @@ import {
   Star,
   Upload,
   User,
+  UserStar,
 } from "lucide-react-native";
 import colors from "@/app/_constants/theme";
 import { useAuthStore } from "@/store/authStore";
@@ -442,7 +443,27 @@ export default function ProfileScreen() {
             </View>
 
             <Pressable
-              className="bg-danger rounded-2xl px-4 py-3.5 mt-2 flex-row items-center justify-center gap-2 active:opacity-90"
+              className="bg-accent rounded-2xl px-4 py-3.5 mt-2 flex-row items-center justify-center gap-2 active:opacity-90"
+              onPress={() => router.push("/report-dispute")}
+            >
+              <>
+                <UserStar size={18} color={"white"} />
+                <Text className="text-white font-semibold">Report Dispute</Text>
+              </>
+            </Pressable>
+
+            <Pressable
+              className="bg-accent rounded-2xl px-4 py-3.5 flex-row items-center justify-center gap-2 active:opacity-90"
+              onPress={() => router.push("/reviews")}
+            >
+              <>
+                <UserStar size={18} color={"white"} />
+                <Text className="text-white font-semibold">Review</Text>
+              </>
+            </Pressable>
+
+            <Pressable
+              className="bg-danger rounded-2xl px-4 py-3.5 flex-row items-center justify-center gap-2 active:opacity-90"
               disabled={loggingOut}
               onPress={async () => {
                 try {

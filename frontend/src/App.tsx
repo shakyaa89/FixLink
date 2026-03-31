@@ -2,7 +2,7 @@ import HomePage from "./pages/HomePage";
 import "./index.css";
 import "./App.css";
 import Footer from "./components/Footer";
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import AuthPage from "./pages/AuthPages/AuthPage";
 import { useEffect } from "react";
 import { useAuthStore } from "./store/authStore";
@@ -20,7 +20,7 @@ import ReviewsPage from "./pages/UserPages/ReviewsPage";
 import ProfilePage from "./pages/UserPages/ProfilePage";
 import DisputesPage from "./pages/UserPages/DisputesPage";
 import ServiceProviderRoute from "./routes/ServiceProviderRoute";
-import ProtectedRoute from "./routes/ProtectedRoute";
+import ProtectedRoute from "./routes/ProtectedRoute"; -
 import ServiceProviderDashboard from "./pages/ServiceProviderPages/ServiceProviderDashboard";
 import ViewJobsPage from "./pages/ServiceProviderPages/ViewJobsPage";
 import JobDetailsPage from "./pages/UserPages/JobDetailsPage";
@@ -42,9 +42,21 @@ import AdminUserDetailsPage from "./pages/AdminPages/AdminUserDetailsPage";
 import AdminJobDetailsPage from "./pages/AdminPages/AdminJobDetailsPage";
 import AdminCreateJobPage from "./pages/AdminPages/AdminCreateJobPage";
 import EditProfilePage from "./pages/UserPages/EditProfilePage";
+import { isServiceProviderProfileComplete } from "./utils/serviceProviderProfile";
 
 function App() {
   const { checkAuth, checking, user } = useAuthStore();
+  const isProviderComplete = isServiceProviderProfileComplete(user);
+  const dashboardPath =
+    user?.role === "user"
+      ? "/user/dashboard"
+      : user?.role === "serviceProvider"
+        ? isProviderComplete
+          ? "/serviceprovider/dashboard"
+          : "/serviceprovider/complete-profile"
+        : user?.role === "admin"
+          ? "/admin/dashboard"
+          : "/";
 
   const { theme } = useThemeStore();
 
@@ -64,16 +76,18 @@ function App() {
 
   return (
     <div
-      className={`min-h-screen flex flex-col bg-(--primary-bg) text-(--text) ${
-        theme == "dark" ? "dark" : ""
-      }`}
+      className={`min-h-screen flex flex-col bg-(--primary-bg) text-(--text) ${theme == "dark" ? "dark" : ""
+        }`}
     >
       <Toaster position="top-center" />
       <Navbar />
       {user && <Chatbot />}
       <main className="grow">
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          <Route
+            path="/"
+            element={user ? <Navigate to={dashboardPath} replace /> : <HomePage />}
+          />
 
           <Route
             path="/auth"
@@ -303,7 +317,7 @@ function App() {
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </main>
-      <Footer />
+      {!user && <Footer />}
     </div>
   );
 }

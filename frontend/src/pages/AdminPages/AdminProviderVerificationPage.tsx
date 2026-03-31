@@ -12,7 +12,9 @@ export default function AdminProviderVerificationPage() {
     providerId: string;
     providerName: string;
     status: "verified" | "rejected";
+    rejectionReason?: string;
   } | null>(null);
+  const [rejectionError, setRejectionError] = useState<string | null>(null);
 
   const fetchProviders = async () => {
     try {
@@ -32,10 +34,15 @@ export default function AdminProviderVerificationPage() {
   const handleUpdate = async (
     providerId: string,
     status: "verified" | "rejected",
+    rejectionReason?: string,
   ) => {
     try {
       setUpdatingId(providerId);
-      await AdminApi.updateServiceProviderVerification(providerId, status);
+      await AdminApi.updateServiceProviderVerification(
+        providerId,
+        status,
+        rejectionReason,
+      );
       fetchProviders();
     } catch (err) {
       console.error("Failed to update verification", err);
@@ -51,7 +58,19 @@ export default function AdminProviderVerificationPage() {
 
   const handleConfirmUpdate = async () => {
     if (!confirmation) return;
-    await handleUpdate(confirmation.providerId, confirmation.status);
+    if (confirmation.status === "rejected") {
+      const reason = confirmation.rejectionReason?.trim();
+      if (!reason) {
+        setRejectionError("Please provide a rejection reason.");
+        return;
+      }
+    }
+    setRejectionError(null);
+    await handleUpdate(
+      confirmation.providerId,
+      confirmation.status,
+      confirmation.rejectionReason?.trim(),
+    );
     setConfirmation(null);
   };
 
@@ -208,6 +227,7 @@ export default function AdminProviderVerificationPage() {
                             providerId: provider._id,
                             providerName: provider.fullName,
                             status: "rejected",
+                            rejectionReason: "",
                           })
                         }
                         disabled={!provider._id || updatingId === provider._id}
@@ -236,6 +256,30 @@ export default function AdminProviderVerificationPage() {
               Are you sure you want to {confirmation.status === "verified" ? "approve" : "reject"}{" "}
               {confirmation.providerName}?
             </p>
+
+            {confirmation.status === "rejected" && (
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-(--text) mb-2">
+                  Rejection reason
+                </label>
+                <textarea
+                  value={confirmation.rejectionReason || ""}
+                  onChange={(event) =>
+                    setConfirmation((prev) =>
+                      prev
+                        ? { ...prev, rejectionReason: event.target.value }
+                        : prev,
+                    )
+                  }
+                  rows={4}
+                  className="w-full border border-(--border) rounded-lg px-3 py-2 bg-(--primary) text-(--text)"
+                  placeholder="Explain why this provider was rejected"
+                />
+                {rejectionError && (
+                  <p className="text-sm text-(--danger) mt-2">{rejectionError}</p>
+                )}
+              </div>
+            )}
             <div className="mt-6 flex items-center justify-end gap-3">
               <button
                 type="button"

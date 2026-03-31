@@ -1,8 +1,8 @@
 import axios from "axios";
 
 
-// export const API_BASE_URL = "http://192.168.137.1:3005";
-export const API_BASE_URL = "https://fixlink-n7rz.onrender.com";
+export const API_BASE_URL = "http://192.168.1.66:3005";
+// export const API_BASE_URL = "https://fixlink-n7rz.onrender.com";
 const baseURL = `${API_BASE_URL}/api`;
 
 interface User {
@@ -421,10 +421,14 @@ export const AdminApi = {
   fetchServiceProviders: () =>
     Api.get("/admin/service-providers", { headers: getAuthHeader() }),
 
-  updateServiceProviderVerification: (providerId: string, status: string) =>
+  updateServiceProviderVerification: (
+    providerId: string,
+    status: string,
+    rejectionReason?: string,
+  ) =>
     Api.put(
       `/admin/service-providers/${providerId}/verification`,
-      { status },
+      { status, rejectionReason },
       { headers: getAuthHeader() },
     ),
 };
