@@ -20,6 +20,7 @@ export default function AdminJobsPage() {
   const [error, setError] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
 
   const stats = useMemo(() => {
     const total = jobs.length;
@@ -77,19 +78,20 @@ export default function AdminJobsPage() {
   };
 
   const handleDeleteJob = async (jobId: string, title: string) => {
-    const confirmed = window.confirm(
-      `Delete job \"${title}\"? This action cannot be undone.`,
-    );
+    setDeleteTarget({ id: jobId, title });
+  };
 
-    if (!confirmed) {
+  const confirmDeleteJob = async () => {
+    if (!deleteTarget) {
       return;
     }
 
     try {
-      setDeletingId(jobId);
+      setDeletingId(deleteTarget.id);
       setError(null);
-      await AdminApi.deleteJob(jobId);
+      await AdminApi.deleteJob(deleteTarget.id);
       await fetchJobs();
+      setDeleteTarget(null);
     } catch (err) {
       console.error("Failed to delete job", err);
       setError("Unable to delete job.");
@@ -240,6 +242,41 @@ export default function AdminJobsPage() {
           )}
         </div>
       </main>
+
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+          <button
+            type="button"
+            aria-label="Close modal"
+            onClick={() => setDeleteTarget(null)}
+            className="absolute inset-0 bg-black/50"
+          />
+          <div className="relative w-full max-w-md rounded-2xl border border-(--border) bg-(--primary) p-6 shadow-2xl">
+            <h3 className="text-xl font-semibold text-(--text)">Delete Job</h3>
+            <p className="mt-2 text-sm text-(--muted)">
+              Delete job "{deleteTarget.title}"? This action cannot be undone.
+            </p>
+            <div className="mt-6 flex items-center justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setDeleteTarget(null)}
+                disabled={deletingId === deleteTarget.id}
+                className="px-4 py-2 text-sm font-medium rounded-lg bg-(--secondary) text-(--text) border border-(--border) disabled:opacity-60"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmDeleteJob}
+                disabled={deletingId === deleteTarget.id}
+                className="px-4 py-2 text-sm font-semibold rounded-lg bg-(--danger-bg) text-(--danger) border border-(--border) disabled:opacity-60"
+              >
+                {deletingId === deleteTarget.id ? "Processing..." : "Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

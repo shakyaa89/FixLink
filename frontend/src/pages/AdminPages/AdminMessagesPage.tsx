@@ -17,6 +17,9 @@ export default function AdminMessagesPage() {
   const [error, setError] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+  const [editTarget, setEditTarget] = useState<{ id: string; content: string } | null>(null);
+  const [editDraft, setEditDraft] = useState("");
 
   const fetchMessages = async () => {
     try {
@@ -37,22 +40,27 @@ export default function AdminMessagesPage() {
   }, []);
 
   const handleEdit = async (messageId: string, currentContent: string) => {
-    const nextContent = window.prompt("Edit message", currentContent);
+    setEditTarget({ id: messageId, content: currentContent });
+    setEditDraft(currentContent);
+  };
 
-    if (nextContent == null) {
+  const confirmEdit = async () => {
+    if (!editTarget) {
       return;
     }
 
-    if (!nextContent.trim()) {
+    if (!editDraft.trim()) {
       setError("Message content cannot be empty.");
       return;
     }
 
     try {
-      setUpdatingId(messageId);
+      setUpdatingId(editTarget.id);
       setError(null);
-      await AdminApi.updateMessage(messageId, { content: nextContent.trim() });
+      await AdminApi.updateMessage(editTarget.id, { content: editDraft.trim() });
       await fetchMessages();
+      setEditTarget(null);
+      setEditDraft("");
     } catch (err) {
       console.error("Failed to update message", err);
       setError("Unable to update message.");
@@ -62,15 +70,20 @@ export default function AdminMessagesPage() {
   };
 
   const handleDelete = async (messageId: string) => {
-    if (!window.confirm("Delete this message?")) {
+    setDeleteTarget(messageId);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) {
       return;
     }
 
     try {
-      setDeletingId(messageId);
+      setDeletingId(deleteTarget);
       setError(null);
-      await AdminApi.deleteMessage(messageId);
+      await AdminApi.deleteMessage(deleteTarget);
       await fetchMessages();
+      setDeleteTarget(null);
     } catch (err) {
       console.error("Failed to delete message", err);
       setError("Unable to delete message.");
@@ -159,6 +172,88 @@ export default function AdminMessagesPage() {
           )}
         </div>
       </main>
+
+      {editTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+          <button
+            type="button"
+            aria-label="Close modal"
+            onClick={() => {
+              setEditTarget(null);
+              setEditDraft("");
+            }}
+            className="absolute inset-0 bg-black/50"
+          />
+          <div className="relative w-full max-w-lg rounded-2xl border border-(--border) bg-(--primary) p-6 shadow-2xl">
+            <h3 className="text-xl font-semibold text-(--text)">Edit Message</h3>
+            <p className="mt-2 text-sm text-(--muted)">Update message content.</p>
+
+            <textarea
+              value={editDraft}
+              onChange={(event) => setEditDraft(event.target.value)}
+              rows={4}
+              className="mt-4 w-full rounded-lg border border-(--border) bg-(--secondary) p-3 text-(--text) outline-none focus:ring-2 focus:ring-(--accent)"
+            />
+
+            <div className="mt-6 flex items-center justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setEditTarget(null);
+                  setEditDraft("");
+                }}
+                disabled={updatingId === editTarget.id}
+                className="px-4 py-2 text-sm font-medium rounded-lg bg-(--secondary) text-(--text) border border-(--border) disabled:opacity-60"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmEdit}
+                disabled={updatingId === editTarget.id}
+                className="px-4 py-2 text-sm font-semibold rounded-lg bg-(--accent) text-(--primary) disabled:opacity-60"
+              >
+                {updatingId === editTarget.id ? "Saving..." : "Save"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+          <button
+            type="button"
+            aria-label="Close modal"
+            onClick={() => setDeleteTarget(null)}
+            className="absolute inset-0 bg-black/50"
+          />
+          <div className="relative w-full max-w-md rounded-2xl border border-(--border) bg-(--primary) p-6 shadow-2xl">
+            <h3 className="text-xl font-semibold text-(--text)">Delete Message</h3>
+            <p className="mt-2 text-sm text-(--muted)">
+              Delete this message? This action cannot be undone.
+            </p>
+            <div className="mt-6 flex items-center justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setDeleteTarget(null)}
+                disabled={deletingId === deleteTarget}
+                className="px-4 py-2 text-sm font-medium rounded-lg bg-(--secondary) text-(--text) border border-(--border) disabled:opacity-60"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmDelete}
+                disabled={deletingId === deleteTarget}
+                className="px-4 py-2 text-sm font-semibold rounded-lg bg-(--danger-bg) text-(--danger) border border-(--border) disabled:opacity-60"
+              >
+                {deletingId === deleteTarget ? "Processing..." : "Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

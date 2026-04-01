@@ -5,6 +5,7 @@ import { useState } from "react";
 import { AiApi, JobApi } from "../../api/Apis";
 import toast from "react-hot-toast";
 import axios from "axios";
+import { CITIES, LOCATION_OPTIONS } from "../../utils/nepalLocations";
 
 const MAX_IMAGE_SIZE_BYTES = 2 * 1024 * 1024;
 
@@ -15,6 +16,7 @@ export default function CreateJobPage() {
   const [description, setDescription] = useState("");
   const [jobCategory, setJobCategory] = useState("");
   const [userPrice, setUserPrice] = useState(0);
+  const [city, setCity] = useState("");
   const [location, setLocation] = useState("");
   const [locationURL, setLocationURL] = useState("");
   const [postType, setPostType] = useState<"now" | "scheduled">("now");
@@ -23,6 +25,7 @@ export default function CreateJobPage() {
   const [images, setImages] = useState<File[]>([]);
 
   const [uploading, setUploading] = useState(false);
+  const placeOptions = city ? LOCATION_OPTIONS[city] ?? [] : [];
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
@@ -80,6 +83,7 @@ export default function CreateJobPage() {
       !description ||
       !jobCategory ||
       !userPrice ||
+      !city ||
       !location ||
       images.length === 0
     ) {
@@ -118,7 +122,7 @@ export default function CreateJobPage() {
         description,
         jobCategory,
         userPrice,
-        location,
+        location: `${city}, ${location}`,
         locationURL,
         images: imageUrls,
         scheduledFor:
@@ -138,6 +142,7 @@ export default function CreateJobPage() {
       setDescription("");
       setJobCategory("");
       setUserPrice(0);
+      setCity("");
       setLocation("");
       setLocationURL("");
       setPostType("now");
@@ -233,7 +238,7 @@ export default function CreateJobPage() {
             </div>
 
             {/* Price & Location */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="bg-(--primary) border border-(--border) rounded-xl p-5">
                 <label className="block text-(--text) font-semibold mb-3">
                   Your Price (Rs)<span className="text-red-500 ml-1">*</span>
@@ -249,15 +254,42 @@ export default function CreateJobPage() {
 
               <div className="bg-(--primary) border border-(--border) rounded-xl p-5">
                 <label className="block text-(--text) font-semibold mb-3">
+                  City<span className="text-red-500 ml-1">*</span>
+                </label>
+                <select
+                  value={city}
+                  onChange={(e) => {
+                    setCity(e.target.value);
+                    setLocation("");
+                  }}
+                  className="w-full p-3 rounded-lg border border-(--border) text-(--text) focus:ring-2 focus:ring-(--accent) focus:border-transparent outline-none bg-(--secondary) cursor-pointer"
+                >
+                  <option value="">Select city</option>
+                  {CITIES.map((cityOption) => (
+                    <option key={cityOption} value={cityOption}>
+                      {cityOption}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="bg-(--primary) border border-(--border) rounded-xl p-5">
+                <label className="block text-(--text) font-semibold mb-3">
                   Location<span className="text-red-500 ml-1">*</span>
                 </label>
-                <input
-                  type="text"
+                <select
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
-                  placeholder="Enter your location"
-                  className="w-full p-3 rounded-lg border border-(--border) focus:ring-2 focus:ring-(--accent) focus:border-transparent outline-none bg-(--secondary) text-(--text)"
-                />
+                  disabled={!city}
+                  className="w-full p-3 rounded-lg border border-(--border) focus:ring-2 focus:ring-(--accent) focus:border-transparent outline-none bg-(--secondary) text-(--text) disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  <option value="">{city ? "Select location" : "Select city first"}</option>
+                  {placeOptions.map((placeOption) => (
+                    <option key={placeOption} value={placeOption}>
+                      {placeOption}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
 

@@ -1,12 +1,12 @@
-import { Mail, Lock, User, Phone, Upload, Loader2 } from "lucide-react";
+import { Mail, Lock, User, Phone, Upload, Loader2, MapPin } from "lucide-react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { AuthApi } from "../../api/Apis";
 import { useState } from "react";
 import { useAuthStore } from "../../store/authStore";
+import { CITIES, LOCATION_OPTIONS } from "../../utils/nepalLocations";
 
-const CITIES = ["Kathmandu", "Lalitpur", "Bhaktapur"];
 const MAX_IMAGE_SIZE_BYTES = 2 * 1024 * 1024;
 
 function ServiceProviderRegisterForm() {
@@ -18,6 +18,7 @@ function ServiceProviderRegisterForm() {
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [city, setCity] = useState("");
+  const [address, setAddress] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
@@ -26,6 +27,7 @@ function ServiceProviderRegisterForm() {
 
   const navigate = useNavigate();
   const { setUser } = useAuthStore();
+  const placeOptions = city ? LOCATION_OPTIONS[city] ?? [] : [];
 
   const uploadToCloudinary = async (file: File) => {
     if (file.size > MAX_IMAGE_SIZE_BYTES) {
@@ -57,7 +59,7 @@ function ServiceProviderRegisterForm() {
 
     console.log("called");
 
-    if (!fullName || !email || !phoneNumber || !city || !password || !profilePicture) {
+    if (!fullName || !email || !phoneNumber || !city || !address || !password || !profilePicture) {
       toast.error("Please fill in all required fields");
       return;
     }
@@ -93,6 +95,7 @@ function ServiceProviderRegisterForm() {
         email,
         phoneNumber,
         city,
+        address,
         password,
         role: "serviceProvider",
         profilePicture: profileUrl,
@@ -113,6 +116,7 @@ function ServiceProviderRegisterForm() {
       setEmail("");
       setPhoneNumber("");
       setCity("");
+      setAddress("");
       setPassword("");
       setConfirmPassword("");
       setProfilePicture(null);
@@ -190,7 +194,10 @@ function ServiceProviderRegisterForm() {
           </label>
           <select
             value={city}
-            onChange={(e) => setCity(e.target.value)}
+            onChange={(e) => {
+              setCity(e.target.value);
+              setAddress("");
+            }}
             className="w-full px-4 py-3 border-2 border-(--border) rounded-xl focus:border-blue-600 bg-white"
           >
             <option value="">Select city</option>
@@ -200,6 +207,29 @@ function ServiceProviderRegisterForm() {
               </option>
             ))}
           </select>
+        </div>
+
+        {/* Place */}
+        <div>
+          <label className="block text-sm font-semibold text-(--text) mb-2">
+            Place<span className="text-red-500">*</span>
+          </label>
+          <div className="relative">
+            <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-(--muted)" />
+            <select
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              disabled={!city}
+              className="w-full pl-12 pr-4 py-3 border-2 border-(--border) rounded-xl focus:border-blue-600 bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
+            >
+              <option value="">{city ? "Select place" : "Select city first"}</option>
+              {placeOptions.map((placeOption) => (
+                <option key={placeOption} value={placeOption}>
+                  {placeOption}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         {/* Password */}

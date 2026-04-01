@@ -11,6 +11,7 @@ export default function AdminUsersPage() {
   const [error, setError] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; fullName: string } | null>(null);
 
   const stats = useMemo(() => {
     const total = users.length;
@@ -67,19 +68,20 @@ export default function AdminUsersPage() {
   };
 
   const handleDeleteUser = async (userId: string, fullName: string) => {
-    const confirmed = window.confirm(
-      `Delete ${fullName}? This action cannot be undone.`,
-    );
+    setDeleteTarget({ id: userId, fullName });
+  };
 
-    if (!confirmed) {
+  const confirmDeleteUser = async () => {
+    if (!deleteTarget) {
       return;
     }
 
     try {
-      setDeletingId(userId);
+      setDeletingId(deleteTarget.id);
       setError(null);
-      await AdminApi.deleteUser(userId);
+      await AdminApi.deleteUser(deleteTarget.id);
       await fetchUsers();
+      setDeleteTarget(null);
     } catch (err) {
       console.error("Failed to delete user", err);
       setError("Unable to delete user.");
@@ -226,6 +228,41 @@ export default function AdminUsersPage() {
           )}
         </div>
       </main>
+
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+          <button
+            type="button"
+            aria-label="Close modal"
+            onClick={() => setDeleteTarget(null)}
+            className="absolute inset-0 bg-black/50"
+          />
+          <div className="relative w-full max-w-md rounded-2xl border border-(--border) bg-(--primary) p-6 shadow-2xl">
+            <h3 className="text-xl font-semibold text-(--text)">Delete User</h3>
+            <p className="mt-2 text-sm text-(--muted)">
+              Delete {deleteTarget.fullName}? This action cannot be undone.
+            </p>
+            <div className="mt-6 flex items-center justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setDeleteTarget(null)}
+                disabled={deletingId === deleteTarget.id}
+                className="px-4 py-2 text-sm font-medium rounded-lg bg-(--secondary) text-(--text) border border-(--border) disabled:opacity-60"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmDeleteUser}
+                disabled={deletingId === deleteTarget.id}
+                className="px-4 py-2 text-sm font-semibold rounded-lg bg-(--danger-bg) text-(--danger) border border-(--border) disabled:opacity-60"
+              >
+                {deletingId === deleteTarget.id ? "Processing..." : "Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

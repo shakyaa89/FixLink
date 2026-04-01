@@ -13,8 +13,8 @@ import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { AuthApi } from "../../api/Apis";
 import { useState } from "react";
+import { CITIES, LOCATION_OPTIONS } from "../../utils/nepalLocations";
 
-const CITIES = ["Kathmandu", "Lalitpur", "Bhaktapur"];
 const MAX_IMAGE_SIZE_BYTES = 2 * 1024 * 1024;
 
 function RegisterForm() {
@@ -33,6 +33,8 @@ function RegisterForm() {
   const [addressDescription, setAddressDescription] = useState("");
   const [addressUrl, setAddressUrl] = useState("");
   const [agreeToTerms, setAgreeToTerms] = useState(false);
+
+  const placeOptions = city ? LOCATION_OPTIONS[city] ?? [] : [];
 
   const navigate = useNavigate();
 
@@ -195,7 +197,10 @@ function RegisterForm() {
           </label>
           <select
             value={city}
-            onChange={(e) => setCity(e.target.value)}
+            onChange={(e) => {
+              setCity(e.target.value);
+              setAddress("");
+            }}
             className="w-full px-4 py-3 border-2 border-(--border) rounded-xl focus:border-blue-600 bg-white"
           >
             <option value="">Select city</option>
@@ -281,17 +286,23 @@ function RegisterForm() {
         {/* Address */}
         <div>
           <label className="block text-sm font-semibold text-(--text) mb-2">
-            Address<span className="text-red-500">*</span>
+            Place<span className="text-red-500">*</span>
           </label>
           <div className="relative">
             <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-(--muted)" />
-            <input
-              type="text"
+            <select
               value={address}
               onChange={(e) => setAddress(e.target.value)}
-              placeholder="Enter your address"
-              className="w-full pl-12 pr-4 py-3 border-2 border-(--border) rounded-xl focus:border-blue-600"
-            />
+              disabled={!city}
+              className="w-full pl-12 pr-4 py-3 border-2 border-(--border) rounded-xl focus:border-blue-600 bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
+            >
+              <option value="">{city ? "Select place" : "Select city first"}</option>
+              {placeOptions.map((placeOption) => (
+                <option key={placeOption} value={placeOption}>
+                  {placeOption}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 

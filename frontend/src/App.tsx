@@ -20,7 +20,7 @@ import ReviewsPage from "./pages/UserPages/ReviewsPage";
 import ProfilePage from "./pages/UserPages/ProfilePage";
 import DisputesPage from "./pages/UserPages/DisputesPage";
 import ServiceProviderRoute from "./routes/ServiceProviderRoute";
-import ProtectedRoute from "./routes/ProtectedRoute"; -
+import ProtectedRoute from "./routes/ProtectedRoute"; 
 import ServiceProviderDashboard from "./pages/ServiceProviderPages/ServiceProviderDashboard";
 import ViewJobsPage from "./pages/ServiceProviderPages/ViewJobsPage";
 import JobDetailsPage from "./pages/UserPages/JobDetailsPage";
