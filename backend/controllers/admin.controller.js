@@ -447,15 +447,32 @@ export const updateAdminDispute = async (req, res) => {
       return res.status(404).json({ message: "Dispute not found" });
     }
 
-    const { title, description, status, priority } = req.body;
+    const { title, description, status, priority, resolutionMessage } = req.body;
+
+    const isValidStatus =
+      status !== undefined ? ["open", "resolved"].includes(status) : false;
+    const nextStatus = isValidStatus ? status : dispute.status;
+    const isResolvingNow = dispute.status !== "resolved" && nextStatus === "resolved";
+
+    if (isResolvingNow && (!resolutionMessage || !resolutionMessage.trim())) {
+      return res
+        .status(400)
+        .json({ message: "Resolution message is required when resolving a dispute" });
+    }
 
     if (title !== undefined) dispute.title = title;
     if (description !== undefined) dispute.description = description;
-    if (status !== undefined && ["open", "resolved"].includes(status)) {
+    if (isValidStatus) {
       dispute.status = status;
     }
     if (priority !== undefined && ["low", "medium", "high"].includes(priority)) {
       dispute.priority = priority;
+    }
+
+    if (nextStatus === "open") {
+      dispute.resolutionMessage = "";
+    } else if (resolutionMessage !== undefined) {
+      dispute.resolutionMessage = resolutionMessage.trim();
     }
 
     await dispute.save();
@@ -755,10 +772,10 @@ export const updateServiceProviderVerification = async (req, res) => {
       return res.status(400).json({ message: "Provider id is required" });
     }
 
-    if (!status || !["verified", "rejected"].includes(status)) {
+    if (!status || !["pending", "verified", "rejected"].includes(status)) {
       return res
         .status(400)
-        .json({ message: "Status must be verified or rejected" });
+        .json({ message: "Status must be pending, verified, or rejected" });
     }
 
     if (status === "rejected" && (!rejectionReason || !rejectionReason.trim())) {

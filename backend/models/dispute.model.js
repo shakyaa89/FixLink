@@ -27,6 +27,11 @@ const disputeSchema = new mongoose.Schema(
       enum: ["low", "medium", "high"],
       default: "medium",
     },
+    resolutionMessage: {
+      type: String,
+      default: "",
+      trim: true,
+    },
     reportedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

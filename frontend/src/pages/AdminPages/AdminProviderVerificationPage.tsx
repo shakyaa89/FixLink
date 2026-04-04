@@ -11,7 +11,7 @@ export default function AdminProviderVerificationPage() {
   const [confirmation, setConfirmation] = useState<{
     providerId: string;
     providerName: string;
-    status: "verified" | "rejected";
+    status: "pending" | "verified" | "rejected";
     rejectionReason?: string;
   } | null>(null);
   const [rejectionError, setRejectionError] = useState<string | null>(null);
@@ -33,7 +33,7 @@ export default function AdminProviderVerificationPage() {
 
   const handleUpdate = async (
     providerId: string,
-    status: "verified" | "rejected",
+    status: "pending" | "verified" | "rejected",
     rejectionReason?: string,
   ) => {
     try {
@@ -204,39 +204,59 @@ export default function AdminProviderVerificationPage() {
                     </div>
 
                     <div className="flex flex-wrap items-center gap-2 lg:justify-end lg:col-span-2">
-                      <button
-                        onClick={() =>
-                          provider._id &&
-                          setConfirmation({
-                            providerId: provider._id,
-                            providerName: provider.fullName,
-                            status: "verified",
-                          })
-                        }
-                        disabled={!provider._id || updatingId === provider._id}
-                        className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-(--success-bg) text-(--success) border border-(--border) transition disabled:opacity-60"
-                      >
-                        <span className="flex items-center gap-1">
-                          <ShieldCheck className="w-4 h-4" /> Approve
-                        </span>
-                      </button>
-                      <button
-                        onClick={() =>
-                          provider._id &&
-                          setConfirmation({
-                            providerId: provider._id,
-                            providerName: provider.fullName,
-                            status: "rejected",
-                            rejectionReason: "",
-                          })
-                        }
-                        disabled={!provider._id || updatingId === provider._id}
-                        className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-(--danger-bg) text-(--danger) border border-(--border) transition disabled:opacity-60"
-                      >
-                        <span className="flex items-center gap-1">
-                          <ShieldX className="w-4 h-4" /> Reject
-                        </span>
-                      </button>
+                      {provider.verificationStatus !== "verified" && (
+                        <button
+                          onClick={() =>
+                            provider._id &&
+                            setConfirmation({
+                              providerId: provider._id,
+                              providerName: provider.fullName,
+                              status: "verified",
+                            })
+                          }
+                          disabled={!provider._id || updatingId === provider._id}
+                          className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-(--success-bg) text-(--success) border border-(--border) transition disabled:opacity-60"
+                        >
+                          <span className="flex items-center gap-1">
+                            <ShieldCheck className="w-4 h-4" /> Approve
+                          </span>
+                        </button>
+                      )}
+                      {provider.verificationStatus !== "pending" && (
+                        <button
+                          onClick={() =>
+                            provider._id &&
+                            setConfirmation({
+                              providerId: provider._id,
+                              providerName: provider.fullName,
+                              status: "pending",
+                            })
+                          }
+                          disabled={!provider._id || updatingId === provider._id}
+                          className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-(--secondary) text-(--text) border border-(--border) transition disabled:opacity-60"
+                        >
+                          Pending
+                        </button>
+                      )}
+                      {provider.verificationStatus !== "rejected" && (
+                        <button
+                          onClick={() =>
+                            provider._id &&
+                            setConfirmation({
+                              providerId: provider._id,
+                              providerName: provider.fullName,
+                              status: "rejected",
+                              rejectionReason: "",
+                            })
+                          }
+                          disabled={!provider._id || updatingId === provider._id}
+                          className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-(--danger-bg) text-(--danger) border border-(--border) transition disabled:opacity-60"
+                        >
+                          <span className="flex items-center gap-1">
+                            <ShieldX className="w-4 h-4" /> Reject
+                          </span>
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -250,10 +270,10 @@ export default function AdminProviderVerificationPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           <div className="w-full max-w-md rounded-2xl border border-(--border) bg-(--primary) p-6 shadow-sm">
             <h2 className="text-xl font-semibold text-(--text)">
-              Confirm {confirmation.status === "verified" ? "approval" : "rejection"}
+              Confirm {confirmation.status === "verified" ? "approval" : confirmation.status === "rejected" ? "rejection" : "pending"}
             </h2>
             <p className="mt-3 text-sm text-(--muted)">
-              Are you sure you want to {confirmation.status === "verified" ? "approve" : "reject"}{" "}
+              Are you sure you want to {confirmation.status === "verified" ? "approve" : confirmation.status === "rejected" ? "reject" : "mark as pending"}{" "}
               {confirmation.providerName}?
             </p>
 

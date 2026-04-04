@@ -3,6 +3,7 @@ import { Mail, Lock, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../store/authStore";
+import { isServiceProviderProfileComplete } from "../../utils/serviceProviderProfile";
 
 function LoginForm() {
   const [loginEmail, setLoginEmail] = useState("");
@@ -25,7 +26,24 @@ function LoginForm() {
     try {
       setLoading(true);
       const response = await login(loginEmail, loginPassword);
-      if (response?.success == "Login Successful") navigate("/");
+      const loggedInUser = response?.user;
+
+      if (!loggedInUser) return;
+
+      if (loggedInUser.role === "admin") {
+        navigate("/admin/dashboard", { replace: true });
+        return;
+      }
+
+      if (loggedInUser.role === "serviceProvider") {
+        const providerPath = isServiceProviderProfileComplete(loggedInUser)
+          ? "/serviceprovider/dashboard"
+          : "/serviceprovider/complete-profile";
+        navigate(providerPath, { replace: true });
+        return;
+      }
+
+      navigate("/user/dashboard", { replace: true });
     } catch (err: any) {
       const message =
         err.response?.data?.message || err.message || "Login failed";

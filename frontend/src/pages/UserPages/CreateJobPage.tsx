@@ -6,11 +6,13 @@ import { AiApi, JobApi } from "../../api/Apis";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { CITIES, LOCATION_OPTIONS } from "../../utils/nepalLocations";
+import { useNavigate } from "react-router-dom";
 
 const MAX_IMAGE_SIZE_BYTES = 2 * 1024 * 1024;
 
 export default function CreateJobPage() {
   const { user } = useAuthStore();
+  const navigate = useNavigate();
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -148,6 +150,8 @@ export default function CreateJobPage() {
       setPostType("now");
       setScheduledFor("");
       setImages([]);
+
+      navigate("/user/jobs", { replace: true });
     } catch (error) {
       console.log(error);
       toast.error("Error creating job");

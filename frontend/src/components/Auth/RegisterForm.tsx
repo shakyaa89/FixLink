@@ -126,7 +126,7 @@ function RegisterForm() {
       setAddressUrl("");
       setAgreeToTerms(false);
 
-      navigate("/");
+      navigate("/auth", { replace: true });
     } catch (err: any) {
       const message =
         err.response?.data?.message || err.message || "Registration failed";

@@ -18,6 +18,7 @@ import toast from "react-hot-toast";
 export default function DisputesPage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [showDisputeForm, setShowDisputeForm] = useState(false);
   const [disputes, setDisputes] = useState<DisputeData[]>([]);
   const [jobs, setJobs] = useState<DisputableJobData[]>([]);
   const [jobId, setJobId] = useState("");
@@ -94,6 +95,7 @@ export default function DisputesPage() {
       setDescription("");
       setPriority("medium");
       setJobId("");
+      setShowDisputeForm(false);
       fetchDisputeData();
     } catch (error: any) {
       const message =
@@ -188,13 +190,29 @@ export default function DisputesPage() {
           </div>
 
           <div className="mb-8 bg-(--primary) rounded-2xl p-6 shadow-sm border border-(--border)">
-            <h2 className="text-2xl font-bold text-(--text) mb-4">
-              New Dispute
-            </h2>
-            <form
-              onSubmit={handleCreateDispute}
-              className="grid grid-cols-1 md:grid-cols-2 gap-4"
-            >
+            <div className="flex items-center justify-between gap-4 mb-4">
+              <h2 className="text-2xl font-bold text-(--text)">New Dispute</h2>
+              <button
+                type="button"
+                onClick={() => setShowDisputeForm((prev) => !prev)}
+                disabled={loading || jobs.length === 0}
+                className="px-4 py-2 rounded-lg font-medium bg-(--accent) text-(--primary) hover:bg-(--accent-hover) transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {showDisputeForm ? "Hide Form" : "Raise Dispute"}
+              </button>
+            </div>
+
+            {!showDisputeForm && (
+              <p className="text-sm text-(--muted)">
+                Click "Raise Dispute" to open the form.
+              </p>
+            )}
+
+            {showDisputeForm && (
+              <form
+                onSubmit={handleCreateDispute}
+                className="grid grid-cols-1 md:grid-cols-2 gap-4"
+              >
               <div className="md:col-span-2">
                 <label className="block text-sm text-(--muted) mb-2">Job</label>
                 <select
@@ -254,7 +272,15 @@ export default function DisputesPage() {
                 />
               </div>
 
-              <div className="md:col-span-2 flex justify-end">
+              <div className="md:col-span-2 flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowDisputeForm(false)}
+                  disabled={submitting}
+                  className="px-4 py-2 rounded-lg font-medium bg-(--secondary) text-(--text) border border-(--border) disabled:opacity-50"
+                >
+                  Cancel
+                </button>
                 <button
                   type="submit"
                   disabled={submitting || loading || jobs.length === 0}
@@ -271,6 +297,7 @@ export default function DisputesPage() {
                 </button>
               </div>
             </form>
+            )}
           </div>
 
           {/* Disputes List */}
@@ -308,6 +335,17 @@ export default function DisputesPage() {
                               {dispute.description ||
                                 "No description provided."}
                             </p>
+                            {dispute.status === "resolved" &&
+                              dispute.resolutionMessage?.trim() && (
+                                <div className="mt-3 rounded-lg border border-(--border) bg-(--success-bg) px-3 py-2">
+                                  <p className="text-xs font-semibold text-(--success)">
+                                    Resolution message
+                                  </p>
+                                  <p className="text-sm text-(--text) mt-1">
+                                    {dispute.resolutionMessage}
+                                  </p>
+                                </div>
+                              )}
                             <p className="text-xs text-(--muted) mt-2">
                               Job: {resolveJobLabel(dispute)}
                             </p>

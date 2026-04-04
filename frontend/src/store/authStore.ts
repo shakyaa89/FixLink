@@ -25,15 +25,17 @@ export const useAuthStore = create<AuthState>((set) => ({
       localStorage.setItem("jwtToken", res.data.token);
       set({ user: res.data.user });
       toast.success(res?.data?.message);
-      const success = { message: "Login successful" };
-      return success;
+      return res.data;
     } catch (error: any) {
       if (error.response?.data?.message) {
         toast.error(error.response.data.message);
       } else if (error.request) {
         toast.error("Unable to reach server. Please try again later.");
+      } else {
+        toast.error(error.message || "Login failed");
       }
       set({ user: null });
+      throw error;
     } finally {
       set({ loading: false });
     }

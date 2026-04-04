@@ -23,6 +23,12 @@ export default function AdminDisputesPage() {
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
+  const [resolveTarget, setResolveTarget] = useState<{
+    id: string;
+    title: string;
+    message: string;
+  } | null>(null);
+  const [resolveError, setResolveError] = useState<string | null>(null);
 
   const formatDate = (value?: string) => {
     if (!value) return "-";
@@ -118,6 +124,39 @@ export default function AdminDisputesPage() {
     setDeleteTarget({ id: disputeId, title });
   };
 
+  const handleResolveDispute = (disputeId: string, title: string) => {
+    setResolveError(null);
+    setResolveTarget({ id: disputeId, title, message: "" });
+  };
+
+  const confirmResolveDispute = async () => {
+    if (!resolveTarget) {
+      return;
+    }
+
+    const message = resolveTarget.message.trim();
+    if (!message) {
+      setResolveError("Please enter a resolution message.");
+      return;
+    }
+
+    try {
+      setUpdatingId(resolveTarget.id);
+      setError(null);
+      await AdminApi.updateDispute(resolveTarget.id, {
+        status: "resolved",
+        resolutionMessage: message,
+      });
+      setResolveTarget(null);
+      await fetchDisputes();
+    } catch (err) {
+      console.error("Failed to resolve dispute", err);
+      setError("Unable to resolve dispute.");
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
   const confirmDeleteDispute = async () => {
     if (!deleteTarget) {
       return;
@@ -208,7 +247,7 @@ export default function AdminDisputesPage() {
                   {disputes.map((dispute) => (
                     <div
                       key={dispute._id}
-                      className="grid grid-cols-1 lg:grid-cols-6 gap-4 px-6 py-4 items-center"
+                      className="grid grid-cols-1 lg:grid-cols-7 gap-4 px-6 py-4 items-center"
                     >
                       <div className="lg:col-span-2">
                         <p className="text-(--text) font-semibold">
@@ -226,9 +265,11 @@ export default function AdminDisputesPage() {
                           disabled={!dispute._id || updatingId === dispute._id}
                           onChange={(event) =>
                             dispute._id &&
-                            handleDisputeUpdate(dispute._id, {
-                              status: event.target.value as "open" | "resolved",
-                            })
+                            (event.target.value === "resolved"
+                              ? handleResolveDispute(dispute._id, dispute.title)
+                              : handleDisputeUpdate(dispute._id, {
+                                  status: "open",
+                                }))
                           }
                           className="text-xs font-semibold px-3 py-2 rounded-lg bg-(--secondary) text-(--muted) border border-(--border) capitalize"
                         >
@@ -258,18 +299,32 @@ export default function AdminDisputesPage() {
                           {dispute.updatedLabel}
                         </p>
                       </div>
-                      <div className="flex flex-wrap items-center gap-2">
-                        <button
-                          type="button"
-                          disabled={!dispute._id || updatingId === dispute._id}
-                          onClick={() =>
-                            dispute._id &&
-                            handleDisputeUpdate(dispute._id, { status: "resolved" })
-                          }
-                          className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-(--success-bg) text-(--success) border border-(--border) transition disabled:opacity-60"
-                        >
-                          Resolve
-                        </button>
+                      <div className="flex flex-wrap items-center gap-2 lg:justify-end">
+                        {dispute.status === "resolved" ? (
+                          <button
+                            type="button"
+                            disabled={!dispute._id || updatingId === dispute._id}
+                            onClick={() =>
+                              dispute._id &&
+                              handleDisputeUpdate(dispute._id, { status: "open" })
+                            }
+                            className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-(--secondary) text-(--text) border border-(--border) transition disabled:opacity-60"
+                          >
+                            Open
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            disabled={!dispute._id || updatingId === dispute._id}
+                            onClick={() =>
+                              dispute._id &&
+                              handleResolveDispute(dispute._id, dispute.title)
+                            }
+                            className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-(--success-bg) text-(--success) border border-(--border) transition disabled:opacity-60"
+                          >
+                            Resolve
+                          </button>
+                        )}
                         <button
                           type="button"
                           disabled={!dispute._id || deletingId === dispute._id}
@@ -320,6 +375,68 @@ export default function AdminDisputesPage() {
                 className="px-4 py-2 text-sm font-semibold rounded-lg bg-(--danger-bg) text-(--danger) border border-(--border) disabled:opacity-60"
               >
                 {deletingId === deleteTarget.id ? "Processing..." : "Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {resolveTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+          <button
+            type="button"
+            aria-label="Close modal"
+            onClick={() => {
+              setResolveTarget(null);
+              setResolveError(null);
+            }}
+            className="absolute inset-0 bg-black/50"
+          />
+          <div className="relative w-full max-w-lg rounded-2xl border border-(--border) bg-(--primary) p-6 shadow-2xl">
+            <h3 className="text-xl font-semibold text-(--text)">Resolve Dispute</h3>
+            <p className="mt-2 text-sm text-(--muted)">
+              Add a resolution message for "{resolveTarget.title}".
+            </p>
+
+            <div className="mt-4">
+              <label className="block text-sm font-medium text-(--text) mb-2">
+                Resolution message
+              </label>
+              <textarea
+                rows={4}
+                value={resolveTarget.message}
+                onChange={(event) =>
+                  setResolveTarget((prev) =>
+                    prev ? { ...prev, message: event.target.value } : prev,
+                  )
+                }
+                className="w-full border border-(--border) rounded-lg px-3 py-2 bg-(--primary) text-(--text)"
+                placeholder="Explain how the dispute was resolved"
+              />
+              {resolveError && (
+                <p className="text-sm text-(--danger) mt-2">{resolveError}</p>
+              )}
+            </div>
+
+            <div className="mt-6 flex items-center justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setResolveTarget(null);
+                  setResolveError(null);
+                }}
+                disabled={updatingId === resolveTarget.id}
+                className="px-4 py-2 text-sm font-medium rounded-lg bg-(--secondary) text-(--text) border border-(--border) disabled:opacity-60"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmResolveDispute}
+                disabled={updatingId === resolveTarget.id}
+                className="px-4 py-2 text-sm font-semibold rounded-lg bg-(--accent) text-(--primary) border border-(--border) disabled:opacity-60"
+              >
+                {updatingId === resolveTarget.id ? "Processing..." : "Confirm Resolve"}
               </button>
             </div>
           </div>

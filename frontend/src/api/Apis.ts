@@ -135,6 +135,7 @@ export interface AdminDisputeData {
   jobId?: { _id?: string; title?: string } | string;
   status?: string;
   priority?: string;
+  resolutionMessage?: string;
   updatedAt?: string;
 }
 
@@ -188,6 +189,7 @@ export interface DisputeData {
   description?: string;
   status?: "open" | "resolved";
   priority?: "low" | "medium" | "high";
+  resolutionMessage?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -394,6 +396,7 @@ export const AdminApi = {
       description: string;
       status: "open" | "resolved";
       priority: "low" | "medium" | "high";
+      resolutionMessage: string;
     }>
   ) => Api.put(`/admin/disputes/${disputeId}`, data, { headers: getAuthHeader() }),
 
@@ -423,7 +426,7 @@ export const AdminApi = {
 
   updateServiceProviderVerification: (
     providerId: string,
-    status: string,
+    status: "pending" | "verified" | "rejected",
     rejectionReason?: string,
   ) =>
     Api.put(
