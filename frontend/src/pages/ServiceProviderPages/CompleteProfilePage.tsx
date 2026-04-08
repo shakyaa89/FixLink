@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { MapPin, Upload, Loader2, Link2, FileText } from "lucide-react";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { AiApi, AuthApi } from "../../api/Apis";
@@ -108,9 +108,11 @@ export default function CompleteProfilePage() {
       }
 
       navigate("/serviceprovider/dashboard");
-    } catch (err: any) {
+    } catch (err: unknown) {
       const message =
-        err.response?.data?.message || err.message || "Update failed";
+        err instanceof AxiosError
+          ? err.response?.data?.message || err.message || "Update failed"
+          : "Update failed";
       toast.error(message);
     } finally {
       setLoading(false);

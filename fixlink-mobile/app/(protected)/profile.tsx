@@ -30,6 +30,7 @@ import { AuthApi } from "@/api/Apis";
 import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
 import { Picker } from "@react-native-picker/picker";
+import { isServiceProviderProfileComplete } from "@/utils/serviceProviderProfile";
 
 const CITIES = ["Kathmandu", "Lalitpur", "Bhaktapur"];
 const MAX_IMAGE_SIZE_BYTES = 2 * 1024 * 1024;
@@ -72,6 +73,15 @@ export default function ProfileScreen() {
       ? `${user.ratingAverage.toFixed(1)} / 5.0`
       : "Not available";
   const verificationStatus = user?.verificationStatus || "Not verified";
+  const profileComplete = isServiceProviderProfileComplete(user);
+  const normalizedVerification =
+    verificationStatus === "verified"
+      ? "Verified"
+      : verificationStatus === "rejected"
+        ? "Rejected"
+        : verificationStatus === "pending"
+          ? "Pending"
+          : "Not verified";
   let roleLabel = role;
   if (role === "serviceProvider") roleLabel = "Service Provider";
   if (role === "admin") roleLabel = "Admin";
@@ -418,6 +428,26 @@ export default function ProfileScreen() {
               <View className="bg-secondary border border-border rounded-2xl px-4 py-3.5">
                 <View className="flex-row items-center gap-2 mb-1.5">
                   <BadgeCheck size={16} color={colors.muted} />
+                  <Text className="text-xs text-muted font-medium">Profile Completion</Text>
+                </View>
+                <Text className="text-base text-text font-semibold">
+                  {profileComplete ? "Complete" : "Incomplete"}
+                </Text>
+                {!profileComplete && (
+                  <Pressable
+                    className="mt-3 bg-accent rounded-xl py-2.5 items-center"
+                    onPress={() => router.push("/service-provider/complete-profile")}
+                  >
+                    <Text className="text-white text-sm font-semibold">Complete Profile</Text>
+                  </Pressable>
+                )}
+              </View>
+            )}
+
+            {role === "serviceProvider" && (
+              <View className="bg-secondary border border-border rounded-2xl px-4 py-3.5">
+                <View className="flex-row items-center gap-2 mb-1.5">
+                  <BadgeCheck size={16} color={colors.muted} />
                   <Text className="text-xs text-muted font-medium">Service Category</Text>
                 </View>
                 <Text className="text-base text-text font-semibold">{providerCategory}</Text>
@@ -439,7 +469,10 @@ export default function ProfileScreen() {
                 <BadgeCheck size={16} color={colors.muted} />
                 <Text className="text-xs text-muted font-medium">Verification Status</Text>
               </View>
-              <Text className="text-base text-text font-semibold">{verificationStatus}</Text>
+              <Text className="text-base text-text font-semibold">{normalizedVerification}</Text>
+              {user?.verificationStatus === "rejected" && Boolean(user?.rejectionReason) && (
+                <Text className="text-sm text-muted mt-2">{user?.rejectionReason}</Text>
+              )}
             </View>
 
             <Pressable

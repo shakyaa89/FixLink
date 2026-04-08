@@ -260,7 +260,7 @@ export default function UserRegister() {
                 <Phone size={20} color={colors.muted} />
                 <TextInput
                   className="flex-1 text-text text-base"
-                  placeholder="(555) 123-4567"
+                  placeholder="9832132421"
                   placeholderTextColor={colors.muted}
                   keyboardType="phone-pad"
                   value={phoneNumber}
@@ -426,19 +426,6 @@ export default function UserRegister() {
               ) : (
                 <Text className="text-white text-base font-bold">Create Account</Text>
               )}
-            </Pressable>
-
-            <View className="flex-row items-center gap-3">
-              <View className="flex-1 h-px bg-border" />
-              <Text className="text-sm text-muted">or</Text>
-              <View className="flex-1 h-px bg-border" />
-            </View>
-
-            <Pressable
-              className="border border-border rounded-xl py-4 items-center bg-secondary active:bg-border/20"
-              onPress={() => { }}
-            >
-              <Text className="text-text text-base font-semibold">Continue with Google</Text>
             </Pressable>
           </View>
 

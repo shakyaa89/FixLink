@@ -18,7 +18,6 @@ import {
     ArrowLeft,
     User,
     Phone,
-    MapPin,
     Upload,
 } from "lucide-react-native";
 import { Picker } from "@react-native-picker/picker";
@@ -29,15 +28,6 @@ import Toast from "react-native-toast-message";
 import { AuthApi } from "@/api/Apis";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useAuthStore } from "@/store/authStore";
-
-const PROVIDER_CATEGORIES = [
-    "Plumbing",
-    "Electrical",
-    "Carpentry",
-    "Painting",
-    "Landscaping",
-    "General Repairs",
-];
 
 const CITIES = ["Kathmandu", "Lalitpur", "Bhaktapur"];
 const MAX_IMAGE_SIZE_BYTES = 2 * 1024 * 1024;
@@ -58,12 +48,6 @@ export default function ServiceProviderRegistration() {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [profilePicture, setProfilePicture] = useState<ImagePicker.ImagePickerAsset | null>(null);
-
-    const [providerCategory, setProviderCategory] = useState("");
-    const [address, setAddress] = useState("");
-
-    const [verificationProofFile, setVerificationProofFile] = useState<ImagePicker.ImagePickerAsset | null>(null);
-    const [idProofFile, setIdProofFile] = useState<ImagePicker.ImagePickerAsset | null>(null);
 
     const pickImage = async (
         setImage: (img: ImagePicker.ImagePickerAsset | null) => void
@@ -127,11 +111,7 @@ export default function ServiceProviderRegistration() {
             !city ||
             !password ||
             !confirmPassword ||
-            !address ||
-            !providerCategory ||
-            !profilePicture ||
-            !verificationProofFile ||
-            !idProofFile
+            !profilePicture
         ) {
             Toast.show({ type: "error", text1: "Please fill in all required fields" });
             return;
@@ -151,11 +131,7 @@ export default function ServiceProviderRegistration() {
             setLoading(true);
             setUploading(true);
 
-            const [profileUrl, verificationProofURL, idURL] = await Promise.all([
-                uploadToCloudinary(profilePicture),
-                uploadToCloudinary(verificationProofFile),
-                uploadToCloudinary(idProofFile),
-            ]);
+            const profileUrl = await uploadToCloudinary(profilePicture);
 
             const response = await AuthApi.registerApi({
                 fullName,
@@ -164,11 +140,7 @@ export default function ServiceProviderRegistration() {
                 city,
                 password,
                 role: "serviceProvider",
-                address,
                 profilePicture: profileUrl,
-                verificationProofURL,
-                providerCategory,
-                idURL,
             });
 
             await AsyncStorage.setItem("jwtToken", response.data.token);
@@ -186,10 +158,6 @@ export default function ServiceProviderRegistration() {
             setPassword("");
             setConfirmPassword("");
             setProfilePicture(null);
-            setProviderCategory("");
-            setAddress("");
-            setVerificationProofFile(null);
-            setIdProofFile(null);
             setAgreeToTerms(false);
 
             router.replace("/");
@@ -268,7 +236,7 @@ export default function ServiceProviderRegistration() {
                                 <Phone size={20} color={colors.muted} />
                                 <TextInput
                                     className="flex-1 text-text text-base"
-                                    placeholder="(555) 123-4567"
+                                    placeholder="984444231"
                                     placeholderTextColor={colors.muted}
                                     keyboardType="phone-pad"
                                     value={phoneNumber}
@@ -289,23 +257,6 @@ export default function ServiceProviderRegistration() {
                                     <Picker.Item label="Select city" value="" color={colors.muted} />
                                     {CITIES.map((cityOption) => (
                                         <Picker.Item key={cityOption} label={cityOption} value={cityOption} />
-                                    ))}
-                                </Picker>
-                            </View>
-                        </View>
-
-                        <View className="gap-2">
-                            <Text className="text-sm font-medium text-text">Provider category</Text>
-                            <View className="border border-border rounded-xl px-1 bg-secondary">
-                                <Picker
-                                    selectedValue={providerCategory}
-                                    onValueChange={(itemValue) => setProviderCategory(itemValue)}
-                                    style={{ color: colors.text }}
-                                    dropdownIconColor={colors.muted}
-                                >
-                                    <Picker.Item label="Select category" value="" color={colors.muted} />
-                                    {PROVIDER_CATEGORIES.map((category) => (
-                                        <Picker.Item key={category} label={category} value={category} />
                                     ))}
                                 </Picker>
                             </View>
@@ -379,65 +330,6 @@ export default function ServiceProviderRegistration() {
                                 </View>
                             ) : null}
                         </View>
-
-                        <View className="gap-2">
-                            <Text className="text-sm font-medium text-text">Address</Text>
-                            <View className="border border-border rounded-xl px-4 py-3 flex-row items-center gap-3 bg-secondary">
-                                <MapPin size={20} color={colors.muted} />
-                                <TextInput
-                                    className="flex-1 text-text text-base"
-                                    placeholder="Enter your address"
-                                    placeholderTextColor={colors.muted}
-                                    value={address}
-                                    onChangeText={setAddress}
-                                />
-                            </View>
-                        </View>
-
-
-                        <View className="gap-2">
-                            <Text className="text-sm font-medium text-text">Verification proof</Text>
-                            <Pressable
-                                onPress={() => pickImage(setVerificationProofFile)}
-                                className="border border-dashed border-border rounded-xl p-4 bg-secondary flex-row items-center justify-center gap-2"
-                            >
-                                <Upload size={18} color={colors.muted} />
-                                <Text className="text-text font-medium">Upload verification proof</Text>
-                            </Pressable>
-                            {verificationProofFile?.uri ? (
-                                <View className="flex-row items-center gap-3 mt-2">
-                                    <Image
-                                        source={{ uri: verificationProofFile.uri }}
-                                        style={{ width: 44, height: 44, borderRadius: 8 }}
-                                    />
-                                    <Text className="text-sm text-muted flex-1" numberOfLines={1}>
-                                        {verificationProofFile.fileName || "Selected proof"}
-                                    </Text>
-                                </View>
-                            ) : null}
-                        </View>
-
-                        <View className="gap-2">
-                            <Text className="text-sm font-medium text-text">Service License or Other Document</Text>
-                            <Pressable
-                                onPress={() => pickImage(setIdProofFile)}
-                                className="border border-dashed border-border rounded-xl p-4 bg-secondary flex-row items-center justify-center gap-2"
-                            >
-                                <Upload size={18} color={colors.muted} />
-                                <Text className="text-text font-medium">Upload ID proof</Text>
-                            </Pressable>
-                            {idProofFile?.uri ? (
-                                <View className="flex-row items-center gap-3 mt-2">
-                                    <Image
-                                        source={{ uri: idProofFile.uri }}
-                                        style={{ width: 44, height: 44, borderRadius: 8 }}
-                                    />
-                                    <Text className="text-sm text-muted flex-1" numberOfLines={1}>
-                                        {idProofFile.fileName || "Selected ID"}
-                                    </Text>
-                                </View>
-                            ) : null}
-                        </View>
                     </View>
 
                     {/* Terms */}
@@ -476,18 +368,6 @@ export default function ServiceProviderRegistration() {
                             )}
                         </Pressable>
 
-                        <View className="flex-row items-center gap-3">
-                            <View className="flex-1 h-px bg-border" />
-                            <Text className="text-sm text-muted">or</Text>
-                            <View className="flex-1 h-px bg-border" />
-                        </View>
-
-                        <Pressable
-                            className="border border-border rounded-xl py-4 items-center bg-secondary active:bg-border/20"
-                            onPress={() => { }}
-                        >
-                            <Text className="text-text text-base font-semibold">Continue with Google</Text>
-                        </Pressable>
                     </View>
 
                     {/* Footer */}

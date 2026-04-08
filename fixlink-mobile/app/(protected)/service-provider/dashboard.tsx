@@ -10,6 +10,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import {
+  AlertCircle,
   BriefcaseBusiness,
   CheckCircle2,
   Clock3,
@@ -71,6 +72,19 @@ export default function ProviderDashboard() {
     return { total, available, inProgress, completed };
   }, [jobs]);
 
+  const verificationStatus = (user?.verificationStatus || "pending") as
+    | "pending"
+    | "verified"
+    | "rejected"
+    | "";
+
+  const statusLabel =
+    verificationStatus === "verified"
+      ? "Verified"
+      : verificationStatus === "rejected"
+        ? "Rejected"
+        : "Pending Review";
+
   return (
     <SafeAreaView className="flex-1 bg-primary">
       <ScrollView
@@ -91,6 +105,17 @@ export default function ProviderDashboard() {
             <Text className="text-sm text-muted mt-1">
               Browse and manage jobs in {user?.providerCategory || "your category"}
             </Text>
+          </View>
+
+          <View className="bg-secondary border border-border rounded-2xl p-4">
+            <View className="flex-row items-center gap-2">
+              <AlertCircle size={16} color={colors.muted} />
+              <Text className="text-xs text-muted">Verification Status</Text>
+            </View>
+            <Text className="text-base font-semibold text-text mt-1">{statusLabel}</Text>
+            {verificationStatus === "rejected" && Boolean(user?.rejectionReason) && (
+              <Text className="text-sm text-muted mt-2">{user?.rejectionReason}</Text>
+            )}
           </View>
 
           <View className="flex-row gap-3">

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2, Star } from "lucide-react";
 import AdminSidebar from "../../components/AdminSidebar/AdminSidebar";
 import { AdminApi, type AdminReviewData } from "../../api/Apis";
 
@@ -127,20 +127,26 @@ export default function AdminReviewsPage() {
                       <p className="text-sm text-(--text)">{resolveLabel(review.revieweeId)}</p>
                     </div>
                     <div>
-                      <select
-                        value={String(review.rating || 1)}
-                        disabled={!review._id || updatingId === review._id}
-                        onChange={(event) =>
-                          review._id && handleRatingUpdate(review._id, Number(event.target.value))
-                        }
-                        className="w-full text-xs font-semibold px-3 py-2 rounded-lg bg-(--secondary) text-(--muted) border border-(--border)"
-                      >
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                      </select>
+                      <div className="flex items-center gap-1">
+                        {[1, 2, 3, 4, 5].map((value) => {
+                          const active = value <= (review.rating || 1);
+                          return (
+                            <button
+                              key={value}
+                              type="button"
+                              disabled={!review._id || updatingId === review._id}
+                              onClick={() => review._id && handleRatingUpdate(review._id, value)}
+                              aria-label={`Set rating to ${value}`}
+                              className="p-1 rounded-md disabled:opacity-60"
+                            >
+                              <Star
+                                className={`w-5 h-5 ${active ? "text-yellow-500" : "text-(--border)"}`}
+                                fill={active ? "currentColor" : "none"}
+                              />
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
                     <div className="lg:col-span-2">
                       <p className="text-xs text-(--muted)">Comment</p>

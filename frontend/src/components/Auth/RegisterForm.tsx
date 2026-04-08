@@ -8,7 +8,7 @@ import {
   Link2,
   Loader2,
 } from "lucide-react";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { AuthApi } from "../../api/Apis";
@@ -127,9 +127,11 @@ function RegisterForm() {
       setAgreeToTerms(false);
 
       navigate("/auth", { replace: true });
-    } catch (err: any) {
+    } catch (err: unknown) {
       const message =
-        err.response?.data?.message || err.message || "Registration failed";
+        err instanceof AxiosError
+          ? err.response?.data?.message || err.message || "Registration failed"
+          : "Registration failed";
       toast.error(message);
     } finally {
       setLoading(false);

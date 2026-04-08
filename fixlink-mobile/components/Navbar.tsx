@@ -3,6 +3,7 @@ import { Home, User, BriefcaseBusiness, MessageCircle, Bot } from "lucide-react-
 import colors from "../app/_constants/theme";
 import { usePathname, useRouter } from "expo-router";
 import { useAuthStore } from "@/store/authStore";
+import { isServiceProviderProfileComplete } from "@/utils/serviceProviderProfile";
 
 
 export default function NavBar() {
@@ -28,7 +29,11 @@ export default function NavBar() {
         }
 
         if (user?.role === "serviceProvider") {
-            navigateIfNeeded("/service-provider/dashboard", ["/(protected)/service-provider/dashboard"]);
+            const isProviderComplete = isServiceProviderProfileComplete(user);
+            navigateIfNeeded(
+                isProviderComplete ? "/service-provider/dashboard" : "/service-provider/complete-profile",
+                ["/(protected)/service-provider/dashboard", "/(protected)/service-provider/complete-profile"]
+            );
             return;
         }
 

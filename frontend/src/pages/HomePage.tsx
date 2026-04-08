@@ -24,46 +24,58 @@ export default function HomePage() {
 
   const services = [
     {
-      icon: Droplets,
       title: "Plumbing",
       description:
         "Expert plumbing solutions for your home. From repairs to installations.",
       color: "bg-blue-500",
     },
     {
-      icon: Zap,
       title: "Electrical",
       description:
         "Safe and reliable electrical services by certified professionals.",
       color: "bg-yellow-500",
     },
     {
-      icon: Hammer,
       title: "Carpentry",
       description: "Custom carpentry and woodwork for any renovation project.",
       color: "bg-orange-500",
     },
     {
-      icon: Paintbrush,
       title: "Painting",
       description:
         "Interior and exterior painting with premium quality finishes.",
       color: "bg-purple-500",
     },
     {
-      icon: TreePine,
       title: "Landscaping",
       description:
         "Transform your outdoor space with professional landscaping.",
       color: "bg-green-500",
     },
     {
-      icon: Wrench,
       title: "General Repairs",
       description: "Quick fixes and maintenance for all your home needs.",
       color: "bg-red-500",
     },
   ];
+
+  const renderServiceIcon = (title: string) => {
+    switch (title) {
+      case "Plumbing":
+        return <Droplets className="w-8 h-8 text-(--primary)" />;
+      case "Electrical":
+        return <Zap className="w-8 h-8 text-(--primary)" />;
+      case "Carpentry":
+        return <Hammer className="w-8 h-8 text-(--primary)" />;
+      case "Painting":
+        return <Paintbrush className="w-8 h-8 text-(--primary)" />;
+      case "Landscaping":
+        return <TreePine className="w-8 h-8 text-(--primary)" />;
+      case "General Repairs":
+      default:
+        return <Wrench className="w-8 h-8 text-(--primary)" />;
+    }
+  };
 
   const features = [
     "Verified & Trusted Professionals",
@@ -262,7 +274,6 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {services.map((service, index) => {
-              const Icon = service.icon as any;
               return (
                 <div
                   key={index}
@@ -271,7 +282,7 @@ export default function HomePage() {
                   <div
                     className={`inline-block p-4 rounded-full ${service.color} mb-4 group-hover:scale-110 transition`}
                   >
-                    <Icon className="w-8 h-8 text-(--primary)" />
+                    {renderServiceIcon(service.title)}
                   </div>
                   <h3 className="text-xl font-semibold text-(--text) mb-2">
                     {service.title}

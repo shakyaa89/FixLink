@@ -14,12 +14,14 @@ import {
   Mail,
   Phone,
   Check,
+  Star,
   AlertCircle,
   ArrowLeft,
   ExternalLink,
   ShieldCheck,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { AxiosError } from "axios";
 
 export default function JobDetailsPage() {
   const [loading, setLoading] = useState(true);
@@ -70,9 +72,13 @@ export default function JobDetailsPage() {
       toast.success(response?.data?.message);
 
       fetchJob();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error cancelling job:", error);
-      toast.error(error?.data?.message || "Error cancelling the job");
+      const message =
+        error instanceof AxiosError
+          ? error.response?.data?.message || error.message || "Error cancelling the job"
+          : "Error cancelling the job";
+      toast.error(message);
     }
 
     setShowCancelDialog(false);
@@ -89,6 +95,8 @@ export default function JobDetailsPage() {
       toast.success(response?.data?.message);
 
       fetchJob();
+      setShowOfferAcceptDialog(false);
+      setAcceptOfferId("");
     } catch (error) {
       console.error("Error accepting offer:", error);
       toast.error("Failed to accept offer. Please try again.");
@@ -111,15 +119,42 @@ export default function JobDetailsPage() {
         comment: reviewComment,
       });
       toast.success("Review submitted.");
-    } catch (error: any) {
+    } catch (error: unknown) {
       const message =
-        error?.response?.data?.message || "Failed to submit review.";
+        error instanceof AxiosError
+          ? error.response?.data?.message || error.message || "Failed to submit review."
+          : "Failed to submit review.";
       if (message === "Review already submitted") {
+        toast.error("Review already submitted!")
       }
       toast.error(message);
     } finally {
       setReviewSubmitting(false);
     }
+  };
+
+  const renderReviewStars = (rating: number) => {
+    return (
+      <div className="flex items-center gap-2">
+        {[1, 2, 3, 4, 5].map((value) => {
+          const active = value <= rating;
+          return (
+            <button
+              key={value}
+              type="button"
+              onClick={() => setReviewRating(value)}
+              aria-label={`Rate ${value} star${value > 1 ? "s" : ""}`}
+              className="p-1 rounded-md transition hover:scale-105"
+            >
+              <Star
+                className={`w-7 h-7 ${active ? "text-yellow-500" : "text-(--border)"}`}
+                fill={active ? "currentColor" : "none"}
+              />
+            </button>
+          );
+        })}
+      </div>
+    );
   };
 
   useEffect(() => {
@@ -495,45 +530,6 @@ export default function JobDetailsPage() {
                             <Check className="w-4 h-4" />
                             Accept Offer
                           </button>
-
-                          {showOfferAcceptDialog && (
-                            <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-                              <div className="bg-(--primary) rounded-xl max-w-md w-full p-6 shadow-xl">
-                                <div className="flex items-start gap-4 mb-4">
-                                  <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center shrink-0">
-                                    <AlertCircle className="w-6 h-6 text-red-600" />
-                                  </div>
-                                  <div>
-                                    <h3 className="text-lg font-bold text-(--text) mb-1">
-                                      Accept this offer?
-                                    </h3>
-                                    <p className="text-sm text-(--muted)">
-                                      Are you sure you want to accept this
-                                      offer? This action cannot be undone.
-                                    </p>
-                                  </div>
-                                </div>
-                                <div className="flex gap-3 justify-end">
-                                  <button
-                                    onClick={() =>
-                                      setShowOfferAcceptDialog(false)
-                                    }
-                                    className="px-4 py-2 border border-(--border) text-(--text) rounded-lg hover:bg-(--secondary) transition"
-                                  >
-                                    Cancel
-                                  </button>
-                                  <button
-                                    onClick={() =>
-                                      handleOfferAccept(acceptOfferId)
-                                    }
-                                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
-                                  >
-                                    Yes, Accept offer
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-                          )}
                         </div>
                       );
                     })}
@@ -615,18 +611,10 @@ export default function JobDetailsPage() {
                   <label className="block text-sm font-medium text-(--text) mb-2">
                     Rating
                   </label>
-                  <select
-                    value={reviewRating}
-                    onChange={(e) => setReviewRating(Number(e.target.value))}
-                    className="w-full border border-(--border) rounded-lg px-3 py-2 bg-(--primary) text-(--text)"
-                  >
-                    <option value={0}>Select rating</option>
-                    {[1, 2, 3, 4, 5].map((value) => (
-                      <option key={value} value={value}>
-                        {value}
-                      </option>
-                    ))}
-                  </select>
+                  {renderReviewStars(reviewRating)}
+                  <p className="text-xs text-(--muted) mt-2">
+                    {reviewRating > 0 ? `${reviewRating} / 5 selected` : "Select a rating"}
+                  </p>
                 </div>
 
                 <div>
@@ -727,6 +715,45 @@ export default function JobDetailsPage() {
                 className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
               >
                 Yes, Cancel Job
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Offer Accept Dialog */}
+      {showOfferAcceptDialog && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-(--primary) rounded-xl max-w-md w-full p-6 shadow-xl">
+            <div className="flex items-start gap-4 mb-4">
+              <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center shrink-0">
+                <AlertCircle className="w-6 h-6 text-red-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-(--text) mb-1">
+                  Accept this offer?
+                </h3>
+                <p className="text-sm text-(--muted)">
+                  Are you sure you want to accept this offer? This action
+                  cannot be undone.
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => {
+                  setShowOfferAcceptDialog(false);
+                  setAcceptOfferId("");
+                }}
+                className="px-4 py-2 border border-(--border) text-(--text) rounded-lg hover:bg-(--secondary) transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleOfferAccept(acceptOfferId)}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+              >
+                Yes, Accept offer
               </button>
             </div>
           </div>

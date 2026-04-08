@@ -14,6 +14,7 @@ import {
   type DisputeData,
 } from "../../api/Apis";
 import toast from "react-hot-toast";
+import { AxiosError } from "axios";
 
 export default function DisputesPage() {
   const [loading, setLoading] = useState(true);
@@ -97,9 +98,11 @@ export default function DisputesPage() {
       setJobId("");
       setShowDisputeForm(false);
       fetchDisputeData();
-    } catch (error: any) {
+    } catch (error: unknown) {
       const message =
-        error?.response?.data?.message || "Failed to submit dispute.";
+        error instanceof AxiosError
+          ? error.response?.data?.message || error.message || "Failed to submit dispute."
+          : "Failed to submit dispute.";
       toast.error(message);
     } finally {
       setSubmitting(false);

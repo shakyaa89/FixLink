@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -21,8 +21,9 @@ import {
 } from "lucide-react-native";
 import { Picker } from "@react-native-picker/picker";
 import colors from "@/app/_constants/theme";
-import { JobApi } from "@/api/Apis";
+import { AiApi, JobApi } from "@/api/Apis";
 import { useAuthStore } from "@/store/authStore";
+import { CITIES, LOCATION_OPTIONS } from "@/utils/nepalLocations";
 
 const categories = [
   "Plumbing",
@@ -42,11 +43,16 @@ export default function CreateJobPage() {
   const [description, setDescription] = useState("");
   const [jobCategory, setJobCategory] = useState("");
   const [userPrice, setUserPrice] = useState("");
+  const [city, setCity] = useState("");
   const [location, setLocation] = useState("");
   const [locationURL, setLocationURL] = useState("");
   const [images, setImages] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+
+  const placeOptions = useMemo(() => {
+    return city ? LOCATION_OPTIONS[city] ?? [] : [];
+  }, [city]);
 
   const pickImages = async () => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -119,6 +125,7 @@ export default function CreateJobPage() {
       !description ||
       !jobCategory ||
       !price ||
+      !city ||
       !location ||
       images.length === 0
     ) {
@@ -128,6 +135,21 @@ export default function CreateJobPage() {
 
     try {
       setSubmitting(true);
+
+      const verifyJob = await AiApi.verifyJob({
+        title,
+        description,
+        userPrice: price,
+      });
+
+      if (verifyJob?.data?.reply !== "VALID") {
+        Toast.show({
+          type: "error",
+          text1: verifyJob?.data?.reply || "Job did not pass AI verification",
+        });
+        return;
+      }
+
       const imageUrls = await uploadMultipleToCloudinary(images);
 
       const response = await JobApi.createJobApi({
@@ -136,7 +158,7 @@ export default function CreateJobPage() {
         description,
         jobCategory,
         userPrice: price,
-        location,
+        location: `${city}, ${location}`,
         locationURL,
         images: imageUrls,
       } as any);
@@ -227,14 +249,44 @@ export default function CreateJobPage() {
               className="border border-border rounded-xl px-3 py-3 text-text bg-primary"
             />
 
+            <Text className="text-sm font-semibold text-text">City *</Text>
+            <View className="border border-border rounded-xl bg-primary overflow-hidden">
+              <Picker
+                selectedValue={city}
+                onValueChange={(value) => {
+                  setCity(value);
+                  setLocation("");
+                }}
+                style={{ color: colors.text }}
+              >
+                <Picker.Item label="Select city" value="" />
+                {CITIES.map((cityOption) => (
+                  <Picker.Item key={cityOption} label={cityOption} value={cityOption} />
+                ))}
+              </Picker>
+            </View>
+
             <Text className="text-sm font-semibold text-text">Location *</Text>
-            <TextInput
-              value={location}
-              onChangeText={setLocation}
-              placeholder="Enter your location"
-              placeholderTextColor={colors.muted}
-              className="border border-border rounded-xl px-3 py-3 text-text bg-primary"
-            />
+            <View
+              className={`border border-border rounded-xl bg-primary overflow-hidden ${
+                !city ? "opacity-60" : ""
+              }`}
+            >
+              <Picker
+                selectedValue={location}
+                enabled={Boolean(city)}
+                onValueChange={(value) => setLocation(value)}
+                style={{ color: colors.text }}
+              >
+                <Picker.Item
+                  label={city ? "Select location" : "Select city first"}
+                  value=""
+                />
+                {placeOptions.map((placeOption) => (
+                  <Picker.Item key={placeOption} label={placeOption} value={placeOption} />
+                ))}
+              </Picker>
+            </View>
 
             <Text className="text-sm font-semibold text-text">Location URL (Optional)</Text>
             <TextInput

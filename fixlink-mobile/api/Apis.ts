@@ -22,8 +22,11 @@ interface User {
     addressURL?: string;
     profilePicture: string;
     role?: string;
+    verificationStatus?: 'pending' | 'verified' | 'rejected' | '';
+    rejectionReason?: string;
     verificationProofURL?: string;
     providerCategory?: string;
+    idProofURL?: string;
     idURL?: string;
 }
 
@@ -34,6 +37,8 @@ interface ServiceProviderProfilePayload {
     address: string;
     addressDescription?: string;
     addressURL?: string;
+    verificationStatus?: 'pending' | 'verified' | 'rejected';
+    rejectionReason?: string;
 }
 
 interface UpdateUserProfilePayload {
@@ -225,6 +230,12 @@ export const ReviewApi = {
 export const AiApi = {
     chat: async (data: { message: string; history?: AiChatMessage[]; category?: string }) =>
         Api.post('/ai/chat', data, { headers: await getAuthHeader() }),
+
+    verifyProvider: async (data: { verificationProofURL: string; category: string }) =>
+        Api.post('/ai/verify', data, { headers: await getAuthHeader() }),
+
+    verifyJob: async (data: { title: string; description: string; userPrice: number }) =>
+        Api.post('/ai/verifyJob', data, { headers: await getAuthHeader() }),
 };
 
 export const MessageApi = {

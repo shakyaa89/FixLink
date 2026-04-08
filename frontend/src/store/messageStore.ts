@@ -2,6 +2,7 @@ import { create } from "zustand";
 import toast from "react-hot-toast";
 import { io, type Socket } from "socket.io-client";
 import { API_BASE_URL, MessageApi, type MessageData } from "../api/Apis.ts";
+import { AxiosError } from "axios";
 
 export interface ChatUser {
   _id: string;
@@ -43,9 +44,12 @@ export const useMessageStore = create<MessageState>((set, get) => ({
     try {
       const res = await MessageApi.fetchContacts();
       set({ recentChats: res.data?.contacts || [] });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.log(error);
-      const errMsg = error.response?.data?.message || "Failed to load contacts";
+      const errMsg =
+        error instanceof AxiosError
+          ? error.response?.data?.message || error.message || "Failed to load contacts"
+          : "Failed to load contacts";
       toast.error(errMsg);
     } finally {
       set({ contactsLoading: false });
@@ -131,9 +135,12 @@ export const useMessageStore = create<MessageState>((set, get) => ({
     try {
       const res = await MessageApi.fetchMessages(userId);
       set({ messages: res.data?.messages || [] });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.log(error);
-      const errMsg = error.response?.data?.message || "Failed to load messages";
+      const errMsg =
+        error instanceof AxiosError
+          ? error.response?.data?.message || error.message || "Failed to load messages"
+          : "Failed to load messages";
       toast.error(errMsg);
       set({ messages: [] });
     } finally {
@@ -168,9 +175,12 @@ export const useMessageStore = create<MessageState>((set, get) => ({
           set({ messages: [...messages, newMessage] });
         }
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.log(error);
-      const errMsg = error.response?.data?.message || "Failed to send message";
+      const errMsg =
+        error instanceof AxiosError
+          ? error.response?.data?.message || error.message || "Failed to send message"
+          : "Failed to send message";
       toast.error(errMsg);
     } finally {
       set({ sending: false });

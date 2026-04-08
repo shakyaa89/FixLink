@@ -1,0 +1,322 @@
+import { useState } from "react";
+import {
+  ActivityIndicator,
+  Image,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useRouter } from "expo-router";
+import { Picker } from "@react-native-picker/picker";
+import * as ImagePicker from "expo-image-picker";
+import axios from "axios";
+import Toast from "react-native-toast-message";
+import {
+  ArrowLeft,
+  BadgeCheck,
+  FileText,
+  Link2,
+  MapPin,
+  Upload,
+} from "lucide-react-native";
+import colors from "@/app/_constants/theme";
+import { AiApi, AuthApi } from "@/api/Apis";
+import { useAuthStore } from "@/store/authStore";
+
+const PROVIDER_CATEGORIES = [
+  "Plumbing",
+  "Electrical",
+  "Carpentry",
+  "Painting",
+  "Landscaping",
+  "General Repairs",
+];
+
+const MAX_IMAGE_SIZE_BYTES = 2 * 1024 * 1024;
+
+export default function CompleteProviderProfileScreen() {
+  const router = useRouter();
+  const { user, setUser } = useAuthStore();
+
+  const [providerCategory, setProviderCategory] = useState(user?.providerCategory || "");
+  const [address, setAddress] = useState(user?.address || "");
+  const [addressDescription, setAddressDescription] = useState(user?.addressDescription || "");
+  const [addressURL, setAddressURL] = useState(user?.addressURL || user?.addressUrl || "");
+
+  const [verificationProofFile, setVerificationProofFile] =
+    useState<ImagePicker.ImagePickerAsset | null>(null);
+  const [idProofFile, setIdProofFile] = useState<ImagePicker.ImagePickerAsset | null>(null);
+
+  const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+
+  const pickImage = async (
+    setter: (asset: ImagePicker.ImagePickerAsset | null) => void
+  ) => {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) {
+      Toast.show({ type: "error", text1: "Media permission is required" });
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      quality: 0.8,
+      allowsEditing: true,
+    });
+
+    if (result.canceled || result.assets.length === 0) return;
+
+    const selectedAsset = result.assets[0];
+    if (
+      typeof selectedAsset.fileSize === "number" &&
+      selectedAsset.fileSize > MAX_IMAGE_SIZE_BYTES
+    ) {
+      Toast.show({ type: "error", text1: "Image must be 2MB or smaller" });
+      return;
+    }
+
+    setter(selectedAsset);
+  };
+
+  const uploadToCloudinary = async (asset: ImagePicker.ImagePickerAsset) => {
+    if (
+      typeof asset.fileSize === "number" &&
+      asset.fileSize > MAX_IMAGE_SIZE_BYTES
+    ) {
+      throw new Error("Image must be 2MB or smaller");
+    }
+
+    const formData = new FormData();
+    formData.append("file", {
+      uri: asset.uri,
+      type: asset.mimeType || "image/jpeg",
+      name: asset.fileName || `provider-${Date.now()}.jpg`,
+    } as any);
+    formData.append("upload_preset", "unsigned_upload");
+
+    const { data } = await axios.post(
+      "https://api.cloudinary.com/v1_1/diocl7ilu/image/upload",
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    return data.secure_url as string;
+  };
+
+  const handleSubmit = async () => {
+    if (!providerCategory || !address || !verificationProofFile || !idProofFile) {
+      Toast.show({ type: "error", text1: "Please fill all required fields" });
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setUploading(true);
+
+      const [verificationProofURL, idURL] = await Promise.all([
+        uploadToCloudinary(verificationProofFile),
+        uploadToCloudinary(idProofFile),
+      ]);
+
+      setUploading(false);
+
+      const verification = await AiApi.verifyProvider({
+        verificationProofURL,
+        category: providerCategory,
+      });
+
+      let verificationStatus: "pending" | "verified" | "rejected" = "pending";
+      let rejectionReason = "";
+
+      if (verification?.data?.reply === "PROPER") {
+        verificationStatus = "verified";
+      } else {
+        verificationStatus = "rejected";
+        rejectionReason = verification?.data?.reply || "Verification failed";
+      }
+
+      const response = await AuthApi.completeServiceProviderProfile({
+        providerCategory,
+        address,
+        addressDescription,
+        addressURL,
+        verificationProofURL,
+        idURL,
+        verificationStatus,
+        rejectionReason,
+      });
+
+      const updatedUser = response?.data?.user;
+      if (updatedUser) {
+        setUser(updatedUser);
+      }
+
+      Toast.show({
+        type: "success",
+        text1:
+          response?.data?.message ||
+          (verificationStatus === "verified"
+            ? "Profile completed and verified"
+            : "Profile submitted. Please review your verification status."),
+      });
+
+      router.replace("/service-provider/dashboard");
+    } catch (error: any) {
+      Toast.show({
+        type: "error",
+        text1: error?.response?.data?.message || "Unable to complete profile",
+      });
+    } finally {
+      setUploading(false);
+      setLoading(false);
+    }
+  };
+
+  return (
+    <SafeAreaView className="flex-1 bg-primary">
+      <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+        <View className="px-6 py-6 gap-5">
+          <View className="flex-row items-center gap-3">
+            <Pressable
+              onPress={() => router.back()}
+              className="w-10 h-10 border border-border rounded-xl items-center justify-center active:bg-secondary"
+            >
+              <ArrowLeft size={20} color={colors.text} />
+            </Pressable>
+            <View className="flex-1">
+              <Text className="text-2xl font-bold text-text">Complete Profile</Text>
+              <Text className="text-sm text-muted">Submit required details to continue</Text>
+            </View>
+            <View className="w-10 h-10 rounded-xl bg-accent/10 items-center justify-center">
+              <FileText size={18} color={colors.accent} />
+            </View>
+          </View>
+
+          <View className="bg-secondary border border-border rounded-2xl p-4 gap-3">
+            <View className="flex-row items-center gap-2">
+              <BadgeCheck size={16} color={colors.accent} />
+              <Text className="text-sm font-semibold text-text">Provider Details</Text>
+            </View>
+
+            <Text className="text-sm font-semibold text-text">Service Category *</Text>
+            <View className="border border-border rounded-xl bg-primary overflow-hidden">
+              <Picker
+                selectedValue={providerCategory}
+                onValueChange={(value) => setProviderCategory(value)}
+                style={{ color: colors.text }}
+              >
+                <Picker.Item label="Select category" value="" />
+                {PROVIDER_CATEGORIES.map((category) => (
+                  <Picker.Item key={category} label={category} value={category} />
+                ))}
+              </Picker>
+            </View>
+
+            <Text className="text-sm font-semibold text-text">Address *</Text>
+            <View className="border border-border rounded-xl px-3 py-3 flex-row items-center gap-2 bg-primary">
+              <MapPin size={16} color={colors.muted} />
+              <TextInput
+                value={address}
+                onChangeText={setAddress}
+                placeholder="Enter your address"
+                placeholderTextColor={colors.muted}
+                className="flex-1 text-text"
+              />
+            </View>
+
+            <Text className="text-sm font-semibold text-text">Address Description</Text>
+            <TextInput
+              value={addressDescription}
+              onChangeText={setAddressDescription}
+              placeholder="Additional location details"
+              placeholderTextColor={colors.muted}
+              multiline
+              textAlignVertical="top"
+              className="border border-border rounded-xl px-3 py-3 text-text bg-primary min-h-[90px]"
+            />
+
+            <Text className="text-sm font-semibold text-text">Address URL (Optional)</Text>
+            <View className="border border-border rounded-xl px-3 py-3 flex-row items-center gap-2 bg-primary">
+              <Link2 size={16} color={colors.muted} />
+              <TextInput
+                value={addressURL}
+                onChangeText={setAddressURL}
+                placeholder="https://maps.google.com/..."
+                placeholderTextColor={colors.muted}
+                autoCapitalize="none"
+                className="flex-1 text-text"
+              />
+            </View>
+          </View>
+
+          <View className="bg-secondary border border-border rounded-2xl p-4 gap-3">
+            <Text className="text-sm font-semibold text-text">Service License Document *</Text>
+            <Pressable
+              onPress={() => pickImage(setVerificationProofFile)}
+              className="border border-dashed border-border rounded-xl p-4 bg-primary items-center justify-center gap-2"
+            >
+              <Upload size={18} color={colors.muted} />
+              <Text className="text-text font-medium">Upload verification proof</Text>
+            </Pressable>
+            {verificationProofFile?.uri ? (
+              <View className="flex-row items-center gap-2">
+                <Image
+                  source={{ uri: verificationProofFile.uri }}
+                  style={{ width: 42, height: 42, borderRadius: 8 }}
+                />
+                <Text className="text-sm text-muted flex-1" numberOfLines={1}>
+                  {verificationProofFile.fileName || "Verification document selected"}
+                </Text>
+              </View>
+            ) : null}
+
+            <Text className="text-sm font-semibold text-text">Citizenship / ID Document *</Text>
+            <Pressable
+              onPress={() => pickImage(setIdProofFile)}
+              className="border border-dashed border-border rounded-xl p-4 bg-primary items-center justify-center gap-2"
+            >
+              <Upload size={18} color={colors.muted} />
+              <Text className="text-text font-medium">Upload ID document</Text>
+            </Pressable>
+            {idProofFile?.uri ? (
+              <View className="flex-row items-center gap-2">
+                <Image
+                  source={{ uri: idProofFile.uri }}
+                  style={{ width: 42, height: 42, borderRadius: 8 }}
+                />
+                <Text className="text-sm text-muted flex-1" numberOfLines={1}>
+                  {idProofFile.fileName || "ID document selected"}
+                </Text>
+              </View>
+            ) : null}
+          </View>
+
+          <Pressable
+            className="bg-accent rounded-xl py-4 items-center disabled:opacity-60 mb-8"
+            disabled={loading || uploading}
+            onPress={handleSubmit}
+          >
+            {loading || uploading ? (
+              <View className="flex-row items-center gap-2">
+                <ActivityIndicator size="small" color="#fff" />
+                <Text className="text-white font-semibold">
+                  {uploading ? "Uploading documents..." : "Submitting..."}
+                </Text>
+              </View>
+            ) : (
+              <Text className="text-white font-semibold">Submit Documents</Text>
+            )}
+          </Pressable>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
+}

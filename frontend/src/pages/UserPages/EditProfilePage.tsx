@@ -11,7 +11,7 @@ import {
 import Sidebar from "../../components/Sidebar/Sidebar";
 import { useAuthStore } from "../../store/authStore";
 import toast from "react-hot-toast";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { AuthApi } from "../../api/Apis";
 import { useNavigate } from "react-router-dom";
 
@@ -99,9 +99,11 @@ export default function EditProfilePage() {
 
             navigate("/profile");
 
-        } catch (err: any) {
+        } catch (err: unknown) {
             const message =
-                err.response?.data?.message || err.message || "Updating failed";
+                err instanceof AxiosError
+                    ? err.response?.data?.message || err.message || "Updating failed"
+                    : "Updating failed";
             toast.error(message);
         }finally{
             setUpdating(false);

@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { useAuthStore } from "../../store/authStore";
 import toast from "react-hot-toast";
+import { AxiosError } from "axios";
 
 export default function JobDetailsProviderPage() {
   const [job, setJob] = useState<JobData>();
@@ -86,9 +87,9 @@ export default function JobDetailsProviderPage() {
   async function handleSendOffer() {
     const offeredPriceNum = Number(offeredPrice);
 
-    const offerLowerLimit = job?.userPrice! - (job?.userPrice! * 20) / 100;
+    const offerLowerLimit = job?.userPrice ?? 0 - (job?.userPrice ?? 0 * 20) / 100;
 
-    const offerUpperLimit = job?.userPrice! + (job?.userPrice! * 20) / 100;
+    const offerUpperLimit = job?.userPrice ?? 0 + (job?.userPrice ?? 0 * 20) / 100;
 
     if (!offeredPrice) {
       setModalError("Please enter an offer price.");
@@ -106,7 +107,7 @@ export default function JobDetailsProviderPage() {
     try {
       setSendingOffer(true);
       await OfferApi.createOffer({
-        jobId: job?._id!,
+        jobId: job!._id!,
         offeredPrice: offeredPriceNum,
       });
 
@@ -118,9 +119,13 @@ export default function JobDetailsProviderPage() {
       setOfferModal(false);
       setOfferedPrice("");
       setOfferSuccessModal(true);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      setModalError(err?.response?.data?.message || "Failed to submit offer");
+      const message =
+        err instanceof AxiosError
+          ? err.response?.data?.message || err.message || "Failed to submit offer"
+          : "Failed to submit offer";
+      setModalError(message);
     } finally {
       setSendingOffer(false);
     }
@@ -155,10 +160,13 @@ export default function JobDetailsProviderPage() {
         comment: reviewComment,
       });
       toast.success("Review submitted.");
-    } catch (error: any) {
+    } catch (error: unknown) {
       const message =
-        error?.response?.data?.message || "Failed to submit review.";
+        error instanceof AxiosError
+          ? error.response?.data?.message || error.message || "Failed to submit review."
+          : "Failed to submit review.";
       if (message === "Review already submitted") {
+        toast.error("Review already submitted!")
       }
       toast.error(message);
     } finally {

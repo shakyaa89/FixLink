@@ -10,6 +10,7 @@ import {
 } from "lucide-react-native";
 import { useAuthStore } from "@/store/authStore";
 import { useEffect } from "react";
+import { isServiceProviderProfileComplete } from "@/utils/serviceProviderProfile";
 
 export default function Index() {
   const router = useRouter();
@@ -24,7 +25,12 @@ export default function Index() {
     }
 
     if (user.role === "serviceProvider") {
-      router.replace("/service-provider/dashboard");
+      const isProviderComplete = isServiceProviderProfileComplete(user);
+      router.replace(
+        isProviderComplete
+          ? "/service-provider/dashboard"
+          : "/service-provider/complete-profile"
+      );
       return;
     }
 

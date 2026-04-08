@@ -66,6 +66,7 @@ export default function Chatbot() {
             "Sorry, I could not reach the AI service right now. Please try again.",
         },
       ]);
+      console.log(error)
     } finally {
       setLoading(false);
     }

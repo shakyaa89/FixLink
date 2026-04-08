@@ -574,11 +574,27 @@ export const deleteAdminOffer = async (req, res) => {
       return res.status(400).json({ message: "Invalid offer id" });
     }
 
-    const offer = await Offer.findByIdAndDelete(offerId).lean();
+    const offer = await Offer.findById(offerId);
 
     if (!offer) {
       return res.status(404).json({ message: "Offer not found" });
     }
+
+    if (offer.status === "accepted") {
+      offer.status = "pending";
+      await offer.save();
+
+      await Job.findByIdAndUpdate(offer.jobId, {
+        $set: { jobStatus: "open", finalPrice: 0 },
+      });
+
+      return res.status(200).json({
+        message: "Accepted offer reset to pending successfully",
+        offer,
+      });
+    }
+
+    await Offer.findByIdAndDelete(offerId);
 
     await Job.findByIdAndUpdate(offer.jobId, { $pull: { offers: offer._id } });
 

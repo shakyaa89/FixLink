@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Home, Mail, Lock, Eye, EyeOff, ArrowLeft } from "lucide-react-native";
 import { useAuthStore } from "@/store/authStore";
 import Toast from "react-native-toast-message";
+import { isServiceProviderProfileComplete } from "@/utils/serviceProviderProfile";
 
 export default function Login() {
   const router = useRouter();
@@ -29,7 +30,11 @@ export default function Login() {
       if (currentUser?.role === "user") {
         router.replace("/user/dashboard");
       } else if (currentUser?.role === "serviceProvider") {
-        router.replace("/service-provider/dashboard");
+        router.replace(
+          isServiceProviderProfileComplete(currentUser)
+            ? "/service-provider/dashboard"
+            : "/service-provider/complete-profile"
+        );
       } else if (currentUser?.role === "admin") {
         router.replace("/admin-mobile");
       } else {
@@ -118,19 +123,6 @@ export default function Login() {
               ) : (
                 <Text className="text-white text-base font-bold">Log In</Text>
               )}
-            </Pressable>
-
-            <View className="flex-row items-center gap-3">
-              <View className="flex-1 h-px bg-border" />
-              <Text className="text-sm text-muted">or</Text>
-              <View className="flex-1 h-px bg-border" />
-            </View>
-
-            <Pressable
-              className="border border-border rounded-xl py-4 items-center bg-secondary active:bg-border/20"
-              onPress={() => { }}
-            >
-              <Text className="text-text text-base font-semibold">Continue with Google</Text>
             </Pressable>
           </View>
 

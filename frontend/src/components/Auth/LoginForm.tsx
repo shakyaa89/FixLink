@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../store/authStore";
 import { isServiceProviderProfileComplete } from "../../utils/serviceProviderProfile";
+import { AxiosError } from "axios";
 
 function LoginForm() {
   const [loginEmail, setLoginEmail] = useState("");
@@ -44,10 +45,15 @@ function LoginForm() {
       }
 
       navigate("/user/dashboard", { replace: true });
-    } catch (err: any) {
-      const message =
-        err.response?.data?.message || err.message || "Login failed";
-      toast.error(message);
+    } catch (err: unknown) {
+      if (err instanceof AxiosError) {
+        const message =
+          err.response?.data?.message || err.message || "Login failed";
+        toast.error(message);
+      } else {
+        console.error("Login failed:", err);
+        toast.error("Login failed");
+      }
     } finally {
       setLoading(false);
     }

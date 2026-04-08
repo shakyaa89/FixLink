@@ -16,6 +16,7 @@ import Sidebar from "../../components/Sidebar/Sidebar";
 import { JobApi, type JobData } from "../../api/Apis";
 import { useAuthStore } from "../../store/authStore";
 import { Link } from "react-router-dom";
+import { AxiosError } from "axios";
 
 type JobStatusFilter =
   | "all"
@@ -39,9 +40,13 @@ export default function ViewJobsPage() {
       const response = await JobApi.fetchProviderJobsApi(user.providerCategory);
       const fetchedJobs = response.data.jobs || [];
       setJobs(fetchedJobs);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Error fetching jobs:", err);
-      if (err?.response?.data?.message === "You have to be verified to complete this action!") {
+      const message =
+        err instanceof AxiosError
+          ? err.response?.data?.message || err.message || "Failed to load jobs. Please try again."
+          : "Failed to load jobs. Please try again.";
+      if (message === "You have to be verified to complete this action!") {
         setError("You have to be verified to view jobs.");
       } else {
         setError("Failed to load jobs. Please try again.");
