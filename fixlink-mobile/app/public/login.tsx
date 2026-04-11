@@ -23,7 +23,7 @@ export default function Login() {
     if (success) {
       Toast.show({
         type: 'success',
-        text2: "Logged In Successfully!"
+        text1: "Logged In Successfully!"
       })
       const currentUser = useAuthStore.getState().user;
 

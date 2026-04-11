@@ -15,6 +15,7 @@ import {
   ArrowLeft,
   ExternalLink,
   User,
+  Star,
 } from "lucide-react";
 import { useAuthStore } from "../../store/authStore";
 import toast from "react-hot-toast";
@@ -34,6 +35,7 @@ export default function JobDetailsProviderPage() {
   const [modalError, setModalError] = useState("");
   const [sendingOffer, setSendingOffer] = useState(false);
   const [completingJob, setCompletingJob] = useState(false);
+  const [showCompleteConfirmDialog, setShowCompleteConfirmDialog] = useState(false);
   const [reviewRating, setReviewRating] = useState(0);
   const [reviewComment, setReviewComment] = useState("");
   const [reviewSubmitting, setReviewSubmitting] = useState(false);
@@ -136,9 +138,16 @@ export default function JobDetailsProviderPage() {
     try {
       setCompletingJob(true);
       await JobApi.completeJobApi(job._id);
+      toast.success("Job marked as completed.");
+      setShowCompleteConfirmDialog(false);
       await fetchJob();
-    } catch (err) {
+    } catch (err: unknown) {
       console.error(err);
+      const message =
+        err instanceof AxiosError
+          ? err.response?.data?.message || err.message || "Failed to complete job"
+          : "Failed to complete job";
+      toast.error(message);
     } finally {
       setCompletingJob(false);
     }
@@ -165,13 +174,34 @@ export default function JobDetailsProviderPage() {
         error instanceof AxiosError
           ? error.response?.data?.message || error.message || "Failed to submit review."
           : "Failed to submit review.";
-      if (message === "Review already submitted") {
-        toast.error("Review already submitted!")
-      }
       toast.error(message);
     } finally {
       setReviewSubmitting(false);
     }
+  };
+
+  const renderReviewStars = (rating: number) => {
+    return (
+      <div className="flex items-center gap-2">
+        {[1, 2, 3, 4, 5].map((value) => {
+          const active = value <= rating;
+          return (
+            <button
+              key={value}
+              type="button"
+              onClick={() => setReviewRating(value)}
+              aria-label={`Rate ${value} star${value > 1 ? "s" : ""}`}
+              className="p-1 rounded-md transition hover:scale-105"
+            >
+              <Star
+                className={`w-7 h-7 ${active ? "text-yellow-500" : "text-(--border)"}`}
+                fill={active ? "currentColor" : "none"}
+              />
+            </button>
+          );
+        })}
+      </div>
+    );
   };
 
   useEffect(() => {
@@ -642,18 +672,10 @@ export default function JobDetailsProviderPage() {
                   <label className="block text-sm font-medium text-(--text) mb-2">
                     Rating
                   </label>
-                  <select
-                    value={reviewRating}
-                    onChange={(e) => setReviewRating(Number(e.target.value))}
-                    className="w-full border border-(--border) rounded-lg px-3 py-2 bg-(--primary) text-(--text)"
-                  >
-                    <option value={0}>Select rating</option>
-                    {[1, 2, 3, 4, 5].map((value) => (
-                      <option key={value} value={value}>
-                        {value}
-                      </option>
-                    ))}
-                  </select>
+                  {renderReviewStars(reviewRating)}
+                  <p className="text-xs text-(--muted) mt-2">
+                    {reviewRating > 0 ? `${reviewRating} / 5 selected` : "Select a rating"}
+                  </p>
                 </div>
 
                 <div>
@@ -722,7 +744,7 @@ export default function JobDetailsProviderPage() {
 
               <div className="mt-6 flex justify-end">
                 <button
-                  onClick={handleCompleteJob}
+                  onClick={() => setShowCompleteConfirmDialog(true)}
                   disabled={completingJob}
                   className="px-5 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium disabled:opacity-60"
                 >
@@ -771,6 +793,43 @@ export default function JobDetailsProviderPage() {
           )}
         </div>
       </main>
+
+      {showCompleteConfirmDialog && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-(--primary) rounded-xl max-w-md w-full p-6 shadow-xl">
+            <div className="flex items-start gap-4 mb-4">
+              <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center shrink-0">
+                <AlertCircle className="w-6 h-6 text-amber-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-(--text) mb-1">
+                  Mark job as completed?
+                </h3>
+                <p className="text-sm text-(--muted)">
+                  Confirm that all work is done before continuing. This updates
+                  the job status to completed.
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setShowCompleteConfirmDialog(false)}
+                disabled={completingJob}
+                className="px-4 py-2 border border-(--border) text-(--text) rounded-lg hover:bg-(--secondary) transition disabled:opacity-60"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleCompleteJob}
+                disabled={completingJob}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition disabled:opacity-60"
+              >
+                {completingJob ? "Completing..." : "Yes, complete job"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

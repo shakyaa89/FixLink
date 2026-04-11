@@ -13,6 +13,7 @@ import colors from "@/app/_constants/theme";
 import { useAuthStore } from "@/store/authStore";
 import Toast from "react-native-toast-message";
 import { ReviewApi } from "@/api/Apis";
+import { AxiosError } from "axios";
 
 interface Review {
   _id: string;
@@ -43,17 +44,17 @@ export default function ReviewsScreen() {
         setReceivedReviews(response.data.reviews);
       }
       
-      const sentResponse = await ReviewApi.fetchMyReviews();
+      const sentResponse = await ReviewApi.fetchMySentReviews();
       if (sentResponse.data.reviews) {
         setSentReviews(sentResponse.data.reviews);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       Toast.show({
         type: "error",
         text1:
-          error?.response?.data?.message ||
-          error?.message ||
-          "Failed to load reviews",
+          error instanceof AxiosError
+            ? error.response?.data?.message || error.message || "Failed to load reviews"
+            : "Failed to load reviews",
       });
     } finally {
       setLoading(false);

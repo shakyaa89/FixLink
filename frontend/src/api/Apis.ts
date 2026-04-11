@@ -3,6 +3,7 @@ import axios from "axios";
 
 export const API_BASE_URL = "http://192.168.1.66:3005";
 // export const API_BASE_URL = "https://fixlink-n7rz.onrender.com";
+export const CLOUDINARY_UPLOAD_URL = "https://api.cloudinary.com/v1_1/dj1vqpua0/image/upload";
 const baseURL = `${API_BASE_URL}/api`;
 
 interface User {

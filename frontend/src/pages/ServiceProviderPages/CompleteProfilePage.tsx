@@ -1,9 +1,14 @@
 import { useState } from "react";
-import { MapPin, Upload, Loader2, Link2, FileText } from "lucide-react";
+import { Upload, Loader2, Link2, FileText } from "lucide-react";
 import axios, { AxiosError } from "axios";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import { AiApi, AuthApi } from "../../api/Apis";
+import {
+  AiApi,
+  AuthApi,
+  CLOUDINARY_UPLOAD_URL,
+  
+} from "../../api/Apis";
 import { useAuthStore } from "../../store/authStore";
 
 const MAX_IMAGE_SIZE_BYTES = 2 * 1024 * 1024;
@@ -13,7 +18,6 @@ export default function CompleteProfilePage() {
   const [uploading, setUploading] = useState(false);
 
   const [providerCategory, setProviderCategory] = useState("");
-  const [address, setAddress] = useState("");
   const [addressDescription, setAddressDescription] = useState("");
   const [addressURL, setAddressURL] = useState("");
 
@@ -21,7 +25,8 @@ export default function CompleteProfilePage() {
     useState<File | null>(null);
   const [idProofFile, setIdProofFile] = useState<File | null>(null);
 
-  const { setUser } = useAuthStore();
+  const { user, setUser } = useAuthStore();
+  const address = user?.address?.trim() || "";
   const navigate = useNavigate();
 
   const uploadToCloudinary = async (file: File, preset: string) => {
@@ -36,7 +41,7 @@ export default function CompleteProfilePage() {
 
     try {
       const { data } = await axios.post(
-        "https://api.cloudinary.com/v1_1/ddmyk2hd6/image/upload",
+        CLOUDINARY_UPLOAD_URL,
         formData,
       );
       return data.secure_url as string;
@@ -50,6 +55,11 @@ export default function CompleteProfilePage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!address) {
+      toast.error("Address is missing from your profile");
+      return;
+    }
 
     if (
       !providerCategory ||
@@ -153,22 +163,6 @@ export default function CompleteProfilePage() {
                 <option value="Landscaping">Landscaping</option>
                 <option value="General Repairs">General Repairs</option>
               </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-(--text) mb-2">
-                Address<span className="text-red-500">*</span>
-              </label>
-              <div className="relative">
-                <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-(--muted)" />
-                <input
-                  type="text"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  placeholder="Enter your address"
-                  className="w-full pl-12 pr-4 py-3 border-2 border-(--border) rounded-xl focus:border-blue-600"
-                />
-              </div>
             </div>
 
             <div>

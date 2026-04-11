@@ -15,6 +15,7 @@ import { useAuthStore } from "@/store/authStore";
 import Toast from "react-native-toast-message";
 import { AuthApi, DisputeApi } from "@/api/Apis";
 import { Picker } from "@react-native-picker/picker";
+import { AxiosError } from "axios";
 
 interface Dispute {
   _id: string;
@@ -56,13 +57,13 @@ export default function ReportDisputeScreen() {
       if (disputesResponse.data.disputes) {
         setDisputes(disputesResponse.data.disputes);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       Toast.show({
         type: "error",
         text1:
-          error?.response?.data?.message ||
-          error?.message ||
-          "Failed to load data",
+          error instanceof AxiosError
+            ? error.response?.data?.message || error.message || "Failed to load data"
+            : "Failed to load data",
       });
     } finally {
       setLoading(false);
@@ -113,13 +114,13 @@ export default function ReportDisputeScreen() {
       setDescription("");
       setPriority("medium");
       fetchData();
-    } catch (error: any) {
+    } catch (error: unknown) {
       Toast.show({
         type: "error",
         text1:
-          error?.response?.data?.message ||
-          error?.message ||
-          "Failed to report dispute",
+          error instanceof AxiosError
+            ? error.response?.data?.message || error.message || "Failed to report dispute"
+            : "Failed to report dispute",
       });
     } finally {
       setSubmitting(false);

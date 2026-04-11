@@ -2,7 +2,7 @@ import { Mail, Lock, User, Phone, Upload, Loader2, MapPin } from "lucide-react";
 import axios, { AxiosError } from "axios";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import { AuthApi } from "../../api/Apis";
+import { AuthApi, CLOUDINARY_UPLOAD_URL } from "../../api/Apis";
 import { useState } from "react";
 import { useAuthStore } from "../../store/authStore";
 import { CITIES, LOCATION_OPTIONS } from "../../utils/nepalLocations";
@@ -41,7 +41,7 @@ function ServiceProviderRegisterForm() {
 
     try {
       const { data } = await axios.post(
-        "https://api.cloudinary.com/v1_1/ddmyk2hd6/image/upload",
+        CLOUDINARY_UPLOAD_URL,
         formData,
       );
       return data.secure_url;

@@ -2,7 +2,7 @@ import { Upload, Loader2, Check, Briefcase } from "lucide-react";
 import Sidebar from "../../components/Sidebar/Sidebar";
 import { useAuthStore } from "../../store/authStore";
 import { useState } from "react";
-import { AiApi, JobApi } from "../../api/Apis";
+import { AiApi, CLOUDINARY_UPLOAD_URL, JobApi } from "../../api/Apis";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { CITIES, LOCATION_OPTIONS } from "../../utils/nepalLocations";
@@ -59,7 +59,7 @@ export default function CreateJobPage() {
         formData.append("upload_preset", "job_image_upload");
 
         const { data } = await axios.post(
-          "https://api.cloudinary.com/v1_1/diocl7ilu/image/upload",
+          CLOUDINARY_UPLOAD_URL,
           formData,
         );
 

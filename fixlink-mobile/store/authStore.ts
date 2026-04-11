@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from 'react-native-toast-message';
+import { AxiosError } from 'axios';
 import { AuthApi } from '../api/Apis';
 import { User } from 'lucide-react-native';
 
@@ -34,12 +35,14 @@ export const useAuthStore = create<AuthState>((set) => ({
       });
 
       return true;
-    } catch (error: any) {
+    } catch (error: unknown) {
       Toast.show({
         type: 'error',
         text1:
-          error?.response?.data?.message ??
-          'Unable to login. Please try again.',
+          error instanceof AxiosError
+            ? error.response?.data?.message ??
+              'Unable to login. Please try again.'
+            : 'Unable to login. Please try again.',
       });
 
       set({ user: null });

@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   Image,
   Linking,
   Modal,
@@ -31,6 +30,7 @@ import {
   Star,
 } from "lucide-react-native";
 import Toast from "react-native-toast-message";
+import { AxiosError } from "axios";
 import colors from "@/app/_constants/theme";
 import { JobApi, OfferApi, ReviewApi, type JobData } from "@/api/Apis";
 import { useAuthStore } from "@/store/authStore";
@@ -54,6 +54,8 @@ export default function JobDetailsPage() {
   const [reviewSubmitted, setReviewSubmitted] = useState(false);
   const [cancelingJob, setCancelingJob] = useState(false);
   const [acceptingOffer, setAcceptingOffer] = useState(false);
+  const [showCancelJobDialog, setShowCancelJobDialog] = useState(false);
+  const [showCompleteJobDialog, setShowCompleteJobDialog] = useState(false);
 
   const [offeredPrice, setOfferedPrice] = useState("");
   const [offerSubmitting, setOfferSubmitting] = useState(false);
@@ -129,11 +131,14 @@ export default function JobDetailsPage() {
         text1: response?.data?.message || "Job canceled",
       });
       fetchJob();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Error cancelling job:", err);
       Toast.show({
         type: "error",
-        text1: err?.response?.data?.message || "Error cancelling the job",
+        text1:
+          err instanceof AxiosError
+            ? err.response?.data?.message || "Error cancelling the job"
+            : "Error cancelling the job",
       });
     } finally {
       setCancelingJob(false);
@@ -151,11 +156,14 @@ export default function JobDetailsPage() {
       });
       setShowOfferAcceptDialog(false);
       fetchJob();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Error accepting offer:", err);
       Toast.show({
         type: "error",
-        text1: err?.response?.data?.message || "Failed to accept offer",
+        text1:
+          err instanceof AxiosError
+            ? err.response?.data?.message || "Failed to accept offer"
+            : "Failed to accept offer",
       });
     } finally {
       setAcceptingOffer(false);
@@ -178,8 +186,11 @@ export default function JobDetailsPage() {
       });
       setReviewSubmitted(true);
       Toast.show({ type: "success", text1: "Review submitted" });
-    } catch (err: any) {
-      const message = err?.response?.data?.message || "Failed to submit review";
+    } catch (err: unknown) {
+      const message =
+        err instanceof AxiosError
+          ? err.response?.data?.message || "Failed to submit review"
+          : "Failed to submit review";
       if (message === "Review already submitted") {
         setReviewSubmitted(true);
       }
@@ -196,8 +207,8 @@ export default function JobDetailsPage() {
           <Pressable key={value} onPress={() => setReviewRating(value)}>
             <Star
               size={28}
-              color={value <= rating ? colors.accent : colors.border}
-              fill={value <= rating ? colors.accent : "transparent"}
+              color={value <= rating ? "#EAB308" : colors.border}
+              fill={value <= rating ? "#EAB308" : "transparent"}
             />
           </Pressable>
         ))}
@@ -234,10 +245,13 @@ export default function JobDetailsPage() {
       setOfferedPrice("");
       Toast.show({ type: "success", text1: "Offer submitted" });
       fetchJob();
-    } catch (err: any) {
+    } catch (err: unknown) {
       Toast.show({
         type: "error",
-        text1: err?.response?.data?.message || "Failed to submit offer",
+        text1:
+          err instanceof AxiosError
+            ? err.response?.data?.message || "Failed to submit offer"
+            : "Failed to submit offer",
       });
     } finally {
       setOfferSubmitting(false);
@@ -251,10 +265,13 @@ export default function JobDetailsPage() {
       await JobApi.completeJobApi(job._id);
       Toast.show({ type: "success", text1: "Job marked as completed" });
       fetchJob();
-    } catch (err: any) {
+    } catch (err: unknown) {
       Toast.show({
         type: "error",
-        text1: err?.response?.data?.message || "Failed to complete job",
+        text1:
+          err instanceof AxiosError
+            ? err.response?.data?.message || "Failed to complete job"
+            : "Failed to complete job",
       });
     } finally {
       setCompletingJob(false);
@@ -435,16 +452,7 @@ export default function JobDetailsPage() {
             <Pressable
               className="bg-red-600 rounded-xl py-3 items-center active:opacity-90 disabled:opacity-60"
               disabled={cancelingJob}
-              onPress={() =>
-                Alert.alert("Cancel Job", "Are you sure you want to cancel this job?", [
-                  { text: "No", style: "cancel" },
-                  {
-                    text: "Yes, Cancel",
-                    style: "destructive",
-                    onPress: () => handleCancelJob(job._id || ""),
-                  },
-                ])
-              }
+              onPress={() => setShowCancelJobDialog(true)}
             >
               {cancelingJob ? (
                 <View className="flex-row items-center gap-2">
@@ -675,7 +683,7 @@ export default function JobDetailsPage() {
 
           {user?.role === "serviceProvider" && job.jobStatus === "in-progress" && isAcceptedProvider && (
             <Pressable
-              onPress={handleCompleteJob}
+              onPress={() => setShowCompleteJobDialog(true)}
               disabled={completingJob}
               className="bg-green-600 rounded-xl py-3 items-center disabled:opacity-60"
             >
@@ -734,6 +742,80 @@ export default function JobDetailsPage() {
                   </View>
                 ) : (
                   <Text className="text-white font-semibold">Accept</Text>
+                )}
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal visible={showCancelJobDialog} transparent animationType="fade">
+        <View className="flex-1 bg-black/50 items-center justify-center px-6">
+          <View className="bg-primary border border-border rounded-2xl p-5 w-full">
+            <Text className="text-lg font-bold text-text">Cancel Job</Text>
+            <Text className="text-sm text-muted mt-1">
+              Are you sure you want to cancel this job?
+            </Text>
+
+            <View className="flex-row gap-3 mt-5">
+              <Pressable
+                className="flex-1 border border-border rounded-xl py-2.5 items-center"
+                onPress={() => setShowCancelJobDialog(false)}
+              >
+                <Text className="text-text font-medium">No</Text>
+              </Pressable>
+              <Pressable
+                className="flex-1 bg-red-600 rounded-xl py-2.5 items-center disabled:opacity-60"
+                disabled={cancelingJob}
+                onPress={async () => {
+                  await handleCancelJob(job._id || "");
+                  setShowCancelJobDialog(false);
+                }}
+              >
+                {cancelingJob ? (
+                  <View className="flex-row items-center gap-2">
+                    <ActivityIndicator size="small" color="#fff" />
+                    <Text className="text-white font-semibold">Cancelling...</Text>
+                  </View>
+                ) : (
+                  <Text className="text-white font-semibold">Yes, Cancel</Text>
+                )}
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal visible={showCompleteJobDialog} transparent animationType="fade">
+        <View className="flex-1 bg-black/50 items-center justify-center px-6">
+          <View className="bg-primary border border-border rounded-2xl p-5 w-full">
+            <Text className="text-lg font-bold text-text">Mark job as completed?</Text>
+            <Text className="text-sm text-muted mt-1">
+              Confirm that all work is done before continuing.
+            </Text>
+
+            <View className="flex-row gap-3 mt-5">
+              <Pressable
+                className="flex-1 border border-border rounded-xl py-2.5 items-center"
+                onPress={() => setShowCompleteJobDialog(false)}
+              >
+                <Text className="text-text font-medium">Cancel</Text>
+              </Pressable>
+              <Pressable
+                className="flex-1 bg-green-600 rounded-xl py-2.5 items-center disabled:opacity-60"
+                disabled={completingJob}
+                onPress={async () => {
+                  await handleCompleteJob();
+                  setShowCompleteJobDialog(false);
+                }}
+              >
+                {completingJob ? (
+                  <View className="flex-row items-center gap-2">
+                    <ActivityIndicator size="small" color="#fff" />
+                    <Text className="text-white font-semibold">Completing...</Text>
+                  </View>
+                ) : (
+                  <Text className="text-white font-semibold">Yes, complete</Text>
                 )}
               </Pressable>
             </View>

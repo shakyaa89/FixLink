@@ -12,18 +12,17 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { Picker } from "@react-native-picker/picker";
 import * as ImagePicker from "expo-image-picker";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import Toast from "react-native-toast-message";
 import {
   ArrowLeft,
   BadgeCheck,
   FileText,
   Link2,
-  MapPin,
   Upload,
 } from "lucide-react-native";
 import colors from "@/app/_constants/theme";
-import { AiApi, AuthApi } from "@/api/Apis";
+import { AiApi, AuthApi, CLOUDINARY_UPLOAD_URL } from "@/api/Apis";
 import { useAuthStore } from "@/store/authStore";
 
 const PROVIDER_CATEGORIES = [
@@ -40,9 +39,9 @@ const MAX_IMAGE_SIZE_BYTES = 2 * 1024 * 1024;
 export default function CompleteProviderProfileScreen() {
   const router = useRouter();
   const { user, setUser } = useAuthStore();
+  const address = user?.address?.trim() || "";
 
   const [providerCategory, setProviderCategory] = useState(user?.providerCategory || "");
-  const [address, setAddress] = useState(user?.address || "");
   const [addressDescription, setAddressDescription] = useState(user?.addressDescription || "");
   const [addressURL, setAddressURL] = useState(user?.addressURL || user?.addressUrl || "");
 
@@ -99,7 +98,7 @@ export default function CompleteProviderProfileScreen() {
     formData.append("upload_preset", "unsigned_upload");
 
     const { data } = await axios.post(
-      "https://api.cloudinary.com/v1_1/diocl7ilu/image/upload",
+      CLOUDINARY_UPLOAD_URL,
       formData,
       {
         headers: {
@@ -112,6 +111,11 @@ export default function CompleteProviderProfileScreen() {
   };
 
   const handleSubmit = async () => {
+    if (!address) {
+      Toast.show({ type: "error", text1: "Address is missing from your profile" });
+      return;
+    }
+
     if (!providerCategory || !address || !verificationProofFile || !idProofFile) {
       Toast.show({ type: "error", text1: "Please fill all required fields" });
       return;
@@ -169,10 +173,13 @@ export default function CompleteProviderProfileScreen() {
       });
 
       router.replace("/service-provider/dashboard");
-    } catch (error: any) {
+    } catch (error: unknown) {
       Toast.show({
         type: "error",
-        text1: error?.response?.data?.message || "Unable to complete profile",
+        text1:
+          error instanceof AxiosError
+            ? error.response?.data?.message || "Unable to complete profile"
+            : "Unable to complete profile",
       });
     } finally {
       setUploading(false);
@@ -218,18 +225,6 @@ export default function CompleteProviderProfileScreen() {
                   <Picker.Item key={category} label={category} value={category} />
                 ))}
               </Picker>
-            </View>
-
-            <Text className="text-sm font-semibold text-text">Address *</Text>
-            <View className="border border-border rounded-xl px-3 py-3 flex-row items-center gap-2 bg-primary">
-              <MapPin size={16} color={colors.muted} />
-              <TextInput
-                value={address}
-                onChangeText={setAddress}
-                placeholder="Enter your address"
-                placeholderTextColor={colors.muted}
-                className="flex-1 text-text"
-              />
             </View>
 
             <Text className="text-sm font-semibold text-text">Address Description</Text>

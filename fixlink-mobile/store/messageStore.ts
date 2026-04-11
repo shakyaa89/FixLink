@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import Toast from "react-native-toast-message";
 import { io, type Socket } from "socket.io-client";
+import { AxiosError } from "axios";
 import {
   API_BASE_URL,
   MessageApi,
@@ -47,8 +48,11 @@ export const useMessageStore = create<MessageState>((set, get) => ({
     try {
       const res = await MessageApi.fetchContacts();
       set({ recentChats: res.data?.contacts || [] });
-    } catch (error: any) {
-      const errMsg = error?.response?.data?.message || "Failed to load contacts";
+    } catch (error: unknown) {
+      const errMsg =
+        error instanceof AxiosError
+          ? error.response?.data?.message || "Failed to load contacts"
+          : "Failed to load contacts";
       showError(errMsg);
     } finally {
       set({ contactsLoading: false });
@@ -144,8 +148,11 @@ export const useMessageStore = create<MessageState>((set, get) => ({
     try {
       const res = await MessageApi.fetchMessages(userId);
       set({ messages: res.data?.messages || [] });
-    } catch (error: any) {
-      const errMsg = error?.response?.data?.message || "Failed to load messages";
+    } catch (error: unknown) {
+      const errMsg =
+        error instanceof AxiosError
+          ? error.response?.data?.message || "Failed to load messages"
+          : "Failed to load messages";
       showError(errMsg);
       set({ messages: [] });
     } finally {
@@ -179,8 +186,11 @@ export const useMessageStore = create<MessageState>((set, get) => ({
           return { messages: [...state.messages, newMessage] };
         });
       }
-    } catch (error: any) {
-      const errMsg = error?.response?.data?.message || "Failed to send message";
+    } catch (error: unknown) {
+      const errMsg =
+        error instanceof AxiosError
+          ? error.response?.data?.message || "Failed to send message"
+          : "Failed to send message";
       showError(errMsg);
     } finally {
       set({ sending: false });

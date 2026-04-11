@@ -17,6 +17,7 @@ import colors from "@/app/_constants/theme";
 import { AiApi, type AiChatMessage } from "@/api/Apis";
 import { useAuthStore } from "@/store/authStore";
 import Toast from "react-native-toast-message";
+import { AxiosError } from "axios";
 
 interface ChatMessage {
   role: "user" | "assistant";
@@ -99,12 +100,14 @@ export default function AiChatScreen() {
         "I could not generate a response right now. Please try again.";
 
       setMessages((prev) => [...prev, { role: "assistant", content: reply }]);
-    } catch (error: any) {
+    } catch (error: unknown) {
       Toast.show({
         type: "error",
         text1:
-          error?.response?.data?.message ||
-          "Could not reach AI service. Please try again.",
+          error instanceof AxiosError
+            ? error.response?.data?.message ||
+              "Could not reach AI service. Please try again."
+            : "Could not reach AI service. Please try again.",
       });
 
       setMessages((prev) => [

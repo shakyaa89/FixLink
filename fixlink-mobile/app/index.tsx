@@ -1,9 +1,7 @@
 import { useRouter } from "expo-router";
-import { Pressable, Text, View } from "react-native";
+import { Image, Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
-  Home,
-  Star,
   CheckCircle,
   Clock,
   Shield
@@ -45,20 +43,20 @@ export default function Index() {
   return (
     <SafeAreaView className="flex-1 bg-primary">
       <View className="flex-1 px-6 py-6 justify-between">
-        
+
 
         {/* Hero Section */}
-        <View className="gap-8 flex-1 justify-center">
-          <Text className="text-6xl font-bold text-text">FixLink</Text>
+        <View className="gap-8 flex-1 justify-center items-center">
+          <Image style={{ width: 200, height: 150}} resizeMode="contain" source={require('../assets/images/logo.png')} />
           <View className="gap-3">
-            <Text className="text-5xl font-bold text-text leading-tight">
+            <Text className="text-5xl font-bold text-text leading-tight text-center">
               Home Repairs,{'\n'}
               <Text className="text-accent">Made Simple</Text>
             </Text>
-            <Text className="text-lg text-muted leading-relaxed">
+            <Text className="text-lg text-muted leading-relaxed text-center">
               Connect with verified local service providers for quick, reliable home repairs.
             </Text>
-          </View>          
+          </View>
 
           {/* Quick Features */}
           <View className="flex-row gap-3">

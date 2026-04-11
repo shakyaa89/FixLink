@@ -12,7 +12,7 @@ import Sidebar from "../../components/Sidebar/Sidebar";
 import { useAuthStore } from "../../store/authStore";
 import toast from "react-hot-toast";
 import axios, { AxiosError } from "axios";
-import { AuthApi } from "../../api/Apis";
+import { AuthApi, CLOUDINARY_UPLOAD_URL } from "../../api/Apis";
 import { useNavigate } from "react-router-dom";
 
 const CITIES = ["Kathmandu", "Lalitpur", "Bhaktapur"];
@@ -49,7 +49,7 @@ export default function EditProfilePage() {
 
         try {
             const { data } = await axios.post(
-                "https://api.cloudinary.com/v1_1/diocl7ilu/image/upload",
+                CLOUDINARY_UPLOAD_URL,
                 formData,
             );
             return data.secure_url;

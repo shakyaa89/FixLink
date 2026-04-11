@@ -26,9 +26,9 @@ import {
 import colors from "@/app/_constants/theme";
 import { useAuthStore } from "@/store/authStore";
 import Toast from "react-native-toast-message";
-import { AuthApi } from "@/api/Apis";
+import { AuthApi, CLOUDINARY_UPLOAD_URL } from "@/api/Apis";
 import * as ImagePicker from "expo-image-picker";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { Picker } from "@react-native-picker/picker";
 import { isServiceProviderProfileComplete } from "@/utils/serviceProviderProfile";
 
@@ -139,7 +139,7 @@ export default function ProfileScreen() {
 
     try {
       const { data } = await axios.post(
-        "https://api.cloudinary.com/v1_1/diocl7ilu/image/upload",
+        CLOUDINARY_UPLOAD_URL,
         formData,
         {
           headers: {
@@ -208,13 +208,13 @@ export default function ProfileScreen() {
         type: "success",
         text1: response?.data?.message || "Profile updated successfully",
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       Toast.show({
         type: "error",
         text1:
-          error?.response?.data?.message ||
-          error?.message ||
-          "Unable to update profile",
+          error instanceof AxiosError
+            ? error.response?.data?.message || error.message || "Unable to update profile"
+            : "Unable to update profile",
       });
     } finally {
       setSaving(false);

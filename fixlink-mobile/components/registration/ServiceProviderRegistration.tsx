@@ -23,9 +23,9 @@ import {
 import { Picker } from "@react-native-picker/picker";
 import colors from "@/app/_constants/theme";
 import * as ImagePicker from "expo-image-picker";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import Toast from "react-native-toast-message";
-import { AuthApi } from "@/api/Apis";
+import { AuthApi, CLOUDINARY_UPLOAD_URL } from "@/api/Apis";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useAuthStore } from "@/store/authStore";
 
@@ -91,7 +91,7 @@ export default function ServiceProviderRegistration() {
         formData.append("upload_preset", "unsigned_upload");
 
         const response = await axios.post(
-                "https://api.cloudinary.com/v1_1/diocl7ilu/image/upload",
+                CLOUDINARY_UPLOAD_URL,
             formData,
             {
                 headers: {
@@ -161,11 +161,11 @@ export default function ServiceProviderRegistration() {
             setAgreeToTerms(false);
 
             router.replace("/");
-        } catch (err: any) {
+        } catch (err: unknown) {
             const message =
-                err?.response?.data?.message ||
-                err?.message ||
-                "Registration failed";
+                err instanceof AxiosError
+                    ? err.response?.data?.message || err.message || "Registration failed"
+                    : "Registration failed";
             Toast.show({ type: "error", text1: message });
         } finally {
             setUploading(false);

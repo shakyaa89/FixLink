@@ -11,7 +11,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import Toast from "react-native-toast-message";
 import {
   ArrowLeft,
@@ -21,7 +21,7 @@ import {
 } from "lucide-react-native";
 import { Picker } from "@react-native-picker/picker";
 import colors from "@/app/_constants/theme";
-import { AiApi, JobApi } from "@/api/Apis";
+import { AiApi, CLOUDINARY_UPLOAD_URL, JobApi } from "@/api/Apis";
 import { useAuthStore } from "@/store/authStore";
 import { CITIES, LOCATION_OPTIONS } from "@/utils/nepalLocations";
 
@@ -103,7 +103,7 @@ export default function CreateJobPage() {
         formData.append("upload_preset", "job_image_upload");
 
         const { data } = await axios.post(
-          "https://api.cloudinary.com/v1_1/diocl7ilu/image/upload",
+          CLOUDINARY_UPLOAD_URL,
           formData,
           { headers: { "Content-Type": "multipart/form-data" } }
         );
@@ -169,10 +169,13 @@ export default function CreateJobPage() {
       });
 
       router.replace("/jobs");
-    } catch (error: any) {
+    } catch (error: unknown) {
       Toast.show({
         type: "error",
-        text1: error?.response?.data?.message || "Error creating job",
+        text1:
+          error instanceof AxiosError
+            ? error.response?.data?.message || "Error creating job"
+            : "Error creating job",
       });
     } finally {
       setSubmitting(false);
