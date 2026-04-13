@@ -68,6 +68,7 @@ export interface JobData {
     location: string;
     locationURL: string;
     jobStatus?: string;
+    scheduledFor?: string;
     images: string[];
     offers?: OfferData[];
     createdAt?: string;
@@ -174,6 +175,11 @@ export const JobApi = {
     createJobApi: async (jobData: JobData) => {
         const headers = await getAuthHeader();
         return Api.post("/job/create", jobData, { headers })
+    },
+
+    scheduleJobApi: async (jobData: JobData & { scheduledFor: string }) => {
+        const headers = await getAuthHeader();
+        return Api.post("/job/schedule", jobData, { headers })
     },
 
     fetchUserJobsApi: async () =>

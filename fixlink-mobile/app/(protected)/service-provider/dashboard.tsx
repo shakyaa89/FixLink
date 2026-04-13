@@ -116,6 +116,14 @@ export default function ProviderDashboard() {
             {verificationStatus === "rejected" && Boolean(user?.rejectionReason) && (
               <Text className="text-sm text-muted mt-2">{user?.rejectionReason}</Text>
             )}
+            {verificationStatus === "rejected" && (
+              <Pressable
+                className="mt-3 bg-accent rounded-xl py-2.5 items-center"
+                onPress={() => router.push("/service-provider/complete-profile")}
+              >
+                <Text className="text-white text-sm font-semibold">Reupload verification proof</Text>
+              </Pressable>
+            )}
           </View>
 
           <View className="flex-row gap-3">

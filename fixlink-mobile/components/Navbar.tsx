@@ -31,7 +31,9 @@ export default function NavBar() {
         if (user?.role === "serviceProvider") {
             const isProviderComplete = isServiceProviderProfileComplete(user);
             navigateIfNeeded(
-                isProviderComplete ? "/service-provider/dashboard" : "/service-provider/complete-profile",
+                isProviderComplete && user.verificationStatus !== "rejected"
+                    ? "/service-provider/dashboard"
+                    : "/service-provider/complete-profile",
                 ["/(protected)/service-provider/dashboard", "/(protected)/service-provider/complete-profile"]
             );
             return;

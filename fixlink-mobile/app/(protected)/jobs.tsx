@@ -57,6 +57,8 @@ function Jobs() {
       case "open":
       case "pending":
         return "bg-green-100 border-green-200";
+      case "scheduled":
+        return "bg-amber-100 border-amber-200";
       case "in-progress":
         return "bg-blue-100 border-blue-200";
       case "completed":
@@ -180,6 +182,20 @@ function Jobs() {
             )}
 
             {jobs.map((job) => {
+              const hasSchedule = Boolean(job.scheduledFor);
+              const displayPrice =
+                typeof job.finalPrice === "number" && job.finalPrice > 0
+                  ? job.finalPrice
+                  : job.userPrice;
+              const scheduleLabel = hasSchedule
+                ? new Date(job.scheduledFor || "").toLocaleString(undefined, {
+                    month: "short",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })
+                : null;
+
               return (
                 <View
                   key={job._id}
@@ -199,7 +215,7 @@ function Jobs() {
                     </View>
                     <View className="items-end gap-1.5">
                       <Text className="text-base font-semibold text-accent">
-                        Rs. {(job.jobStatus === "open" ? job.userPrice : job.finalPrice ?? job.userPrice)?.toLocaleString()}
+                        Rs. {displayPrice?.toLocaleString()}
                       </Text>
                       <View
                         className={`rounded-full border px-3 py-1 ${getStatusStyles(job.jobStatus)}`}
@@ -213,17 +229,21 @@ function Jobs() {
                     {job.description}
                   </Text>
 
-                  <View className="flex-row items-center gap-4 mt-4">
-                    <View className="flex-row items-center gap-2">
+                  <View className="mt-4 gap-2">
+                    <View className="flex-row items-start gap-2">
                       <MapPin size={16} color={colors.muted} />
-                      <Text className="text-sm text-muted">{job.location}</Text>
+                      <Text className="text-sm text-muted flex-1" numberOfLines={1}>
+                        {job.location}
+                      </Text>
                     </View>
-                    <View className="flex-row items-center gap-2">
+                    <View className="flex-row items-start gap-2">
                       <Calendar size={16} color={colors.muted} />
-                      <Text className="text-sm text-muted">
-                        {job.createdAt
-                          ? new Date(job.createdAt).toLocaleDateString()
-                          : "N/A"}
+                      <Text className="text-sm text-muted flex-1" numberOfLines={2}>
+                        {hasSchedule && scheduleLabel
+                          ? `Scheduled ${scheduleLabel}`
+                          : job.createdAt
+                            ? new Date(job.createdAt).toLocaleDateString()
+                            : "N/A"}
                       </Text>
                     </View>
                   </View>

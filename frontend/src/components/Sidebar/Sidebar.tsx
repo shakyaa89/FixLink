@@ -85,6 +85,24 @@ export default function Sidebar() {
 
         {user?.role === "serviceProvider" && isProviderComplete && (
           <>
+            {user.verificationStatus === "rejected" && (
+              <NavLink
+                to="/serviceprovider/complete-profile"
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-4 py-3 rounded-lg ${
+                    isActive
+                      ? "bg-(--accent) text-white shadow"
+                      : "hover:bg-(--secondary)"
+                  } `
+                }
+              >
+                <Flag className="w-5 h-5 shrink-0" />
+                <p className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                  Reupload Proofs
+                </p>
+              </NavLink>
+            )}
+
             <NavLink
               to="/serviceprovider/dashboard"
               className={({ isActive }) =>

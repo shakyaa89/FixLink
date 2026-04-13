@@ -215,6 +215,14 @@ export default function UserDashboard() {
                       Rejection reason: {user.rejectionReason}
                     </p>
                   )}
+                {user.verificationStatus === "rejected" && (
+                  <Link
+                    to="/serviceprovider/complete-profile"
+                    className="mt-3 inline-flex items-center rounded-lg border border-red-300 bg-white px-3 py-1.5 text-sm font-medium text-red-700 hover:bg-red-100"
+                  >
+                    Reupload verification proof
+                  </Link>
+                )}
               </div>
             )}
             <h1 className="text-3xl sm:text-4xl font-bold text-(--text)">

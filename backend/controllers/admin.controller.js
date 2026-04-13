@@ -5,6 +5,10 @@ import Offer from "../models/offer.model.js";
 import Review from "../models/review.model.js";
 import Message from "../models/message.model.js";
 import mongoose from "mongoose";
+import {
+  deleteCloudinaryImagesByUrls,
+  getRemovedCloudinaryUrls,
+} from "../lib/cloudinary.js";
 
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
 
@@ -100,6 +104,13 @@ export const updateAdminUser = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    const previousImageUrls = [
+      currentUser.profilePicture,
+      currentUser.verificationProofURL,
+      currentUser.idProofURL,
+      currentUser.addressURL,
+    ];
+
     const {
       fullName,
       email,
@@ -167,6 +178,14 @@ export const updateAdminUser = async (req, res) => {
 
     await currentUser.save();
 
+    const removedImageUrls = getRemovedCloudinaryUrls(previousImageUrls, [
+      currentUser.profilePicture,
+      currentUser.verificationProofURL,
+      currentUser.idProofURL,
+      currentUser.addressURL,
+    ]);
+    await deleteCloudinaryImagesByUrls(removedImageUrls);
+
     const user = await User.findById(userId).select("-password").lean();
 
     return res.status(200).json({
@@ -192,11 +211,24 @@ export const deleteAdminUser = async (req, res) => {
       return res.status(400).json({ message: "Admin cannot delete own account" });
     }
 
+    const userJobs = await Job.find({ userId }).select("images").lean();
+
     const deletedUser = await User.findByIdAndDelete(userId).lean();
 
     if (!deletedUser) {
       return res.status(404).json({ message: "User not found" });
     }
+
+    const userImageUrls = [
+      deletedUser.profilePicture,
+      deletedUser.verificationProofURL,
+      deletedUser.idProofURL,
+      deletedUser.addressURL,
+    ];
+    const jobImageUrls = userJobs.flatMap((job) =>
+      Array.isArray(job.images) ? job.images : [],
+    );
+    await deleteCloudinaryImagesByUrls([...userImageUrls, ...jobImageUrls]);
 
     return res.status(200).json({ message: "User deleted successfully" });
   } catch (error) {
@@ -325,6 +357,8 @@ export const updateAdminJob = async (req, res) => {
       return res.status(404).json({ message: "Job not found" });
     }
 
+    const previousImages = Array.isArray(job.images) ? [...job.images] : [];
+
     const {
       userId,
       title,
@@ -381,6 +415,9 @@ export const updateAdminJob = async (req, res) => {
 
     await job.save();
 
+    const removedImageUrls = getRemovedCloudinaryUrls(previousImages, job.images);
+    await deleteCloudinaryImagesByUrls(removedImageUrls);
+
     const updatedJob = await Job.findById(jobId)
       .populate("userId", "fullName")
       .populate({ path: "offers", populate: { path: "serviceProviderId", select: "fullName email" } })
@@ -406,6 +443,8 @@ export const deleteAdminJob = async (req, res) => {
     if (!deletedJob) {
       return res.status(404).json({ message: "Job not found" });
     }
+
+    await deleteCloudinaryImagesByUrls(deletedJob.images);
 
     await Offer.deleteMany({ jobId });
     await Dispute.deleteMany({ jobId });

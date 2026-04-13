@@ -40,6 +40,7 @@ export default function CompleteProviderProfileScreen() {
   const router = useRouter();
   const { user, setUser } = useAuthStore();
   const address = user?.address?.trim() || "";
+  const isResubmission = user?.verificationStatus === "rejected";
 
   const [providerCategory, setProviderCategory] = useState(user?.providerCategory || "");
   const [addressDescription, setAddressDescription] = useState(user?.addressDescription || "");
@@ -199,13 +200,28 @@ export default function CompleteProviderProfileScreen() {
               <ArrowLeft size={20} color={colors.text} />
             </Pressable>
             <View className="flex-1">
-              <Text className="text-2xl font-bold text-text">Complete Profile</Text>
-              <Text className="text-sm text-muted">Submit required details to continue</Text>
+              <Text className="text-2xl font-bold text-text">
+                {isResubmission ? "Reupload Verification" : "Complete Profile"}
+              </Text>
+              <Text className="text-sm text-muted">
+                {isResubmission
+                  ? "Your previous verification was rejected. Upload updated documents for review."
+                  : "Submit required details to continue"}
+              </Text>
             </View>
             <View className="w-10 h-10 rounded-xl bg-accent/10 items-center justify-center">
               <FileText size={18} color={colors.accent} />
             </View>
           </View>
+
+          {isResubmission && (
+            <View className="bg-red-50 border border-red-200 rounded-xl px-3 py-3">
+              <Text className="text-sm font-semibold text-red-800">Previous verification was rejected</Text>
+              <Text className="text-sm text-red-700 mt-1">
+                {user?.rejectionReason || "No rejection reason provided."}
+              </Text>
+            </View>
+          )}
 
           <View className="bg-secondary border border-border rounded-2xl p-4 gap-3">
             <View className="flex-row items-center gap-2">
@@ -307,7 +323,9 @@ export default function CompleteProviderProfileScreen() {
                 </Text>
               </View>
             ) : (
-              <Text className="text-white font-semibold">Submit Documents</Text>
+              <Text className="text-white font-semibold">
+                {isResubmission ? "Re-submit Documents" : "Submit Documents"}
+              </Text>
             )}
           </Pressable>
         </View>

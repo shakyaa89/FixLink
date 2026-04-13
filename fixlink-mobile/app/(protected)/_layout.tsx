@@ -23,7 +23,8 @@ export default function ProtectedLayout() {
     if (
         user.role === "serviceProvider" &&
         isProviderComplete &&
-        pathname === "/service-provider/complete-profile"
+        pathname === "/service-provider/complete-profile" &&
+        user.verificationStatus !== "rejected"
     ) {
         return <Redirect href="/service-provider/dashboard" />;
     }

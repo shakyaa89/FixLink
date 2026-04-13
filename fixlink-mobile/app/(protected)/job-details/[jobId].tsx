@@ -93,6 +93,8 @@ export default function JobDetailsPage() {
       case "open":
       case "pending":
         return "bg-green-100 border-green-200";
+      case "scheduled":
+        return "bg-amber-100 border-amber-200";
       case "closed":
         return "bg-red-100 border-red-200";
       case "in-progress":
@@ -332,6 +334,11 @@ export default function JobDetailsPage() {
     | { fullName?: string; email?: string; phoneNumber?: string }
     | undefined;
 
+  const displayPrice =
+    typeof job.finalPrice === "number" && job.finalPrice > 0
+      ? job.finalPrice
+      : job.userPrice;
+
   return (
     <SafeAreaView className="flex-1 bg-primary">
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
@@ -362,6 +369,14 @@ export default function JobDetailsPage() {
                   Posted {new Date(job.createdAt || "").toLocaleDateString()}
                 </Text>
               </View>
+              {job.scheduledFor && (
+                <View className="flex-row items-center gap-1">
+                  <Calendar size={14} color={colors.muted} />
+                  <Text className="text-xs text-muted">
+                    Scheduled {new Date(job.scheduledFor).toLocaleString()}
+                  </Text>
+                </View>
+              )}
               <View className="flex-row items-center gap-1">
                 <Tag size={14} color={colors.muted} />
                 <Text className="text-xs text-muted">{job.jobCategory}</Text>
@@ -414,7 +429,7 @@ export default function JobDetailsPage() {
               <View>
                 <Text className="text-xs text-muted">Price</Text>
                 <Text className="text-2xl font-bold text-text">
-                  Rs. {(job.jobStatus === "open" ? job.userPrice : job.finalPrice ?? job.userPrice)?.toLocaleString()}
+                  Rs. {displayPrice?.toLocaleString()}
                 </Text>
               </View>
             </View>
@@ -448,7 +463,7 @@ export default function JobDetailsPage() {
             <Text className="text-text leading-6">{job.description || "No description provided."}</Text>
           </View>
 
-          {user?.role === "user" && (job.jobStatus === "open" || job.jobStatus === "in-progress") && (
+          {user?.role === "user" && (job.jobStatus === "open" || job.jobStatus === "in-progress" || job.jobStatus === "scheduled") && (
             <Pressable
               className="bg-red-600 rounded-xl py-3 items-center active:opacity-90 disabled:opacity-60"
               disabled={cancelingJob}

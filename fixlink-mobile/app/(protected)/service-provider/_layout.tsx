@@ -27,7 +27,11 @@ export default function RootLayout() {
     return <Redirect href="/service-provider/complete-profile" />;
   }
 
-  if (isProviderComplete && pathname === "/service-provider/complete-profile") {
+  if (
+    isProviderComplete &&
+    pathname === "/service-provider/complete-profile" &&
+    user.verificationStatus !== "rejected"
+  ) {
     return <Redirect href="/service-provider/dashboard" />;
   }
 

@@ -18,6 +18,7 @@ import {
     ArrowLeft,
     User,
     Phone,
+    MapPin,
     Upload,
 } from "lucide-react-native";
 import { Picker } from "@react-native-picker/picker";
@@ -28,8 +29,8 @@ import Toast from "react-native-toast-message";
 import { AuthApi, CLOUDINARY_UPLOAD_URL } from "@/api/Apis";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useAuthStore } from "@/store/authStore";
+import { CITIES, LOCATION_OPTIONS } from "@/utils/nepalLocations";
 
-const CITIES = ["Kathmandu", "Lalitpur", "Bhaktapur"];
 const MAX_IMAGE_SIZE_BYTES = 2 * 1024 * 1024;
 
 export default function ServiceProviderRegistration() {
@@ -45,9 +46,17 @@ export default function ServiceProviderRegistration() {
     const [email, setEmail] = useState("");
     const [phoneNumber, setPhoneNumber] = useState("");
     const [city, setCity] = useState("");
+    const [address, setAddress] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [profilePicture, setProfilePicture] = useState<ImagePicker.ImagePickerAsset | null>(null);
+
+    const handleCityChange = (selectedCity: string) => {
+        setCity(selectedCity);
+        setAddress("");
+    };
+
+    const availableAddresses = city ? LOCATION_OPTIONS[city] ?? [] : [];
 
     const pickImage = async (
         setImage: (img: ImagePicker.ImagePickerAsset | null) => void
@@ -109,6 +118,7 @@ export default function ServiceProviderRegistration() {
             !email ||
             !phoneNumber ||
             !city ||
+            !address ||
             !password ||
             !confirmPassword ||
             !profilePicture
@@ -138,6 +148,7 @@ export default function ServiceProviderRegistration() {
                 email,
                 phoneNumber,
                 city,
+                address,
                 password,
                 role: "serviceProvider",
                 profilePicture: profileUrl,
@@ -155,6 +166,7 @@ export default function ServiceProviderRegistration() {
             setEmail("");
             setPhoneNumber("");
             setCity("");
+            setAddress("");
             setPassword("");
             setConfirmPassword("");
             setProfilePicture(null);
@@ -250,7 +262,7 @@ export default function ServiceProviderRegistration() {
                             <View className="border border-border rounded-xl px-1 bg-secondary">
                                 <Picker
                                     selectedValue={city}
-                                    onValueChange={(itemValue) => setCity(itemValue)}
+                                    onValueChange={(itemValue) => handleCityChange(itemValue)}
                                     style={{ color: colors.text }}
                                     dropdownIconColor={colors.muted}
                                 >
@@ -259,6 +271,37 @@ export default function ServiceProviderRegistration() {
                                         <Picker.Item key={cityOption} label={cityOption} value={cityOption} />
                                     ))}
                                 </Picker>
+                            </View>
+                        </View>
+
+                        <View className="gap-2">
+                            <Text className="text-sm font-medium text-text">Address</Text>
+                            <View className="border border-border rounded-xl px-2 bg-secondary flex-row items-center gap-2">
+                                <View className="pl-2">
+                                    <MapPin size={20} color={colors.muted} />
+                                </View>
+                                <View className="flex-1">
+                                    <Picker
+                                        selectedValue={address}
+                                        enabled={availableAddresses.length > 0}
+                                        onValueChange={(itemValue) => setAddress(itemValue)}
+                                        style={{ color: colors.text }}
+                                        dropdownIconColor={colors.muted}
+                                    >
+                                        <Picker.Item
+                                            label={city ? "Select address" : "Select city first"}
+                                            value=""
+                                            color={colors.muted}
+                                        />
+                                        {availableAddresses.map((addressOption) => (
+                                            <Picker.Item
+                                                key={addressOption}
+                                                label={addressOption}
+                                                value={addressOption}
+                                            />
+                                        ))}
+                                    </Picker>
+                                </View>
                             </View>
                         </View>
 

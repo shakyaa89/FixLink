@@ -177,6 +177,11 @@ export default function JobDetailsPage() {
     );
   }
 
+  const displayPrice =
+    typeof job?.finalPrice === "number" && job.finalPrice > 0
+      ? job.finalPrice
+      : job?.userPrice ?? 0;
+
   if (error || !job) {
     return (
       <div className="flex min-h-screen">
@@ -334,10 +339,7 @@ export default function JobDetailsPage() {
                       <div>
                         <p className="text-sm text-(--muted) mb-1">Price</p>
                         <p className="text-2xl font-bold text-(--text)">
-                          Rs.{" "}
-                          {job.jobStatus === "open"
-                            ? job.userPrice?.toLocaleString()
-                            : job.finalPrice?.toLocaleString()}
+                          Rs. {displayPrice?.toLocaleString()}
                         </p>
                       </div>
                     </div>

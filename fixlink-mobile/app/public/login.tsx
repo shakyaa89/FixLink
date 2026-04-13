@@ -31,7 +31,8 @@ export default function Login() {
         router.replace("/user/dashboard");
       } else if (currentUser?.role === "serviceProvider") {
         router.replace(
-          isServiceProviderProfileComplete(currentUser)
+          isServiceProviderProfileComplete(currentUser) &&
+          currentUser.verificationStatus !== "rejected"
             ? "/service-provider/dashboard"
             : "/service-provider/complete-profile"
         );

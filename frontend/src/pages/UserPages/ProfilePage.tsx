@@ -75,6 +75,12 @@ export default function ProfilePage() {
                 <p className="mt-1 text-sm text-red-700">
                   {user.rejectionReason || "No rejection reason provided."}
                 </p>
+                <button
+                  onClick={() => navigate("/serviceprovider/complete-profile")}
+                  className="mt-3 inline-flex items-center rounded-lg border border-red-300 bg-white px-3 py-1.5 text-sm font-medium text-red-700 hover:bg-red-100"
+                >
+                  Reupload verification proof
+                </button>
               </div>
             )}
 

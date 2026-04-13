@@ -16,6 +16,7 @@ interface AdminJobDetail {
   jobStatus?: string;
   createdAt?: string;
   scheduledFor?: string;
+  images?: string[];
   userId?: { _id?: string; fullName?: string } | string;
 }
 
@@ -28,6 +29,7 @@ const resolveUser = (userId?: AdminJobDetail["userId"]) => {
 export default function AdminJobDetailsPage() {
   const { jobId } = useParams<{ jobId: string }>();
   const [job, setJob] = useState<AdminJobDetail | null>(null);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -39,7 +41,9 @@ export default function AdminJobDetailsPage() {
         setLoading(true);
         setError(null);
         const response = await AdminApi.fetchJobById(jobId);
-        setJob(response.data.job || null);
+        const fetchedJob = response.data.job || null;
+        setJob(fetchedJob);
+        setSelectedImageIndex(0);
       } catch (err) {
         console.error("Failed to fetch job", err);
         setError("Unable to load job details.");
@@ -84,6 +88,51 @@ export default function AdminJobDetailsPage() {
             <div className="text-(--muted)">Job not found.</div>
           ) : (
             <div className="bg-(--primary) border border-(--border) rounded-2xl p-6 space-y-4">
+              <div>
+                <p className="text-xs text-(--muted)">Images</p>
+                {job.images && job.images.length > 0 ? (
+                  <div className="space-y-3 mt-2">
+                    <img
+                      src={job.images[selectedImageIndex]}
+                      alt={`Job image ${selectedImageIndex + 1}`}
+                      className="w-full max-h-96 object-cover rounded-xl border border-(--border)"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src =
+                          "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=600";
+                      }}
+                    />
+                    {job.images.length > 1 && (
+                      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
+                        {job.images.map((image, idx) => (
+                          <button
+                            type="button"
+                            key={`${image}-${idx}`}
+                            onClick={() => setSelectedImageIndex(idx)}
+                            className={`rounded-lg overflow-hidden border ${
+                              selectedImageIndex === idx
+                                ? "border-(--accent) ring-2 ring-(--accent)/30"
+                                : "border-(--border)"
+                            }`}
+                          >
+                            <img
+                              src={image}
+                              alt={`Job thumbnail ${idx + 1}`}
+                              className="w-full h-16 object-cover"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).src =
+                                  "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=200";
+                              }}
+                            />
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-(--text)">No images available</p>
+                )}
+              </div>
+
               <div>
                 <p className="text-xs text-(--muted)">Title</p>
                 <p className="text-(--text) font-semibold">{job.title || "-"}</p>

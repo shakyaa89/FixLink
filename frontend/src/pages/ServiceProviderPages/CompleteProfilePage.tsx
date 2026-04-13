@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Upload, Loader2, Link2, FileText } from "lucide-react";
 import axios, { AxiosError } from "axios";
 import toast from "react-hot-toast";
@@ -27,7 +27,15 @@ export default function CompleteProfilePage() {
 
   const { user, setUser } = useAuthStore();
   const address = user?.address?.trim() || "";
+  const isResubmission = user?.verificationStatus === "rejected";
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!user) return;
+    setProviderCategory(user.providerCategory || "");
+    setAddressDescription(user.addressDescription || "");
+    setAddressURL(user.addressURL || "");
+  }, [user]);
 
   const uploadToCloudinary = async (file: File, preset: string) => {
     if (file.size > MAX_IMAGE_SIZE_BYTES) {
@@ -137,12 +145,23 @@ export default function CompleteProfilePage() {
             <FileText className="w-8 h-8 text-(--primary)" />
           </div>
           <h1 className="text-3xl font-bold text-(--text)">
-            Complete Your Profile
+            {isResubmission ? "Reupload Verification Proof" : "Complete Your Profile"}
           </h1>
           <p className="text-(--muted) mt-2">
-            Upload required documents to continue.
+            {isResubmission
+              ? "Your previous verification was rejected. Upload updated documents to request review again."
+              : "Upload required documents to continue."}
           </p>
         </div>
+
+        {isResubmission && (
+          <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+            <p className="text-sm font-semibold text-red-800">Previous verification was rejected</p>
+            <p className="mt-1 text-sm text-red-700">
+              {user?.rejectionReason || "No rejection reason provided by admin."}
+            </p>
+          </div>
+        )}
 
         <div className="bg-(--primary) rounded-3xl shadow-xl p-8">
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -280,7 +299,7 @@ export default function CompleteProfilePage() {
                   {uploading ? "Uploading..." : "Saving..."}
                 </span>
               ) : (
-                "Submit Documents"
+                isResubmission ? "Re-submit Documents" : "Submit Documents"
               )}
             </button>
           </form>

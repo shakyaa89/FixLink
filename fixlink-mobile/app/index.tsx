@@ -25,7 +25,7 @@ export default function Index() {
     if (user.role === "serviceProvider") {
       const isProviderComplete = isServiceProviderProfileComplete(user);
       router.replace(
-        isProviderComplete
+        isProviderComplete && user.verificationStatus !== "rejected"
           ? "/service-provider/dashboard"
           : "/service-provider/complete-profile"
       );

@@ -27,7 +27,10 @@ const ServiceProviderOnboardingRoute = ({ children }: Props) => {
     return <Navigate to="/auth" replace />;
   }
 
-  if (isServiceProviderProfileComplete(user)) {
+  if (
+    isServiceProviderProfileComplete(user) &&
+    user?.verificationStatus !== "rejected"
+  ) {
     return <Navigate to="/serviceprovider/dashboard" replace />;
   }
 

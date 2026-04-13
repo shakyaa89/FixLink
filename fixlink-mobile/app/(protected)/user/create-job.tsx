@@ -16,6 +16,7 @@ import Toast from "react-native-toast-message";
 import {
   ArrowLeft,
   BriefcaseBusiness,
+  CalendarClock,
   Check,
   ImagePlus,
 } from "lucide-react-native";
@@ -47,6 +48,9 @@ export default function CreateJobPage() {
   const [location, setLocation] = useState("");
   const [locationURL, setLocationURL] = useState("");
   const [images, setImages] = useState<string[]>([]);
+  const [postType, setPostType] = useState<"now" | "schedule">("now");
+  const [scheduledDate, setScheduledDate] = useState("");
+  const [scheduledTime, setScheduledTime] = useState("");
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -133,6 +137,81 @@ export default function CreateJobPage() {
       return;
     }
 
+    let scheduledForISO: string | null = null;
+
+    if (postType === "schedule") {
+      if (!scheduledDate || !scheduledTime) {
+        Toast.show({
+          type: "error",
+          text1: "Please enter both scheduled date and time",
+        });
+        return;
+      }
+
+      const datePattern = /^\d{4}-\d{2}-\d{2}$/;
+      const timePattern = /^\d{2}:\d{2}$/;
+
+      if (!datePattern.test(scheduledDate) || !timePattern.test(scheduledTime)) {
+        Toast.show({
+          type: "error",
+          text1: "Use date YYYY-MM-DD and time HH:MM",
+        });
+        return;
+      }
+
+      const [year, month, day] = scheduledDate.split("-").map(Number);
+      const [hour, minute] = scheduledTime.split(":").map(Number);
+
+      if (
+        !year ||
+        !month ||
+        !day ||
+        Number.isNaN(hour) ||
+        Number.isNaN(minute) ||
+        month < 1 ||
+        month > 12 ||
+        day < 1 ||
+        day > 31 ||
+        hour < 0 ||
+        hour > 23 ||
+        minute < 0 ||
+        minute > 59
+      ) {
+        Toast.show({ type: "error", text1: "Invalid date or time values" });
+        return;
+      }
+
+      const scheduledForDate = new Date(year, month - 1, day, hour, minute, 0, 0);
+
+      if (
+        Number.isNaN(scheduledForDate.getTime()) ||
+        scheduledForDate.getFullYear() !== year ||
+        scheduledForDate.getMonth() !== month - 1 ||
+        scheduledForDate.getDate() !== day
+      ) {
+        Toast.show({ type: "error", text1: "Invalid calendar date" });
+        return;
+      }
+
+      const now = new Date();
+      const maxScheduleDate = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+      if (scheduledForDate <= now) {
+        Toast.show({ type: "error", text1: "Scheduled time must be in the future" });
+        return;
+      }
+
+      if (scheduledForDate > maxScheduleDate) {
+        Toast.show({
+          type: "error",
+          text1: "Jobs can only be scheduled up to 1 week ahead",
+        });
+        return;
+      }
+
+      scheduledForISO = scheduledForDate.toISOString();
+    }
+
     try {
       setSubmitting(true);
 
@@ -152,7 +231,7 @@ export default function CreateJobPage() {
 
       const imageUrls = await uploadMultipleToCloudinary(images);
 
-      const response = await JobApi.createJobApi({
+      const jobPayload = {
         userId: user?._id,
         title,
         description,
@@ -161,11 +240,21 @@ export default function CreateJobPage() {
         location: `${city}, ${location}`,
         locationURL,
         images: imageUrls,
-      } as any);
+      };
+
+      const response =
+        postType === "schedule" && scheduledForISO
+          ? await JobApi.scheduleJobApi({
+              ...jobPayload,
+              scheduledFor: scheduledForISO,
+            } as any)
+          : await JobApi.createJobApi(jobPayload as any);
 
       Toast.show({
         type: "success",
-        text1: response?.data?.message || "Job created successfully",
+        text1:
+          response?.data?.message ||
+          (postType === "schedule" ? "Job scheduled successfully" : "Job created successfully"),
       });
 
       router.replace("/jobs");
@@ -242,6 +331,68 @@ export default function CreateJobPage() {
           </View>
 
           <View className="bg-secondary border border-border rounded-2xl p-4 gap-3">
+            <View className="flex-row items-center gap-2">
+              <CalendarClock size={16} color={colors.accent} />
+              <Text className="text-sm font-semibold text-text">Posting Type *</Text>
+            </View>
+
+            <View className="flex-row gap-2">
+              <Pressable
+                onPress={() => setPostType("now")}
+                className={`flex-1 rounded-xl py-2.5 items-center border ${
+                  postType === "now"
+                    ? "bg-accent border-accent"
+                    : "bg-primary border-border"
+                }`}
+              >
+                <Text
+                  className={`font-semibold ${
+                    postType === "now" ? "text-white" : "text-text"
+                  }`}
+                >
+                  Post Now
+                </Text>
+              </Pressable>
+              <Pressable
+                onPress={() => setPostType("schedule")}
+                className={`flex-1 rounded-xl py-2.5 items-center border ${
+                  postType === "schedule"
+                    ? "bg-accent border-accent"
+                    : "bg-primary border-border"
+                }`}
+              >
+                <Text
+                  className={`font-semibold ${
+                    postType === "schedule" ? "text-white" : "text-text"
+                  }`}
+                >
+                  Schedule
+                </Text>
+              </Pressable>
+            </View>
+
+            {postType === "schedule" && (
+              <View className="gap-3">
+                <Text className="text-sm text-muted">
+                  Enter local date and time. Scheduling is limited to the next 7 days.
+                </Text>
+                <TextInput
+                  value={scheduledDate}
+                  onChangeText={setScheduledDate}
+                  placeholder="YYYY-MM-DD"
+                  placeholderTextColor={colors.muted}
+                  className="border border-border rounded-xl px-3 py-3 text-text bg-primary"
+                />
+                <TextInput
+                  value={scheduledTime}
+                  onChangeText={setScheduledTime}
+                  placeholder="HH:MM (24-hour)"
+                  placeholderTextColor={colors.muted}
+                  className="border border-border rounded-xl px-3 py-3 text-text bg-primary"
+                />
+              </View>
+            )}
+
             <Text className="text-sm font-semibold text-text">Your Price (Rs) *</Text>
             <TextInput
               value={userPrice}
@@ -345,11 +496,17 @@ export default function CreateJobPage() {
               <View className="flex-row items-center gap-2">
                 <ActivityIndicator size="small" color="#fff" />
                 <Text className="text-white font-semibold">
-                  {uploading ? "Uploading images..." : "Submitting..."}
+                    {uploading
+                      ? "Uploading images..."
+                      : postType === "schedule"
+                        ? "Scheduling..."
+                        : "Submitting..."}
                 </Text>
               </View>
             ) : (
-              <Text className="text-white font-semibold">Submit Job</Text>
+                <Text className="text-white font-semibold">
+                  {postType === "schedule" ? "Schedule Job" : "Submit Job"}
+                </Text>
             )}
           </Pressable>
         </View>

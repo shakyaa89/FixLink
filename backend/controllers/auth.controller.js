@@ -1,6 +1,10 @@
 import User from "../models/user.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import {
+  deleteCloudinaryImagesByUrls,
+  getRemovedCloudinaryUrls,
+} from "../lib/cloudinary.js";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_REGEX = /^\+?[0-9]{10,15}$/;
@@ -153,6 +157,12 @@ export async function completeServiceProviderProfile(req, res) {
         .json({ message: "All documents and details are required" });
     }
 
+    const previousImageUrls = [
+      user.verificationProofURL,
+      user.idProofURL,
+      user.addressURL,
+    ];
+
     user.verificationProofURL = verificationProofURL;
     user.idProofURL = idURL;
     user.providerCategory = providerCategory;
@@ -163,6 +173,13 @@ export async function completeServiceProviderProfile(req, res) {
     user.rejectionReason = rejectionReason;
 
     await user.save();
+
+    const removedImageUrls = getRemovedCloudinaryUrls(previousImageUrls, [
+      user.verificationProofURL,
+      user.idProofURL,
+      user.addressURL,
+    ]);
+    await deleteCloudinaryImagesByUrls(removedImageUrls);
 
     return res.status(200).json({
       message: "Service provider profile completed",
@@ -244,6 +261,7 @@ export async function updateUserProfile(req, res){
     profilePicture} = req.body;
 
     const currentUser = req.user;
+    const previousImageUrls = [currentUser.profilePicture, currentUser.addressURL];
 
     if(!fullName || !email || !phoneNumber || !city || !address || !addressDescription ){
       return res.status(400).json({message: "All fields are required!"});
@@ -282,6 +300,12 @@ export async function updateUserProfile(req, res){
     currentUser.profilePicture = profilePicture;
 
     await currentUser.save();
+
+    const removedImageUrls = getRemovedCloudinaryUrls(previousImageUrls, [
+      currentUser.profilePicture,
+      currentUser.addressURL,
+    ]);
+    await deleteCloudinaryImagesByUrls(removedImageUrls);
 
     return res.status(200).json({message: "User updated successfully!", updatedUser: currentUser})
 

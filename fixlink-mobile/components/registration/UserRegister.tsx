@@ -30,8 +30,8 @@ import Toast from "react-native-toast-message";
 import { AuthApi, CLOUDINARY_UPLOAD_URL } from "@/api/Apis";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useAuthStore } from "@/store/authStore";
+import { CITIES, LOCATION_OPTIONS } from "@/utils/nepalLocations";
 
-const CITIES = ["Kathmandu", "Lalitpur", "Bhaktapur"];
 const MAX_IMAGE_SIZE_BYTES = 2 * 1024 * 1024;
 
 export default function UserRegister() {
@@ -52,6 +52,13 @@ export default function UserRegister() {
   const [addressDescription, setAddressDescription] = useState("");
   const [addressUrl, setAddressUrl] = useState("");
   const [agreeToTerms, setAgreeToTerms] = useState(false);
+
+  const handleCityChange = (selectedCity: string) => {
+    setCity(selectedCity);
+    setAddress("");
+  };
+
+  const availableAddresses = city ? LOCATION_OPTIONS[city] ?? [] : [];
 
   const pickImage = async () => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -133,6 +140,11 @@ export default function UserRegister() {
       !profilePicture
     ) {
       Toast.show({ type: "error", text1: "Please fill in all required fields" });
+      return;
+    }
+
+    if(phoneNumber.length != 10){
+      Toast.show({type: "error", text1: "The phone number should be 10 digits!"})
       return;
     }
 
@@ -274,7 +286,7 @@ export default function UserRegister() {
               <View className="border border-border rounded-xl px-1 bg-secondary">
                 <Picker
                   selectedValue={city}
-                  onValueChange={(itemValue) => setCity(itemValue)}
+                  onValueChange={(itemValue) => handleCityChange(itemValue)}
                   style={{ color: colors.text }}
                   dropdownIconColor={colors.muted}
                 >
@@ -283,6 +295,35 @@ export default function UserRegister() {
                     <Picker.Item key={cityOption} label={cityOption} value={cityOption} />
                   ))}
                 </Picker>
+              </View>
+            </View>
+
+            <View className="gap-2">
+              <Text className="text-sm font-medium text-text">Address</Text>
+              <View className="border border-border rounded-xl px-2 bg-secondary flex-row items-center gap-2">
+                <MapPin size={20} color={colors.muted} className="ml-2" />
+                <View className="flex-1">
+                  <Picker
+                    selectedValue={address}
+                    enabled={availableAddresses.length > 0}
+                    onValueChange={(itemValue) => setAddress(itemValue)}
+                    style={{ color: colors.text }}
+                    dropdownIconColor={colors.muted}
+                  >
+                    <Picker.Item
+                      label={city ? "Select address" : "Select city first"}
+                      value=""
+                      color={colors.muted}
+                    />
+                    {availableAddresses.map((addressOption) => (
+                      <Picker.Item
+                        key={addressOption}
+                        label={addressOption}
+                        value={addressOption}
+                      />
+                    ))}
+                  </Picker>
+                </View>
               </View>
             </View>
 
@@ -346,20 +387,6 @@ export default function UserRegister() {
                   </Text>
                 </View>
               ) : null}
-            </View>
-
-            <View className="gap-2">
-              <Text className="text-sm font-medium text-text">Address</Text>
-              <View className="border border-border rounded-xl px-4 py-3 flex-row items-center gap-3 bg-secondary">
-                <MapPin size={20} color={colors.muted} />
-                <TextInput
-                  className="flex-1 text-text text-base"
-                  placeholder="Enter your address"
-                  placeholderTextColor={colors.muted}
-                  value={address}
-                  onChangeText={setAddress}
-                />
-              </View>
             </View>
 
             <View className="gap-2">
