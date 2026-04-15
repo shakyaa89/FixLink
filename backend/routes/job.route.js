@@ -11,20 +11,23 @@ import {
   getJobsbyUserId,
   getJobsForProvider,
   scheduleJob,
+  updateJobByUser,
 } from "../controllers/jobs.controller.js";
 import { protectServiceProviderRoute, requireVerifiedProvider } from "../middleware/serviceProvider.middleware.js";
 
 router.post("/create", protectRoute, createJob);
 
-router.post("/schedule", protectRoute, scheduleJob);
-
 router.get("/fetch-user-jobs", protectRoute, getJobsbyUserId);
 
 router.get("/fetch-all-jobs", protectRoute, getJobs);
 
+router.post("/schedule", protectRoute, scheduleJob);
+
 router.get("/fetch/:id", protectRoute, getJobById);
 
 router.get("/provider", protectServiceProviderRoute, getJobsForProvider);
+
+router.put("/update/:id", protectRoute, updateJobByUser);
 
 router.put("/cancel/:id", protectRoute, cancelJob);
 

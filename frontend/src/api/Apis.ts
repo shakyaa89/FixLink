@@ -1,7 +1,7 @@
 import axios from "axios";
 
 
-export const API_BASE_URL = "http://192.168.1.73:3005";
+export const API_BASE_URL = "http://localhost:3005";
 // export const API_BASE_URL = "https://fixlink-n7rz.onrender.com";
 export const CLOUDINARY_UPLOAD_URL = "https://api.cloudinary.com/v1_1/dj1vqpua0/image/upload";
 const baseURL = `${API_BASE_URL}/api`;
@@ -68,6 +68,16 @@ export interface JobData {
   offers?: OfferData[];
   createdAt?: string;
   updatedAt?: string;
+}
+
+export interface UpdateJobData {
+  title?: string;
+  description?: string;
+  jobCategory?: string;
+  userPrice?: number;
+  location?: string;
+  locationURL?: string;
+  images?: string[];
 }
 
 export interface OfferData {
@@ -254,6 +264,9 @@ export const JobApi = {
     Api.get(`/job/provider?category=${category}`, {
       headers: getAuthHeader(),
     }),
+
+  updateJobDetailsApi: (jobId: string, data: UpdateJobData) =>
+    Api.put(`/job/update/${jobId}`, data, { headers: getAuthHeader() }),
 
   cancelJobApi: (jobId: string) =>
     Api.put(`/job/cancel/${jobId}`, {}, { headers: getAuthHeader() }),

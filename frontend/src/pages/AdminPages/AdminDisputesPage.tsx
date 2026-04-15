@@ -75,8 +75,7 @@ export default function AdminDisputesPage() {
     ];
   }, [disputes]);
 
-  useEffect(() => {
-    const fetchDisputes = async () => {
+  const fetchDisputes = async () => {
     try {
       setLoading(true);
       setError(null);
@@ -100,8 +99,9 @@ export default function AdminDisputesPage() {
     }
   };
 
+  useEffect(() => {
     fetchDisputes();
-  });
+  }, []);
 
   const handleDisputeUpdate = async (
     disputeId: string,

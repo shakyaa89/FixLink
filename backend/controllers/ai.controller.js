@@ -117,15 +117,13 @@ export async function chatWithAi(req, res) {
     };
 
     const response = await axios.post(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, payload,
+      `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${apiKey}`, payload,
       {
         headers: {
           "Content-Type": "application/json",
         },
       }
     );
-
-    console.log(response)
 
     const data = await response.data;
 

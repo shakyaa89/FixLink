@@ -81,7 +81,7 @@ function App() {
     >
       <Toaster position="top-center" />
       <Navbar />
-      {user && <Chatbot />}
+      {user && user.role === 'user' && <Chatbot />}
       <main className="grow">
         <Routes>
           <Route

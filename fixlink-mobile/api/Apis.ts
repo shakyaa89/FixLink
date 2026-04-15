@@ -75,6 +75,16 @@ export interface JobData {
     updatedAt?: string;
 }
 
+export interface UpdateJobData {
+    title?: string;
+    description?: string;
+    jobCategory?: string;
+    userPrice?: number;
+    location?: string;
+    locationURL?: string;
+    images?: string[];
+}
+
 export interface OfferData {
     _id?: string;
     jobId: string;
@@ -195,6 +205,9 @@ export const JobApi = {
         Api.get(`/job/provider?category=${category}`, {
             headers: await getAuthHeader(),
         }),
+
+    updateJobDetailsApi: async (jobId: string, data: UpdateJobData) =>
+        Api.put(`/job/update/${jobId}`, data, { headers: await getAuthHeader() }),
 
     cancelJobApi: async (jobId: string) =>
         Api.put(`/job/cancel/${jobId}`, {}, { headers: await getAuthHeader() }),

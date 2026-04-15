@@ -32,8 +32,23 @@ import {
 import Toast from "react-native-toast-message";
 import { AxiosError } from "axios";
 import colors from "@/app/_constants/theme";
-import { JobApi, OfferApi, ReviewApi, type JobData } from "@/api/Apis";
+import {
+  JobApi,
+  OfferApi,
+  ReviewApi,
+  type JobData,
+  type UpdateJobData,
+} from "@/api/Apis";
 import { useAuthStore } from "@/store/authStore";
+
+const JOB_CATEGORIES = [
+  "Plumbing",
+  "Electrical",
+  "Carpentry",
+  "Painting",
+  "Landscaping",
+  "General Repairs",
+];
 
 export default function JobDetailsPage() {
   const { jobId } = useLocalSearchParams<{ jobId: string }>();
@@ -56,6 +71,14 @@ export default function JobDetailsPage() {
   const [acceptingOffer, setAcceptingOffer] = useState(false);
   const [showCancelJobDialog, setShowCancelJobDialog] = useState(false);
   const [showCompleteJobDialog, setShowCompleteJobDialog] = useState(false);
+  const [showEditJobDialog, setShowEditJobDialog] = useState(false);
+  const [updatingJob, setUpdatingJob] = useState(false);
+  const [editTitle, setEditTitle] = useState("");
+  const [editDescription, setEditDescription] = useState("");
+  const [editCategory, setEditCategory] = useState("");
+  const [editPrice, setEditPrice] = useState("");
+  const [editLocation, setEditLocation] = useState("");
+  const [editLocationURL, setEditLocationURL] = useState("");
 
   const [offeredPrice, setOfferedPrice] = useState("");
   const [offerSubmitting, setOfferSubmitting] = useState(false);
@@ -280,6 +303,73 @@ export default function JobDetailsPage() {
     }
   };
 
+  const openEditJobDialog = () => {
+    if (!job) return;
+
+    setEditTitle(job.title || "");
+    setEditDescription(job.description || "");
+    setEditCategory(job.jobCategory || "");
+    setEditPrice(String(job.userPrice || ""));
+    setEditLocation(job.location || "");
+    setEditLocationURL(job.locationURL || "");
+    setShowEditJobDialog(true);
+  };
+
+  const handleUpdateJob = async () => {
+    if (!job?._id) return;
+
+    const parsedPrice = Number(editPrice);
+
+    if (
+      !editTitle.trim() ||
+      !editDescription.trim() ||
+      !editCategory ||
+      !editLocation.trim() ||
+      Number.isNaN(parsedPrice)
+    ) {
+      Toast.show({
+        type: "error",
+        text1: "Please fill all required fields with valid values",
+      });
+      return;
+    }
+
+    if (!JOB_CATEGORIES.includes(editCategory)) {
+      Toast.show({ type: "error", text1: "Please choose a valid category" });
+      return;
+    }
+
+    const payload: UpdateJobData = {
+      title: editTitle.trim(),
+      description: editDescription.trim(),
+      jobCategory: editCategory,
+      userPrice: parsedPrice,
+      location: editLocation.trim(),
+      locationURL: editLocationURL.trim(),
+    };
+
+    try {
+      setUpdatingJob(true);
+      const response = await JobApi.updateJobDetailsApi(job._id, payload);
+      Toast.show({
+        type: "success",
+        text1: response?.data?.message || "Job updated successfully",
+      });
+      setShowEditJobDialog(false);
+      fetchJob();
+    } catch (err: unknown) {
+      Toast.show({
+        type: "error",
+        text1:
+          err instanceof AxiosError
+            ? err.response?.data?.message || "Failed to update job"
+            : "Failed to update job",
+      });
+    } finally {
+      setUpdatingJob(false);
+    }
+  };
+
   const openLocation = async () => {
     if (!job?.locationURL) return;
     const canOpen = await Linking.canOpenURL(job.locationURL);
@@ -464,20 +554,32 @@ export default function JobDetailsPage() {
           </View>
 
           {user?.role === "user" && (job.jobStatus === "open" || job.jobStatus === "in-progress" || job.jobStatus === "scheduled") && (
-            <Pressable
-              className="bg-red-600 rounded-xl py-3 items-center active:opacity-90 disabled:opacity-60"
-              disabled={cancelingJob}
-              onPress={() => setShowCancelJobDialog(true)}
-            >
-              {cancelingJob ? (
-                <View className="flex-row items-center gap-2">
-                  <ActivityIndicator size="small" color="#fff" />
-                  <Text className="text-white font-semibold">Cancelling...</Text>
-                </View>
-              ) : (
-                <Text className="text-white font-semibold">Cancel Job</Text>
+            <View className="gap-3">
+              {(job.jobStatus === "open" || job.jobStatus === "scheduled") && (
+                <Pressable
+                  className="bg-accent rounded-xl py-3 items-center active:opacity-90 disabled:opacity-60"
+                  disabled={updatingJob}
+                  onPress={openEditJobDialog}
+                >
+                  <Text className="text-white font-semibold">Edit Job</Text>
+                </Pressable>
               )}
-            </Pressable>
+
+              <Pressable
+                className="bg-red-600 rounded-xl py-3 items-center active:opacity-90 disabled:opacity-60"
+                disabled={cancelingJob}
+                onPress={() => setShowCancelJobDialog(true)}
+              >
+                {cancelingJob ? (
+                  <View className="flex-row items-center gap-2">
+                    <ActivityIndicator size="small" color="#fff" />
+                    <Text className="text-white font-semibold">Cancelling...</Text>
+                  </View>
+                ) : (
+                  <Text className="text-white font-semibold">Cancel Job</Text>
+                )}
+              </Pressable>
+            </View>
           )}
 
           {user?.role === "user" && job.jobStatus === "open" && (
@@ -831,6 +933,109 @@ export default function JobDetailsPage() {
                   </View>
                 ) : (
                   <Text className="text-white font-semibold">Yes, complete</Text>
+                )}
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal visible={showEditJobDialog} transparent animationType="fade">
+        <View className="flex-1 bg-black/50 items-center justify-center px-6">
+          <View className="bg-primary border border-border rounded-2xl p-5 w-full max-h-[90%]">
+            <Text className="text-lg font-bold text-text">Edit Job Details</Text>
+            <ScrollView className="mt-4" showsVerticalScrollIndicator={false}>
+              <View className="gap-3 pb-2">
+                <Text className="text-sm text-text font-semibold">Title</Text>
+                <TextInput
+                  value={editTitle}
+                  onChangeText={setEditTitle}
+                  placeholder="Fix leaking sink"
+                  placeholderTextColor={colors.muted}
+                  className="border border-border rounded-xl px-3 py-3 text-text bg-secondary"
+                />
+
+                <Text className="text-sm text-text font-semibold">Category</Text>
+                <View className="flex-row flex-wrap gap-2">
+                  {JOB_CATEGORIES.map((category) => {
+                    const active = editCategory === category;
+                    return (
+                      <Pressable
+                        key={category}
+                        onPress={() => setEditCategory(category)}
+                        className={`px-3 py-2 rounded-full border ${
+                          active
+                            ? "bg-accent border-accent"
+                            : "bg-secondary border-border"
+                        }`}
+                      >
+                        <Text className={active ? "text-white" : "text-text"}>{category}</Text>
+                      </Pressable>
+                    );
+                  })}
+                </View>
+
+                <Text className="text-sm text-text font-semibold">Price (NPR)</Text>
+                <TextInput
+                  value={editPrice}
+                  onChangeText={setEditPrice}
+                  keyboardType="numeric"
+                  placeholder="2500"
+                  placeholderTextColor={colors.muted}
+                  className="border border-border rounded-xl px-3 py-3 text-text bg-secondary"
+                />
+
+                <Text className="text-sm text-text font-semibold">Location</Text>
+                <TextInput
+                  value={editLocation}
+                  onChangeText={setEditLocation}
+                  placeholder="Kathmandu, Baneshwor"
+                  placeholderTextColor={colors.muted}
+                  className="border border-border rounded-xl px-3 py-3 text-text bg-secondary"
+                />
+
+                <Text className="text-sm text-text font-semibold">Location URL (optional)</Text>
+                <TextInput
+                  value={editLocationURL}
+                  onChangeText={setEditLocationURL}
+                  placeholder="https://maps.google.com/..."
+                  placeholderTextColor={colors.muted}
+                  className="border border-border rounded-xl px-3 py-3 text-text bg-secondary"
+                  autoCapitalize="none"
+                />
+
+                <Text className="text-sm text-text font-semibold">Description</Text>
+                <TextInput
+                  value={editDescription}
+                  onChangeText={setEditDescription}
+                  placeholder="Describe your service needs"
+                  placeholderTextColor={colors.muted}
+                  className="border border-border rounded-xl px-3 py-3 text-text bg-secondary min-h-[96px]"
+                  multiline
+                  textAlignVertical="top"
+                />
+              </View>
+            </ScrollView>
+
+            <View className="flex-row gap-3 mt-5">
+              <Pressable
+                className="flex-1 border border-border rounded-xl py-2.5 items-center"
+                onPress={() => setShowEditJobDialog(false)}
+              >
+                <Text className="text-text font-medium">Cancel</Text>
+              </Pressable>
+              <Pressable
+                className="flex-1 bg-accent rounded-xl py-2.5 items-center disabled:opacity-60"
+                disabled={updatingJob}
+                onPress={handleUpdateJob}
+              >
+                {updatingJob ? (
+                  <View className="flex-row items-center gap-2">
+                    <ActivityIndicator size="small" color="#fff" />
+                    <Text className="text-white font-semibold">Saving...</Text>
+                  </View>
+                ) : (
+                  <Text className="text-white font-semibold">Save Changes</Text>
                 )}
               </Pressable>
             </View>

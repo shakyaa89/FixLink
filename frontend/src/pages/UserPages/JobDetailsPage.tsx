@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
 import Sidebar from "../../components/Sidebar/Sidebar";
-import { JobApi, OfferApi, ReviewApi, type JobData } from "../../api/Apis";
+import {
+  JobApi,
+  OfferApi,
+  ReviewApi,
+  type JobData,
+  type UpdateJobData,
+} from "../../api/Apis";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   Ban,
@@ -19,9 +25,19 @@ import {
   ArrowLeft,
   ExternalLink,
   ShieldCheck,
+  Pencil,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { AxiosError } from "axios";
+
+const JOB_CATEGORIES = [
+  "Plumbing",
+  "Electrical",
+  "Carpentry",
+  "Painting",
+  "Landscaping",
+  "General Repairs",
+];
 
 export default function JobDetailsPage() {
   const [loading, setLoading] = useState(true);
@@ -31,6 +47,14 @@ export default function JobDetailsPage() {
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [showOfferAcceptDialog, setShowOfferAcceptDialog] = useState(false);
   const [acceptOfferId, setAcceptOfferId] = useState<string>("");
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [updatingJob, setUpdatingJob] = useState(false);
+  const [editTitle, setEditTitle] = useState("");
+  const [editDescription, setEditDescription] = useState("");
+  const [editCategory, setEditCategory] = useState("");
+  const [editPrice, setEditPrice] = useState("");
+  const [editLocation, setEditLocation] = useState("");
+  const [editLocationURL, setEditLocationURL] = useState("");
   const [reviewRating, setReviewRating] = useState(0);
   const [reviewComment, setReviewComment] = useState("");
   const [reviewSubmitting, setReviewSubmitting] = useState(false);
@@ -133,6 +157,64 @@ export default function JobDetailsPage() {
     }
   };
 
+  const openEditDialog = () => {
+    if (!job) return;
+    setEditTitle(job.title || "");
+    setEditDescription(job.description || "");
+    setEditCategory(job.jobCategory || "");
+    setEditPrice(String(job.userPrice || ""));
+    setEditLocation(job.location || "");
+    setEditLocationURL(job.locationURL || "");
+    setShowEditDialog(true);
+  };
+
+  const handleUpdateJob = async () => {
+    if (!job?._id) return;
+
+    const parsedPrice = Number(editPrice);
+
+    if (
+      !editTitle.trim() ||
+      !editDescription.trim() ||
+      !editCategory ||
+      !editLocation.trim() ||
+      Number.isNaN(parsedPrice)
+    ) {
+      toast.error("Please fill all required fields with valid values.");
+      return;
+    }
+
+    if (!JOB_CATEGORIES.includes(editCategory)) {
+      toast.error("Please choose a valid job category.");
+      return;
+    }
+
+    const payload: UpdateJobData = {
+      title: editTitle.trim(),
+      description: editDescription.trim(),
+      jobCategory: editCategory,
+      userPrice: parsedPrice,
+      location: editLocation.trim(),
+      locationURL: editLocationURL.trim(),
+    };
+
+    try {
+      setUpdatingJob(true);
+      const response = await JobApi.updateJobDetailsApi(job._id, payload);
+      toast.success(response?.data?.message || "Job updated successfully");
+      setShowEditDialog(false);
+      fetchJob();
+    } catch (error: unknown) {
+      const message =
+        error instanceof AxiosError
+          ? error.response?.data?.message || "Failed to update job"
+          : "Failed to update job";
+      toast.error(message);
+    } finally {
+      setUpdatingJob(false);
+    }
+  };
+
   const renderReviewStars = (rating: number) => {
     return (
       <div className="flex items-center gap-2">
@@ -215,6 +297,7 @@ export default function JobDetailsPage() {
   const acceptedOffer = job.offers?.find(
     (offer) => offer.status === "accepted",
   );
+  const canEditJob = job.jobStatus === "open" || job.jobStatus === "scheduled";
   const provider = acceptedOffer?.serviceProviderId as
     | { fullName?: string }
     | undefined;
@@ -417,8 +500,18 @@ export default function JobDetailsPage() {
 
                 {/* Action Buttons */}
                 {(job.jobStatus === "open" ||
-                  job.jobStatus === "in-progress") && (
+                  job.jobStatus === "in-progress" ||
+                  job.jobStatus === "scheduled") && (
                   <div className="flex flex-wrap gap-3">
+                    {canEditJob && (
+                      <button
+                        onClick={openEditDialog}
+                        className="flex items-center gap-2 px-5 py-2.5 bg-(--accent) text-white rounded-lg hover:bg-(--accent-hover) transition font-medium shadow-sm"
+                      >
+                        <Pencil className="w-4 h-4" />
+                        Edit Job
+                      </button>
+                    )}
                     <button
                       onClick={() => setShowCancelDialog(true)}
                       className="flex items-center gap-2 px-5 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-medium shadow-sm"
@@ -756,6 +849,102 @@ export default function JobDetailsPage() {
                 className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
               >
                 Yes, Accept offer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Job Dialog */}
+      {showEditDialog && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-(--primary) rounded-xl max-w-2xl w-full p-6 shadow-xl max-h-[90vh] overflow-y-auto">
+            <h3 className="text-xl font-bold text-(--text) mb-4">Edit Job Details</h3>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-(--text) mb-2">Title</label>
+                <input
+                  value={editTitle}
+                  onChange={(e) => setEditTitle(e.target.value)}
+                  className="w-full border border-(--border) rounded-lg px-3 py-2 bg-(--primary) text-(--text)"
+                  placeholder="Fix leaking sink"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-(--text) mb-2">Category</label>
+                <select
+                  value={editCategory}
+                  onChange={(e) => setEditCategory(e.target.value)}
+                  className="w-full border border-(--border) rounded-lg px-3 py-2 bg-(--primary) text-(--text)"
+                >
+                  <option value="">Select category</option>
+                  {JOB_CATEGORIES.map((category) => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-(--text) mb-2">Price (NPR)</label>
+                <input
+                  value={editPrice}
+                  onChange={(e) => setEditPrice(e.target.value)}
+                  type="number"
+                  min={1}
+                  className="w-full border border-(--border) rounded-lg px-3 py-2 bg-(--primary) text-(--text)"
+                  placeholder="2500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-(--text) mb-2">Location</label>
+                <input
+                  value={editLocation}
+                  onChange={(e) => setEditLocation(e.target.value)}
+                  className="w-full border border-(--border) rounded-lg px-3 py-2 bg-(--primary) text-(--text)"
+                  placeholder="Kathmandu, Baneshwor"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-(--text) mb-2">Location URL (optional)</label>
+                <input
+                  value={editLocationURL}
+                  onChange={(e) => setEditLocationURL(e.target.value)}
+                  className="w-full border border-(--border) rounded-lg px-3 py-2 bg-(--primary) text-(--text)"
+                  placeholder="https://maps.google.com/..."
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-(--text) mb-2">Description</label>
+                <textarea
+                  value={editDescription}
+                  onChange={(e) => setEditDescription(e.target.value)}
+                  rows={4}
+                  className="w-full border border-(--border) rounded-lg px-3 py-2 bg-(--primary) text-(--text)"
+                  placeholder="Describe your service needs"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-3 justify-end mt-6">
+              <button
+                onClick={() => setShowEditDialog(false)}
+                className="px-4 py-2 border border-(--border) text-(--text) rounded-lg hover:bg-(--secondary) transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleUpdateJob}
+                disabled={updatingJob}
+                className="px-4 py-2 bg-(--accent) text-white rounded-lg hover:bg-(--accent-hover) transition disabled:opacity-60"
+              >
+                {updatingJob ? "Saving..." : "Save Changes"}
               </button>
             </div>
           </div>

@@ -14,10 +14,12 @@ interface AuthState {
   setUser: (user: any | null) => void;
 }
 
+
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   loading: true,
   checking: true,
+
 
   login: async (email, password) => {
     set({ loading: true });
