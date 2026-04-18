@@ -33,6 +33,7 @@ import Toast from "react-native-toast-message";
 import { AxiosError } from "axios";
 import colors from "@/app/_constants/theme";
 import {
+  AiApi,
   JobApi,
   OfferApi,
   ReviewApi,
@@ -350,6 +351,21 @@ export default function JobDetailsPage() {
 
     try {
       setUpdatingJob(true);
+
+      const verifyJob = await AiApi.verifyJob({
+        title: payload.title || "",
+        description: payload.description || "",
+        userPrice: payload.userPrice || 0,
+      });
+
+      if (verifyJob?.data?.reply !== "VALID") {
+        Toast.show({
+          type: "error",
+          text1: verifyJob?.data?.reply || "Job did not pass AI verification",
+        });
+        return;
+      }
+
       const response = await JobApi.updateJobDetailsApi(job._id, payload);
       Toast.show({
         type: "success",

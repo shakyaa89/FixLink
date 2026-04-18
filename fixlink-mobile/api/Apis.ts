@@ -1,7 +1,7 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export const API_BASE_URL = 'http://192.168.1.66:3005';
+export const API_BASE_URL = 'http://192.168.1.73:3005';
 // export const API_BASE_URL = 'http://localhost:3005';
 // export const API_BASE_URL = 'https://fixlink-n7rz.onrender.com';
 export const CLOUDINARY_UPLOAD_URL = 'https://api.cloudinary.com/v1_1/dj1vqpua0/image/upload';

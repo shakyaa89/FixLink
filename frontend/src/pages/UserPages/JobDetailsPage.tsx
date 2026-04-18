@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Sidebar from "../../components/Sidebar/Sidebar";
 import {
+  AiApi,
   JobApi,
   OfferApi,
   ReviewApi,
@@ -200,6 +201,18 @@ export default function JobDetailsPage() {
 
     try {
       setUpdatingJob(true);
+
+      const verifyJob = await AiApi.verifyJob({
+        title: payload.title || "",
+        description: payload.description || "",
+        userPrice: payload.userPrice || 0,
+      });
+
+      if (verifyJob?.data?.reply !== "VALID") {
+        toast.error(verifyJob?.data?.reply || "Job did not pass AI verification");
+        return;
+      }
+
       const response = await JobApi.updateJobDetailsApi(job._id, payload);
       toast.success(response?.data?.message || "Job updated successfully");
       setShowEditDialog(false);
