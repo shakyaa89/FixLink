@@ -7,6 +7,7 @@ const resolveUserLabel = (
   value?: { _id?: string; fullName?: string; email?: string } | string,
 ) => {
   if (!value) return "-";
+  // API can return sender/receiver as object or plain id.
   if (typeof value === "string") return value;
   return value.fullName || value.email || value._id || "-";
 };
@@ -50,6 +51,7 @@ export default function AdminMessagesPage() {
     }
 
     if (!editDraft.trim()) {
+      // Prevent saving empty or whitespace-only messages.
       setError("Message content cannot be empty.");
       return;
     }
@@ -58,6 +60,7 @@ export default function AdminMessagesPage() {
       setUpdatingId(editTarget.id);
       setError(null);
       await AdminApi.updateMessage(editTarget.id, { content: editDraft.trim() });
+      // Reload to show the persisted message content.
       await fetchMessages();
       setEditTarget(null);
       setEditDraft("");
@@ -82,6 +85,7 @@ export default function AdminMessagesPage() {
       setDeletingId(deleteTarget);
       setError(null);
       await AdminApi.deleteMessage(deleteTarget);
+      // Refresh list after delete to avoid stale message rows.
       await fetchMessages();
       setDeleteTarget(null);
     } catch (err) {

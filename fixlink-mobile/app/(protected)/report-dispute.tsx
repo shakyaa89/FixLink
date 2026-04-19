@@ -28,6 +28,7 @@ interface Dispute {
   createdAt?: string;
 }
 
+// Lets users create disputes and view previous ones.
 export default function ReportDisputeScreen() {
   const router = useRouter();
   const { user } = useAuthStore();
@@ -44,9 +45,11 @@ export default function ReportDisputeScreen() {
     fetchData();
   }, []);
 
+  // Loads disputable jobs and current user disputes.
   const fetchData = async () => {
     try {
       setLoading(true);
+      // Load eligible jobs and existing disputes together.
       const [jobsResponse, disputesResponse] = await Promise.all([
         DisputeApi.getDisputableJobs(),
         DisputeApi.getMyDisputes(),
@@ -70,6 +73,7 @@ export default function ReportDisputeScreen() {
     }
   };
 
+  // Validates form and submits one dispute.
   const handleSubmitDispute = async () => {
     if (!selectedJobId.trim()) {
       Toast.show({
@@ -127,6 +131,7 @@ export default function ReportDisputeScreen() {
     }
   };
 
+  // Returns color for priority badge.
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case "high":
@@ -140,6 +145,7 @@ export default function ReportDisputeScreen() {
     }
   };
 
+  // Returns color for status badge.
   const getStatusBadgeColor = (status: string) => {
     return status === "resolved" ? "#10b981" : colors.accent;
   };

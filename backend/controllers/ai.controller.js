@@ -1,9 +1,11 @@
+// AI controller for chat and verification features
 import axios from "axios";
 import User from "../models/user.model.js";
 
 const PROVIDER_INTENT_REGEX =
   /\b(list|show|find|recommend|suggest|get|nearby|available)\b.*\b(service provider|service providers|provider|providers|plumber|electrician|carpenter|painter|landscaper|repair)\b|\b(service provider|service providers|provider|providers|plumber|electrician|carpenter|painter|landscaper|repair)\b.*\b(list|show|find|recommend|suggest|get|nearby|available)\b/i;
 
+// Check if user message asks for provider list
 const isListProviderIntent = (message) => {
   if (typeof message !== "string") {
     return false;
@@ -12,6 +14,7 @@ const isListProviderIntent = (message) => {
   return PROVIDER_INTENT_REGEX.test(message.trim());
 };
 
+// Build a plain text provider response
 const formatProviderReply = (providers, city) => {
   if (!providers.length) {
     if (city) {
@@ -34,8 +37,10 @@ const formatProviderReply = (providers, city) => {
   return providerLines.join(" ");
 };
 
+// Convert chat history to Gemini contents format
 const buildContents = (history, message) => {
   const safeHistory = Array.isArray(history) ? history : [];
+  // Keep only recent turns to limit token usage.
   const trimmedHistory = safeHistory.slice(-10);
 
   const contents = trimmedHistory
@@ -54,16 +59,21 @@ const buildContents = (history, message) => {
   return contents;
 };
 
+// Handle AI chat response for app users
 export async function chatWithAi(req, res) {
   try {
+    // Read current message and optional chat history.
     const { message, history } = req.body || {};
     const userMessage = typeof message === "string" ? message.trim() : "";
 
+    // Stop when message text is empty.
     if (!userMessage) {
       return res.status(400).json({ message: "Message is required" });
     }
 
     if (isListProviderIntent(userMessage)) {
+      // Handle provider listing locally without calling Gemini.
+      // Prefer providers from the same city if available.
       const city = req.user?.city ? String(req.user.city) : "";
       const query = {
         role: "serviceProvider",
@@ -82,6 +92,7 @@ export async function chatWithAi(req, res) {
 
       const reply = formatProviderReply(providers, city);
 
+      // Return early for local provider-list intent.
       return res.status(200).json({
         reply,
       });
@@ -127,10 +138,12 @@ export async function chatWithAi(req, res) {
 
     const data = await response.data;
 
+    // Fallback reply when Gemini has no text output.
     const reply =
       data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ||
       "I could not generate a response right now. Please try again.";
 
+    // off-topic fallback.
     const offTopic = reply === "I can help only with home service questions in these categories: Plumbing, Electrical, Carpentry, Painting, Landscaping, and General Repairs. Please ask about one of these.";
 
     return res.status(200).json({ reply, offTopic });
@@ -145,10 +158,13 @@ export async function chatWithAi(req, res) {
   }
 }
 
+// Verify service provider document using AI
 export async function verifyServiceProvider(req, res) {
   try {
+    // Read submitted document URL and declared category.
     const { verificationProofURL, category } = req.body;
 
+    // Extract text first, then verify with Gemini.
     const extractedText = await extractTextFromImage(verificationProofURL);
 
     const prompt = `
@@ -176,6 +192,7 @@ export async function verifyServiceProvider(req, res) {
       ]
     };
 
+    // Ask Gemini to validate category vs. document text.
     const response = await axios.post(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`, payload, {
       headers: {
         "Content-Type": "application/json",
@@ -184,6 +201,7 @@ export async function verifyServiceProvider(req, res) {
 
     const reply = response.data?.candidates?.[0]?.content?.parts?.[0]?.text || null;
 
+    // Return plain verification result.
     return res.status(201).json({ reply: reply.trim() })
 
   } catch (error) {
@@ -197,11 +215,13 @@ export async function verifyServiceProvider(req, res) {
   }
 }
 
-
+// Extract text from image URL using OCR API
 async function extractTextFromImage(imageUrl) {
+  // Read OCR API key from environment.
   const apiKey = process.env.OCR_SPACE_API_KEY;
 
   try {
+    // Run OCR using image URL input.
     const response = await axios.get("https://api.ocr.space/parse/imageurl", {
       params: {
         apikey: apiKey,
@@ -212,6 +232,7 @@ async function extractTextFromImage(imageUrl) {
     });
 
     const result = response.data;
+    // Return extracted text when OCR finds any.
     if (
       result.ParsedResults &&
       result.ParsedResults.length > 0 &&
@@ -219,6 +240,7 @@ async function extractTextFromImage(imageUrl) {
     ) {
       return result.ParsedResults[0].ParsedText;
     } else {
+      // Return empty text on no OCR match.
       return "";
     }
   } catch (error) {
@@ -227,8 +249,10 @@ async function extractTextFromImage(imageUrl) {
   }
 }
 
+// Verify job title, description, and price using AI
 export async function verifyJob(req, res) {
   try {
+    // Read job fields that need validation.
     const { title, description, userPrice } = req.body;
 
     const prompt = `
@@ -252,6 +276,7 @@ export async function verifyJob(req, res) {
       ]
     };
 
+    // Ask Gemini to validate scope and minimum price.
     const response = await axios.post(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`, payload, {
       headers: {
         "Content-Type": "application/json",
@@ -260,6 +285,7 @@ export async function verifyJob(req, res) {
 
     const reply = response.data?.candidates?.[0]?.content?.parts?.[0]?.text || null;
 
+    // Return AI decision text directly.
     return res.status(201).json({ reply: reply.trim() })
 
   } catch (error) {

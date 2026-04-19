@@ -1,3 +1,5 @@
+// Shared color tokens used across mobile screens.
+// Keep names simple so screens can reuse them easily.
 const colors = {
   primary: "#ffffff",
   secondary: "#f9fafb",

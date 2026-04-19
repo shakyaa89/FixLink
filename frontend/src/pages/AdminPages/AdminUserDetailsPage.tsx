@@ -12,6 +12,7 @@ export default function AdminUserDetailsPage() {
 
   useEffect(() => {
     const fetchUser = async () => {
+      // Guard against missing route param before API call.
       if (!userId) return;
 
       try {

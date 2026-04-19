@@ -21,6 +21,7 @@ export default function AdminCreateJobPage() {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    // Convert string input to number before validation and API call.
     const parsedPrice = Number(form.userPrice);
 
     if (
@@ -38,6 +39,7 @@ export default function AdminCreateJobPage() {
     try {
       setLoading(true);
       setError(null);
+      // Trim user-entered text fields to avoid accidental whitespace values.
       await AdminApi.createJob({
         userId: form.userId.trim(),
         title: form.title.trim(),

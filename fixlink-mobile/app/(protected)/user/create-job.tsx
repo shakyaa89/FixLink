@@ -36,6 +36,7 @@ const categories = [
 ];
 const MAX_IMAGE_SIZE_BYTES = 2 * 1024 * 1024;
 
+// Creates a new job with optional schedule time.
 export default function CreateJobPage() {
   const router = useRouter();
   const { user } = useAuthStore();
@@ -58,6 +59,7 @@ export default function CreateJobPage() {
     return city ? LOCATION_OPTIONS[city] ?? [] : [];
   }, [city]);
 
+  // Picks images from gallery and checks size limit.
   const pickImages = async () => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
@@ -89,6 +91,7 @@ export default function CreateJobPage() {
     setImages(uris);
   };
 
+  // Uploads all selected images and returns cloud URLs.
   const uploadMultipleToCloudinary = async (fileUris: string[]) => {
     setUploading(true);
     const uploadedUrls: string[] = [];
@@ -121,6 +124,7 @@ export default function CreateJobPage() {
     }
   };
 
+  // Validates form and submits the new job.
   const handleSubmit = async () => {
     const price = Number(userPrice);
 
@@ -139,6 +143,7 @@ export default function CreateJobPage() {
 
     let scheduledForISO: string | null = null;
 
+    // Extra validation is required for scheduled jobs.
     if (postType === "schedule") {
       if (!scheduledDate || !scheduledTime) {
         Toast.show({
@@ -215,6 +220,7 @@ export default function CreateJobPage() {
     try {
       setSubmitting(true);
 
+      // Run AI safety/quality verification before persisting the job.
       const verifyJob = await AiApi.verifyJob({
         title,
         description,
@@ -229,6 +235,7 @@ export default function CreateJobPage() {
         return;
       }
 
+      // Upload media first so API payload only contains hosted URLs.
       const imageUrls = await uploadMultipleToCloudinary(images);
 
       const jobPayload = {

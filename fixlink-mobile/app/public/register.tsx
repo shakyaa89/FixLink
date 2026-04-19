@@ -4,7 +4,9 @@ import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import colors from "@/app/_constants/theme";
 
+// Lets user choose which signup form to use.
 export default function Register() {
+  // Toggle which registration form to render.
   const [userRole, setUserRole] = useState<"user" | "serviceProvider">("user");
 
   return (
@@ -36,6 +38,7 @@ export default function Register() {
         </View>
       </View>
 
+      // Show one form at a time based on selected role.
       {userRole === "user" && <UserRegister />}
       {userRole === "serviceProvider" && <ServiceProviderRegistration />}
     </View>

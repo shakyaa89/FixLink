@@ -17,6 +17,7 @@ import { useMessageStore } from "@/store/messageStore";
 import { useAuthStore } from "@/store/authStore";
 import { useEffect } from "react";
 
+// Lists recent chats and opens selected conversation.
 export default function MessagesScreen() {
   const router = useRouter();
   const { user } = useAuthStore();
@@ -29,6 +30,7 @@ export default function MessagesScreen() {
   const loggedInId = user?._id || user?.id;
 
   useEffect(() => {
+    // Contacts are scoped to the currently authenticated user.
     if (!loggedInId) return;
     loadContacts();
   }, [loggedInId, loadContacts]);

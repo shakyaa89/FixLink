@@ -82,6 +82,7 @@ export default function CompleteProfilePage() {
     try {
       setLoading(true);
 
+      // Upload both documents first, then run verification and profile update.
       const verificationProofURL = await uploadToCloudinary(
         verificationProofFile,
         "verificationUpload",
@@ -104,6 +105,7 @@ export default function CompleteProfilePage() {
       if (verification.data.reply === "PROPER") {
         verificationStat = "verified";
       } else {
+        // Store AI feedback so user/admin can see why it was rejected.
         rejectionReason = verification.data.reply;
         verificationStat = "rejected";
       }

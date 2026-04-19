@@ -22,6 +22,7 @@ export default function AdminProviderVerificationPage() {
       setError(null);
       const response = await AdminApi.fetchServiceProviders();
       const fetchedProviders = response.data.providers || [];
+      // Keep table data normalized even when API returns undefined.
       setProviders(fetchedProviders);
     } catch (err) {
       console.error("Failed to load providers", err);
@@ -43,6 +44,7 @@ export default function AdminProviderVerificationPage() {
         status,
         rejectionReason,
       );
+      // Refresh from backend so latest moderation state is shown.
       fetchProviders();
     } catch (err) {
       console.error("Failed to update verification", err);
@@ -59,6 +61,7 @@ export default function AdminProviderVerificationPage() {
   const handleConfirmUpdate = async () => {
     if (!confirmation) return;
     if (confirmation.status === "rejected") {
+      // Rejection requires a reason so providers can fix and resubmit.
       const reason = confirmation.rejectionReason?.trim();
       if (!reason) {
         setRejectionError("Please provide a rejection reason.");

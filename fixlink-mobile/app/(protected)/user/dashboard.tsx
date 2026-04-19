@@ -19,6 +19,7 @@ import colors from "@/app/_constants/theme";
 import { JobApi, type JobData } from "@/api/Apis";
 import { useAuthStore } from "@/store/authStore";
 
+// Shows quick stats and actions for normal users.
 export default function UserDashboard() {
   const router = useRouter();
   const { user } = useAuthStore();
@@ -26,6 +27,7 @@ export default function UserDashboard() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
+  // Loads jobs posted by this user.
   const fetchJobs = useCallback(async () => {
     if (!user || user.role !== "user") {
       setJobs([]);
@@ -51,6 +53,7 @@ export default function UserDashboard() {
 
   useFocusEffect(
     useCallback(() => {
+      // Refresh when returning to this tab after creating/updating a job.
       fetchJobs();
     }, [fetchJobs])
   );

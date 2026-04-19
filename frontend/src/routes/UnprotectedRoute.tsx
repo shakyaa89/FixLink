@@ -11,6 +11,7 @@ type Props = {
 const UnprotectedRoute = ({ children }: Props) => {
   const { user, checking } = useAuthStore();
 
+  // Wait for auth state before deciding whether to redirect.
   if (checking) {
     return (
       <div className="min-h-[40vh] flex items-center justify-center">
@@ -20,12 +21,14 @@ const UnprotectedRoute = ({ children }: Props) => {
   }
 
   if (user && !checking) {
+    // Logged-in providers with incomplete profiles are routed to onboarding.
     if (
       user.role === "serviceProvider" &&
       !isServiceProviderProfileComplete(user)
     ) {
       return <Navigate to="/serviceprovider/complete-profile" replace />;
     }
+    // Other logged-in users should not stay on public-only pages.
     return <Navigate to="/" replace />;
   }
 

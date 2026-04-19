@@ -52,6 +52,12 @@ interface UserLoginData {
   password: string;
 }
 
+interface ChangePasswordPayload {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}
+
 export interface JobData {
   _id?: string;
   userId: User;
@@ -212,7 +218,7 @@ export interface DisputableJobData {
   createdAt?: string;
 }
 
-// Helper to get Authorization header
+// Returns auth header with JWT when available.
 const getAuthHeader = () => {
   const token = localStorage.getItem("jwtToken");
   return token ? { Authorization: `Bearer ${token}` } : {};
@@ -241,7 +247,12 @@ export const AuthApi = {
   
   updateUserProfileApi: (updateData: UserEditData) => Api.put("/auth/update/user", updateData, {
       headers: getAuthHeader(),
-    })
+    }),
+
+  changePasswordApi: (payload: ChangePasswordPayload) =>
+    Api.put("/auth/change-password", payload, {
+      headers: getAuthHeader(),
+    }),
 };
 
 export const JobApi = {

@@ -68,6 +68,7 @@ export default function ProfilePage() {
 
           {user.role === "serviceProvider" &&
             user.verificationStatus === "rejected" && (
+              // Show resubmission prompt only for rejected providers.
               <div className="mb-8 rounded-xl border border-red-200 bg-red-50 px-6 py-4">
                 <p className="text-sm font-semibold text-red-800">
                   Verification was rejected
@@ -125,6 +126,7 @@ export default function ProfilePage() {
           {/* Tab Content */}
           <div className="bg-(--primary) rounded-b-2xl shadow-sm border border-(--border) p-8">
             {activeTab === "overview" && (
+              // Render overview blocks only when Overview tab is selected.
               <div className="space-y-8">
                 <div>
                   <h3 className="text-lg font-semibold text-(--text) mb-4">
@@ -157,6 +159,7 @@ export default function ProfilePage() {
             )}
 
             {activeTab === "contact" && (
+              // Render contact blocks only when Contact tab is selected.
               <div className="space-y-8">
                 <h3 className="text-lg font-semibold text-(--text) mb-6">
                   Contact Information

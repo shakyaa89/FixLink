@@ -29,6 +29,7 @@ function ServiceProviderRegisterForm() {
   const { setUser } = useAuthStore();
   const placeOptions = city ? LOCATION_OPTIONS[city] ?? [] : [];
 
+  // Uploads provider profile image and returns URL.
   const uploadToCloudinary = async (file: File) => {
     if (file.size > MAX_IMAGE_SIZE_BYTES) {
       throw new Error("Image must be 2MB or smaller");
@@ -54,6 +55,7 @@ function ServiceProviderRegisterForm() {
   };
 
   // Register
+  // Validates provider form and creates the account.
   const handleRegisterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 

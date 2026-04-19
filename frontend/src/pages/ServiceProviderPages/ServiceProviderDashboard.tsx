@@ -82,7 +82,7 @@ export default function UserDashboard() {
       hoverColor: "hover:bg-(--secondary)",
     },
     {
-      to: "/offers",
+      to: "#",
       icon: FileText,
       title: "Offers",
       description: "View your submitted offers",
@@ -148,6 +148,7 @@ export default function UserDashboard() {
 
   const providerJobsByCategoryMap = jobs.reduce<Record<string, number>>(
     (acc, job) => {
+      // Build category counts for provider chart.
       const category = job.jobCategory || "Uncategorized";
       acc[category] = (acc[category] || 0) + 1;
       return acc;
@@ -183,6 +184,7 @@ export default function UserDashboard() {
           user.providerCategory,
         );
         const fetchedJobs = response.data.jobs || [];
+        // Keep dashboard cards/charts sourced from fresh provider jobs.
         setJobs(fetchedJobs);
       } catch (err) {
         console.error("Error fetching jobs:", err);

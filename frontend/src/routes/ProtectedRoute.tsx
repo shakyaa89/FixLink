@@ -11,6 +11,7 @@ type Props = {
 const ProtectedRoute = ({ children }: Props) => {
   const { user, checking } = useAuthStore();
 
+  // Wait until auth bootstrap completes to avoid wrong redirects.
   if (checking) {
     return (
       <div className="min-h-[40vh] flex items-center justify-center">
@@ -23,6 +24,7 @@ const ProtectedRoute = ({ children }: Props) => {
     return <Navigate to="/auth" replace />;
   }
 
+  // Force incomplete provider profiles to finish onboarding first.
   if (
     user?.role === "serviceProvider" &&
     !isServiceProviderProfileComplete(user)

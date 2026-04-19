@@ -7,6 +7,7 @@ const resolveLabel = (
   value?: { _id?: string; fullName?: string; email?: string } | string,
 ) => {
   if (!value) return "-";
+  // Backend may return populated user object or raw id string.
   if (typeof value === "string") return value;
   return value.fullName || value.email || value._id || "-";
 };
@@ -48,6 +49,7 @@ export default function AdminReviewsPage() {
       setUpdatingId(reviewId);
       setError(null);
       await AdminApi.updateReview(reviewId, { rating });
+      // Reload to reflect persisted rating and any backend recalculations.
       await fetchReviews();
     } catch (err) {
       console.error("Failed to update review", err);
@@ -70,6 +72,7 @@ export default function AdminReviewsPage() {
       setDeletingId(deleteTarget);
       setError(null);
       await AdminApi.deleteReview(deleteTarget);
+      // Refresh list immediately after delete.
       await fetchReviews();
       setDeleteTarget(null);
     } catch (err) {

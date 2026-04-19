@@ -1,3 +1,4 @@
+// Offer schema for provider quotes on jobs
 import mongoose from "mongoose";
 
 const offerSchema = mongoose.Schema(

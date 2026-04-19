@@ -1,13 +1,17 @@
+// Review controller for job feedback and ratings
 import Review from "../models/review.model.js";
 import Job from "../models/job.model.js";
 import Offer from "../models/offer.model.js";
 import User from "../models/user.model.js";
 
+// Create review after completed job
 export const createReview = async (req, res) => {
   try {
+    // Read reviewer and review payload fields.
     const reviewerId = req.user?._id;
     const { jobId, rating, comment } = req.body;
 
+    // Block unauthenticated requests.
     if (!reviewerId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
@@ -16,6 +20,7 @@ export const createReview = async (req, res) => {
       return res.status(400).json({ message: "Job and rating are required" });
     }
 
+    // Enforce integer rating between 1 and 5.
     const ratingNumber = Number(rating);
     if (!Number.isInteger(ratingNumber) || ratingNumber < 1 || ratingNumber > 5) {
       return res.status(400).json({ message: "Rating must be between 1 and 5" });
@@ -44,6 +49,7 @@ export const createReview = async (req, res) => {
 
     const reviewerIdString = reviewerId.toString();
 
+    // Reviewer can only rate the other party of the job.
     let revieweeId = null;
     if (reviewerIdString === jobOwnerId) {
       revieweeId = serviceProviderId;
@@ -72,6 +78,8 @@ export const createReview = async (req, res) => {
       comment: comment?.trim() || "",
     });
 
+    // Recalculate and store latest average rating.
+    // Refresh reviewee average after new review.
     const reviewStats = await Review.aggregate([
       { $match: { revieweeId: newReview.revieweeId } },
       {
@@ -95,20 +103,25 @@ export const createReview = async (req, res) => {
   }
 };
 
+// Fetch reviews received by logged-in user
 export const getMyReceivedReviews = async (req, res) => {
   try {
+    // Read user id from auth context.
     const userId = req.user?._id;
 
+    // Block unauthenticated requests.
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
+    // Load reviews where current user is the reviewee.
     const reviews = await Review.find({ revieweeId: userId })
       .populate("reviewerId", "fullName profilePicture")
       .populate("jobId", "title")
       .sort({ createdAt: -1 })
       .lean();
 
+    // Return newest reviews first.
     return res.status(200).json({ reviews });
   } catch (error) {
     console.log(error);
@@ -116,20 +129,25 @@ export const getMyReceivedReviews = async (req, res) => {
   }
 };
 
+// Fetch reviews sent by logged-in user
 export const getMySentReviews = async (req, res) => {
   try {
+    // Read user id from auth context.
     const userId = req.user?._id;
 
+    // Block unauthenticated requests.
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
+    // Load reviews where current user is the reviewer.
     const reviews = await Review.find({ reviewerId: userId })
       .populate("revieweeId", "fullName profilePicture")
       .populate("jobId", "title")
       .sort({ createdAt: -1 })
       .lean();
 
+    // Return newest reviews first.
     return res.status(200).json({ reviews });
   } catch (error) {
     console.log(error);

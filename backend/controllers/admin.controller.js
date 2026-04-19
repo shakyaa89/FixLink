@@ -1,3 +1,4 @@
+// Admin controller for dashboard and management actions
 import User from "../models/user.model.js";
 import Job from "../models/job.model.js";
 import Dispute from "../models/dispute.model.js";
@@ -10,9 +11,12 @@ import {
   getRemovedCloudinaryUrls,
 } from "../lib/cloudinary.js";
 
+// Check if a value is a valid MongoDB ObjectId
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
 
+// Calculate average rating for a user
 const recalculateUserRatingAverage = async (userId) => {
+  // Aggregate average from all reviews for this user.
   const reviewStats = await Review.aggregate([
     { $match: { revieweeId: new mongoose.Types.ObjectId(userId) } },
     {
@@ -23,19 +27,22 @@ const recalculateUserRatingAverage = async (userId) => {
     },
   ]);
 
+  // Store 0 when user has no reviews.
   await User.findByIdAndUpdate(userId, {
     ratingAverage: reviewStats.length ? reviewStats[0].avgRating : 0,
   });
 };
 
+// Fetch users, jobs and disputes for admin dashboard
 export const getAdminOverview = async (req, res) => {
   try {
+    // Load recent users, jobs, and disputes in parallel.
     const [users, jobs, disputes] = await Promise.all([
       User.find()
         .select("fullName email role verificationStatus createdAt")
         .sort({ createdAt: -1 })
         .limit(5)
-        .lean(), // .lean() returns plain js objects.
+        .lean(), 
       Job.find()
         .populate("userId", "fullName")
         .sort({ createdAt: -1 })
@@ -47,6 +54,7 @@ export const getAdminOverview = async (req, res) => {
         .lean(),
     ]);
 
+  // Return compact dashboard overview.
     return res.status(200).json({ users, jobs, disputes });
   } catch (error) {
     console.log(error);
@@ -54,8 +62,10 @@ export const getAdminOverview = async (req, res) => {
   }
 };
 
+// Fetch all users for admin
 export const getAdminUsers = async (req, res) => {
   try {
+    // Fetch users with admin-list fields only.
     const users = await User.find()
       .select(
         "fullName email role verificationStatus createdAt profilePicture providerCategory"
@@ -63,6 +73,7 @@ export const getAdminUsers = async (req, res) => {
       .sort({ createdAt: -1 })
       .lean();
 
+  // Return users sorted by newest first.
     return res.status(200).json({ users });
   } catch (error) {
     console.log(error);
@@ -70,14 +81,18 @@ export const getAdminUsers = async (req, res) => {
   }
 };
 
+// Fetch a user using ID
 export const getAdminUserById = async (req, res) => {
   try {
+    // Read target user id from params.
     const { userId } = req.params;
 
+    // Validate id format before database query.
     if (!isValidObjectId(userId)) {
       return res.status(400).json({ message: "Invalid user id" });
     }
 
+    // Exclude password from admin response.
     const user = await User.findById(userId).select("-password").lean();
 
     if (!user) {
@@ -91,14 +106,18 @@ export const getAdminUserById = async (req, res) => {
   }
 };
 
+// Update user details for admin
 export const updateAdminUser = async (req, res) => {
   try {
+    // Read target user id from params.
     const { userId } = req.params;
 
+    // Validation check
     if (!isValidObjectId(userId)) {
       return res.status(400).json({ message: "Invalid user id" });
     }
 
+    // Fetch user and check if user exists
     const currentUser = await User.findById(userId);
     if (!currentUser) {
       return res.status(404).json({ message: "User not found" });
@@ -129,6 +148,8 @@ export const updateAdminUser = async (req, res) => {
       ratingAverage,
     } = req.body;
 
+    // Validate unique email before update.
+    // Duplicate email check
     if (email) {
       const emailTaken = await User.findOne({ email, _id: { $ne: userId } }).lean();
       if (emailTaken) {
@@ -137,6 +158,8 @@ export const updateAdminUser = async (req, res) => {
       currentUser.email = email;
     }
 
+    // Validate unique phone number before update.
+    // Duplicate phone number check
     if (phoneNumber) {
       const phoneTaken = await User.findOne({
         phoneNumber,
@@ -176,6 +199,7 @@ export const updateAdminUser = async (req, res) => {
     if (idProofURL !== undefined) currentUser.idProofURL = idProofURL;
     if (rejectionReason !== undefined) currentUser.rejectionReason = rejectionReason;
 
+    // Persist user updates first.
     await currentUser.save();
 
     const removedImageUrls = getRemovedCloudinaryUrls(previousImageUrls, [
@@ -184,8 +208,11 @@ export const updateAdminUser = async (req, res) => {
       currentUser.idProofURL,
       currentUser.addressURL,
     ]);
+
+    // Delete previous images in cloudinary
     await deleteCloudinaryImagesByUrls(removedImageUrls);
 
+    // Return fresh user snapshot without password.
     const user = await User.findById(userId).select("-password").lean();
 
     return res.status(200).json({
@@ -198,8 +225,10 @@ export const updateAdminUser = async (req, res) => {
   }
 };
 
+// Delete user for admin
 export const deleteAdminUser = async (req, res) => {
   try {
+    // Read target and current admin ids.
     const { userId } = req.params;
     const adminId = req.user?._id;
 
@@ -207,10 +236,12 @@ export const deleteAdminUser = async (req, res) => {
       return res.status(400).json({ message: "Invalid user id" });
     }
 
+    // Prevent admin from deleting own account.
     if (String(userId) === String(adminId)) {
       return res.status(400).json({ message: "Admin cannot delete own account" });
     }
 
+    // Collect user job images before deletion.
     const userJobs = await Job.find({ userId }).select("images").lean();
 
     const deletedUser = await User.findByIdAndDelete(userId).lean();
@@ -219,15 +250,19 @@ export const deleteAdminUser = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    // Collect image URLs linked to this user
     const userImageUrls = [
       deletedUser.profilePicture,
       deletedUser.verificationProofURL,
       deletedUser.idProofURL,
       deletedUser.addressURL,
     ];
+
     const jobImageUrls = userJobs.flatMap((job) =>
       Array.isArray(job.images) ? job.images : [],
     );
+
+    // Delete all related images from Cloudinary
     await deleteCloudinaryImagesByUrls([...userImageUrls, ...jobImageUrls]);
 
     return res.status(200).json({ message: "User deleted successfully" });
@@ -237,13 +272,16 @@ export const deleteAdminUser = async (req, res) => {
   }
 };
 
+// Fetch all jobs for admin panel
 export const getAdminJobs = async (req, res) => {
   try {
+    // Fetch all jobs with job owner name.
     const jobs = await Job.find()
       .populate("userId", "fullName")
       .sort({ createdAt: -1 })
       .lean();
 
+    // Return jobs sorted by newest first.
     return res.status(200).json({ jobs });
   } catch (error) {
     console.log(error);
@@ -251,8 +289,10 @@ export const getAdminJobs = async (req, res) => {
   }
 };
 
+// Create a new job as admin
 export const createAdminJob = async (req, res) => {
   try {
+    // Read admin-created job payload.
     const {
       userId,
       title,
@@ -267,6 +307,7 @@ export const createAdminJob = async (req, res) => {
       finalPrice,
     } = req.body;
 
+    // Validate required fields before creation.
     if (
       !userId ||
       !title ||
@@ -287,6 +328,7 @@ export const createAdminJob = async (req, res) => {
       return res.status(404).json({ message: "Job owner not found" });
     }
 
+    // Create job with safe defaults for optional fields.
     const job = await Job.create({
       userId,
       title,
@@ -311,6 +353,7 @@ export const createAdminJob = async (req, res) => {
       .populate("userId", "fullName")
       .lean();
 
+    // Return created job with owner name.
     return res
       .status(201)
       .json({ message: "Job created successfully", job: createdJob });
@@ -320,14 +363,17 @@ export const createAdminJob = async (req, res) => {
   }
 };
 
+// Fetch one job by id for admin
 export const getAdminJobById = async (req, res) => {
   try {
+    // Read target job id from params.
     const { jobId } = req.params;
 
     if (!isValidObjectId(jobId)) {
       return res.status(400).json({ message: "Invalid job id" });
     }
 
+    // Populate owner and offer provider details.
     const job = await Job.findById(jobId)
       .populate("userId", "fullName")
       .populate({ path: "offers", populate: { path: "serviceProviderId", select: "fullName email" } })
@@ -337,6 +383,7 @@ export const getAdminJobById = async (req, res) => {
       return res.status(404).json({ message: "Job not found" });
     }
 
+    // Return full admin job view.
     return res.status(200).json({ job });
   } catch (error) {
     console.log(error);
@@ -344,8 +391,10 @@ export const getAdminJobById = async (req, res) => {
   }
 };
 
+// Update job details as admin
 export const updateAdminJob = async (req, res) => {
   try {
+    // Read target job id from params.
     const { jobId } = req.params;
 
     if (!isValidObjectId(jobId)) {
@@ -374,6 +423,7 @@ export const updateAdminJob = async (req, res) => {
       offers,
     } = req.body;
 
+    // Optionally move job to another owner.
     if (userId !== undefined) {
       if (!isValidObjectId(userId)) {
         return res.status(400).json({ message: "Invalid user id" });
@@ -413,6 +463,7 @@ export const updateAdminJob = async (req, res) => {
       job.offers = offers;
     }
 
+    // Save changes before cleaning old images.
     await job.save();
 
     const removedImageUrls = getRemovedCloudinaryUrls(previousImages, job.images);
@@ -423,6 +474,7 @@ export const updateAdminJob = async (req, res) => {
       .populate({ path: "offers", populate: { path: "serviceProviderId", select: "fullName email" } })
       .lean();
 
+    // Return updated job snapshot.
     return res.status(200).json({ message: "Job updated successfully", job: updatedJob });
   } catch (error) {
     console.log(error);
@@ -430,8 +482,10 @@ export const updateAdminJob = async (req, res) => {
   }
 };
 
+// Delete a job and linked records as admin
 export const deleteAdminJob = async (req, res) => {
   try {
+    // Read target job id from params.
     const { jobId } = req.params;
 
     if (!isValidObjectId(jobId)) {
@@ -444,12 +498,14 @@ export const deleteAdminJob = async (req, res) => {
       return res.status(404).json({ message: "Job not found" });
     }
 
+    // Delete linked media and related records.
     await deleteCloudinaryImagesByUrls(deletedJob.images);
 
     await Offer.deleteMany({ jobId });
     await Dispute.deleteMany({ jobId });
     await Review.deleteMany({ jobId });
 
+    // Confirm successful job cleanup.
     return res.status(200).json({ message: "Job deleted successfully" });
   } catch (error) {
     console.log(error);
@@ -457,14 +513,17 @@ export const deleteAdminJob = async (req, res) => {
   }
 };
 
+// Fetch all disputes for admin
 export const getAdminDisputes = async (req, res) => {
   try {
+    // Fetch all disputes with job and reporter info.
     const disputes = await Dispute.find()
       .populate("jobId", "title")
       .populate("reportedBy", "fullName")
       .sort({ updatedAt: -1 })
       .lean();
 
+  // Return disputes sorted by latest updates.
     return res.status(200).json({ disputes });
   } catch (error) {
     console.log(error);
@@ -472,8 +531,10 @@ export const getAdminDisputes = async (req, res) => {
   }
 };
 
+// Update a dispute as admin
 export const updateAdminDispute = async (req, res) => {
   try {
+    // Read target dispute id from params.
     const { disputeId } = req.params;
 
     if (!isValidObjectId(disputeId)) {
@@ -486,8 +547,10 @@ export const updateAdminDispute = async (req, res) => {
       return res.status(404).json({ message: "Dispute not found" });
     }
 
+    // Read editable dispute fields from request.
     const { title, description, status, priority, resolutionMessage } = req.body;
 
+    // Compute effective status and transition intent.
     const isValidStatus =
       status !== undefined ? ["open", "resolved"].includes(status) : false;
     const nextStatus = isValidStatus ? status : dispute.status;
@@ -521,6 +584,7 @@ export const updateAdminDispute = async (req, res) => {
       .populate("reportedBy", "fullName")
       .lean();
 
+    // Return updated dispute details.
     return res.status(200).json({
       message: "Dispute updated successfully",
       dispute: updatedDispute,
@@ -531,8 +595,10 @@ export const updateAdminDispute = async (req, res) => {
   }
 };
 
+// Delete a dispute as admin
 export const deleteAdminDispute = async (req, res) => {
   try {
+    // Read target dispute id from params.
     const { disputeId } = req.params;
 
     if (!isValidObjectId(disputeId)) {
@@ -545,6 +611,7 @@ export const deleteAdminDispute = async (req, res) => {
       return res.status(404).json({ message: "Dispute not found" });
     }
 
+    // Confirm successful dispute deletion.
     return res.status(200).json({ message: "Dispute deleted successfully" });
   } catch (error) {
     console.log(error);
@@ -552,14 +619,17 @@ export const deleteAdminDispute = async (req, res) => {
   }
 };
 
+// Fetch all offers for admin
 export const getAdminOffers = async (req, res) => {
   try {
+    // Fetch offers with job and provider details.
     const offers = await Offer.find()
       .populate("jobId", "title")
       .populate("serviceProviderId", "fullName email")
       .sort({ createdAt: -1 })
       .lean();
 
+  // Return offers sorted by newest first.
     return res.status(200).json({ offers });
   } catch (error) {
     console.log(error);
@@ -567,8 +637,10 @@ export const getAdminOffers = async (req, res) => {
   }
 };
 
+// Update an offer as admin
 export const updateAdminOffer = async (req, res) => {
   try {
+    // Read target offer id from params.
     const { offerId } = req.params;
 
     if (!isValidObjectId(offerId)) {
@@ -581,6 +653,7 @@ export const updateAdminOffer = async (req, res) => {
       return res.status(404).json({ message: "Offer not found" });
     }
 
+    // Apply only allowed offer fields.
     const { offeredPrice, status } = req.body;
 
     if (offeredPrice !== undefined) offer.offeredPrice = offeredPrice;
@@ -588,6 +661,7 @@ export const updateAdminOffer = async (req, res) => {
       offer.status = status;
     }
 
+    // Save and return populated offer snapshot.
     await offer.save();
 
     const updatedOffer = await Offer.findById(offerId)
@@ -605,8 +679,10 @@ export const updateAdminOffer = async (req, res) => {
   }
 };
 
+// Delete an offer as admin
 export const deleteAdminOffer = async (req, res) => {
   try {
+    // Read target offer id from params.
     const { offerId } = req.params;
 
     if (!isValidObjectId(offerId)) {
@@ -619,13 +695,13 @@ export const deleteAdminOffer = async (req, res) => {
       return res.status(404).json({ message: "Offer not found" });
     }
 
+    // Remove offer and unlink it from parent job.
     await Offer.findByIdAndDelete(offerId);
     await Job.findByIdAndUpdate(offer.jobId, { $pull: { offers: offer._id } });
 
     if (offer.status === "accepted") {
-      await Job.findByIdAndUpdate(offer.jobId, {
-        $set: { jobStatus: "open", finalPrice: 0 },
-      });
+        // Reopen job if the accepted offer is removed.
+        await Job.findByIdAndUpdate(offer.jobId, { $set: { jobStatus: "open", finalPrice: 0 } });
 
       return res.status(200).json({
         message: "Accepted offer deleted and job reset successfully",
@@ -639,8 +715,10 @@ export const deleteAdminOffer = async (req, res) => {
   }
 };
 
+// Fetch all reviews for admin
 export const getAdminReviews = async (req, res) => {
   try {
+    // Fetch reviews with related job and user details.
     const reviews = await Review.find()
       .populate("jobId", "title")
       .populate("reviewerId", "fullName email")
@@ -648,6 +726,7 @@ export const getAdminReviews = async (req, res) => {
       .sort({ createdAt: -1 })
       .lean();
 
+  // Return reviews sorted by newest first.
     return res.status(200).json({ reviews });
   } catch (error) {
     console.log(error);
@@ -655,8 +734,10 @@ export const getAdminReviews = async (req, res) => {
   }
 };
 
+// Update a review as admin
 export const updateAdminReview = async (req, res) => {
   try {
+    // Read target review id from params.
     const { reviewId } = req.params;
 
     if (!isValidObjectId(reviewId)) {
@@ -669,6 +750,7 @@ export const updateAdminReview = async (req, res) => {
       return res.status(404).json({ message: "Review not found" });
     }
 
+    // Read editable review fields.
     const { rating, comment } = req.body;
 
     if (rating !== undefined) {
@@ -681,6 +763,7 @@ export const updateAdminReview = async (req, res) => {
 
     if (comment !== undefined) review.comment = comment;
 
+    // Save review then recompute reviewee average.
     await review.save();
     await recalculateUserRatingAverage(review.revieweeId);
 
@@ -700,8 +783,10 @@ export const updateAdminReview = async (req, res) => {
   }
 };
 
+// Delete a review as admin
 export const deleteAdminReview = async (req, res) => {
   try {
+    // Read target review id from params.
     const { reviewId } = req.params;
 
     if (!isValidObjectId(reviewId)) {
@@ -714,6 +799,7 @@ export const deleteAdminReview = async (req, res) => {
       return res.status(404).json({ message: "Review not found" });
     }
 
+    // Recompute rating after removing this review.
     await recalculateUserRatingAverage(review.revieweeId);
 
     return res.status(200).json({ message: "Review deleted successfully" });
@@ -723,14 +809,17 @@ export const deleteAdminReview = async (req, res) => {
   }
 };
 
+// Fetch all messages for admin
 export const getAdminMessages = async (req, res) => {
   try {
+    // Fetch all messages with sender/receiver info.
     const messages = await Message.find()
       .populate("senderId", "fullName email")
       .populate("receiverId", "fullName email")
       .sort({ createdAt: -1 })
       .lean();
 
+  // Return messages sorted by newest first.
     return res.status(200).json({ messages });
   } catch (error) {
     console.log(error);
@@ -738,8 +827,10 @@ export const getAdminMessages = async (req, res) => {
   }
 };
 
+// Update a message as admin
 export const updateAdminMessage = async (req, res) => {
   try {
+    // Read target message id from params.
     const { messageId } = req.params;
 
     if (!isValidObjectId(messageId)) {
@@ -752,12 +843,14 @@ export const updateAdminMessage = async (req, res) => {
       return res.status(404).json({ message: "Message not found" });
     }
 
+    // Read and validate new message content.
     const { content } = req.body;
 
     if (!content || !String(content).trim()) {
       return res.status(400).json({ message: "Message content is required" });
     }
 
+    // Save and return populated message data.
     message.content = String(content).trim();
     await message.save();
 
@@ -776,8 +869,10 @@ export const updateAdminMessage = async (req, res) => {
   }
 };
 
+// Delete a message as admin
 export const deleteAdminMessage = async (req, res) => {
   try {
+    // Read target message id from params.
     const { messageId } = req.params;
 
     if (!isValidObjectId(messageId)) {
@@ -790,6 +885,7 @@ export const deleteAdminMessage = async (req, res) => {
       return res.status(404).json({ message: "Message not found" });
     }
 
+    // Confirm successful message deletion.
     return res.status(200).json({ message: "Message deleted successfully" });
   } catch (error) {
     console.log(error);
@@ -797,8 +893,10 @@ export const deleteAdminMessage = async (req, res) => {
   }
 };
 
+// Fetch all service providers for admin
 export const getAdminServiceProviders = async (req, res) => {
   try {
+    // Fetch service providers with verification fields.
     const providers = await User.find({ role: "serviceProvider" })
       .select(
         "fullName email phoneNumber profilePicture providerCategory verificationStatus verificationProofURL idProofURL address addressDescription addressURL createdAt"
@@ -806,6 +904,7 @@ export const getAdminServiceProviders = async (req, res) => {
       .sort({ createdAt: -1 })
       .lean();
 
+  // Return providers sorted by newest first.
     return res.status(200).json({ providers });
   } catch (error) {
     console.log(error);
@@ -813,8 +912,10 @@ export const getAdminServiceProviders = async (req, res) => {
   }
 };
 
+// Update service provider verification status
 export const updateServiceProviderVerification = async (req, res) => {
   try {
+    // Read provider id and verification update fields.
     const { providerId } = req.params;
     const { status, rejectionReason } = req.body;
 
@@ -834,6 +935,7 @@ export const updateServiceProviderVerification = async (req, res) => {
         .json({ message: "Rejection reason is required" });
     }
 
+    // Ensure target user exists and is a provider.
     const provider = await User.findById(providerId);
 
     if (!provider) {
@@ -844,6 +946,7 @@ export const updateServiceProviderVerification = async (req, res) => {
       return res.status(400).json({ message: "User is not a service provider" });
     }
 
+    // Save status and optional rejection reason.
     provider.verificationStatus = status;
     if (status === "rejected") {
       provider.rejectionReason = rejectionReason.trim();

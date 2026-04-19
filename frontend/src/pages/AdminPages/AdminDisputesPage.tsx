@@ -33,6 +33,7 @@ export default function AdminDisputesPage() {
   const formatDate = (value?: string) => {
     if (!value) return "-";
     const date = new Date(value);
+    // Keep original value if backend sends a non-ISO date string.
     if (Number.isNaN(date.getTime())) return value;
     return date.toLocaleDateString();
   };
@@ -53,6 +54,7 @@ export default function AdminDisputesPage() {
 
   const resolveJobLabel = (jobId?: AdminDisputeData["jobId"]) => {
     if (!jobId) return "-";
+    // Some responses send only job id string, others send full job object.
     if (typeof jobId === "string") return jobId;
     return jobId.title || jobId._id || "-";
   };
@@ -82,6 +84,7 @@ export default function AdminDisputesPage() {
       const response = await AdminApi.fetchDisputes();
       const fetchedDisputes = (response.data.disputes ||
         []) as AdminDisputeData[];
+      // Normalize API data once so UI rendering logic stays simple.
       setDisputes(
         fetchedDisputes.map((dispute) => ({
           ...dispute,
@@ -110,6 +113,7 @@ export default function AdminDisputesPage() {
     try {
       setUpdatingId(disputeId);
       setError(null);
+      // Re-fetch to keep status, priority, and derived labels in sync.
       await AdminApi.updateDispute(disputeId, data);
       await fetchDisputes();
     } catch (err) {
@@ -135,6 +139,7 @@ export default function AdminDisputesPage() {
     }
 
     const message = resolveTarget.message.trim();
+    // Force a message so resolution history is clear to both sides.
     if (!message) {
       setResolveError("Please enter a resolution message.");
       return;
@@ -166,6 +171,7 @@ export default function AdminDisputesPage() {
       setDeletingId(deleteTarget.id);
       setError(null);
       await AdminApi.deleteDispute(deleteTarget.id);
+      // Refresh table after destructive action.
       await fetchDisputes();
       setDeleteTarget(null);
     } catch (err) {

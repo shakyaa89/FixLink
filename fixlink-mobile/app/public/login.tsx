@@ -8,6 +8,7 @@ import { useAuthStore } from "@/store/authStore";
 import Toast from "react-native-toast-message";
 import { isServiceProviderProfileComplete } from "@/utils/serviceProviderProfile";
 
+// Handles login form and role-based redirect.
 export default function Login() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
@@ -16,7 +17,9 @@ export default function Login() {
 
   const { login, loading } = useAuthStore();
 
+  // Logs in the user and sends them to the right screen.
   const handleLogin = async () => {
+    // Stop early if email or password is empty.
     if (!email || !password) return;
 
     const success = await login(email, password);
@@ -27,9 +30,11 @@ export default function Login() {
       })
       const currentUser = useAuthStore.getState().user;
 
+      // Route each role to its primary landing screen after login.
       if (currentUser?.role === "user") {
         router.replace("/user/dashboard");
       } else if (currentUser?.role === "serviceProvider") {
+        // Incomplete or rejected providers must return to onboarding.
         router.replace(
           isServiceProviderProfileComplete(currentUser) &&
           currentUser.verificationStatus !== "rejected"

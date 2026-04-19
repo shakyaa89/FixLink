@@ -14,6 +14,7 @@ export default function ReviewsPage() {
     const total = receivedReviews.length;
     const sum = receivedReviews.reduce((acc, r) => acc + (r.rating || 0), 0);
     const average = total ? (sum / total).toFixed(1) : "0.0";
+    // Build counts for 5..1 star rows in the same order as the UI.
     const counts = [5, 4, 3, 2, 1].map(
       (value) => receivedReviews.filter((r) => r.rating === value).length,
     );
@@ -21,8 +22,10 @@ export default function ReviewsPage() {
   }, [receivedReviews]);
 
   const renderReviewCard = (review: ReviewData, mode: "received" | "sent") => {
+    // Switch displayed person based on current tab context.
     const person = mode === "received" ? review.reviewerId : review.revieweeId;
     const personName = person?.fullName || "Anonymous";
+    // Derive initials fallback when profile picture is missing.
     const initials = personName
       .split(" ")
       .filter(Boolean)
@@ -96,6 +99,7 @@ export default function ReviewsPage() {
         ReviewApi.fetchMyReceivedReviews(),
         ReviewApi.fetchMySentReviews(),
       ]);
+      // Keep both tabs preloaded to avoid extra fetches on tab switch.
       setReceivedReviews(receivedResponse.data.reviews || []);
       setSentReviews(sentResponse.data.reviews || []);
     } catch (err) {

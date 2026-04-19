@@ -58,10 +58,12 @@ export default function ViewJobsPage() {
   };
 
   const filteredJobs = jobs.filter((job) => {
+    // Status filter is applied first.
     if (statusFilter !== "all" && job.jobStatus !== statusFilter) {
       return false;
     }
     if (searchQuery.trim()) {
+      // Search across common user-facing fields.
       const query = searchQuery.toLowerCase();
       return (
         job.title?.toLowerCase().includes(query) ||
@@ -89,6 +91,7 @@ export default function ViewJobsPage() {
     if (!currentUserId) return null;
     return (
       job.offers.find((offer) => {
+        // Offer provider can be populated object or id string.
         const offerProviderId =
           (offer.serviceProviderId as { _id?: string })?._id ||
           (offer.serviceProviderId as unknown as string);

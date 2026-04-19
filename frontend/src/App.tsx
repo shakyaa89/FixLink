@@ -137,9 +137,9 @@ function App() {
           <Route
             path="/user/edit/profile"
             element={
-              <UserProtectedRoute>
+              <ProtectedRoute>
                 <EditProfilePage />
-              </UserProtectedRoute>
+              </ProtectedRoute>
             }
           />
 

@@ -26,21 +26,10 @@ export default function Messages() {
 
   const loggedInId = user?._id || user?.id;
 
-  // const formatTimestamp = (value?: string) => {
-  //   if (!value) return "";
-  //   try {
-  //     return new Date(value).toLocaleTimeString([], {
-  //       hour: "2-digit",
-  //       minute: "2-digit",
-  //     });
-  //   } catch (error) {
-  //     return value;
-  //   }
-  // };
-
   const isOwnMessage = useMemo(() => {
     const authId = user?._id || user?.id;
     return (senderId: string) => {
+      // Compare each message sender with current user to align chat bubbles.
       if (!authId) return false;
       return senderId === authId;
     };
@@ -59,8 +48,10 @@ export default function Messages() {
 
   useEffect(() => {
     if (!loggedInId) return;
+    // Open realtime connection once we know who is logged in.
     connectSocket(String(loggedInId));
     return () => {
+      // Always clean up socket on unmount/user switch.
       disconnectSocket();
     };
   }, [loggedInId, connectSocket, disconnectSocket]);

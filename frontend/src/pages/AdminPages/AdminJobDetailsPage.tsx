@@ -22,6 +22,7 @@ interface AdminJobDetail {
 
 const resolveUser = (userId?: AdminJobDetail["userId"]) => {
   if (!userId) return "-";
+  // API can return owner either as plain id string or populated object.
   if (typeof userId === "string") return userId;
   return userId.fullName || userId._id || "-";
 };
@@ -43,6 +44,7 @@ export default function AdminJobDetailsPage() {
         const response = await AdminApi.fetchJobById(jobId);
         const fetchedJob = response.data.job || null;
         setJob(fetchedJob);
+        // Reset selected image when viewing a different job.
         setSelectedImageIndex(0);
       } catch (err) {
         console.error("Failed to fetch job", err);

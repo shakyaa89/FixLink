@@ -42,6 +42,7 @@ export default function AdminDashboard() {
   const [error, setError] = useState<string | null>(null);
 
   const stats = useMemo(() => {
+    // Compute top-level KPI cards from loaded datasets.
     const totalUsers = users.length;
     const totalProviders = users.filter(
       (user) => user.role === "serviceProvider",
@@ -82,6 +83,7 @@ export default function AdminDashboard() {
     ).length;
     const adminCount = users.filter((user) => user.role === "admin").length;
 
+    // Keep chart dataset shape stable for react-chartjs updates.
     return {
       labels: ["Users", "Providers", "Admins"],
       datasets: [
@@ -105,6 +107,7 @@ export default function AdminDashboard() {
     ).length;
     const otherCount = disputes.length - openCount - resolvedCount;
 
+    // "Other" catches any unexpected status values from backend.
     return {
       labels: ["Open", "Resolved", "Other"],
       datasets: [
@@ -137,6 +140,7 @@ export default function AdminDashboard() {
       const fetchedDisputes = (response.data.disputes ||
         []) as AdminDisputeData[];
 
+      // Set each dataset explicitly to avoid stale partial updates.
       setUsers(fetchedUsers);
 
       setJobs(fetchedJobs);

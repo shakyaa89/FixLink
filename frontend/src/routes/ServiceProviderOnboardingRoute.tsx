@@ -11,6 +11,7 @@ type Props = {
 const ServiceProviderOnboardingRoute = ({ children }: Props) => {
   const { user, checking } = useAuthStore();
 
+  // Wait until auth bootstrap completes to avoid flicker redirects.
   if (checking) {
     return (
       <div className="min-h-[40vh] flex items-center justify-center">
@@ -27,6 +28,7 @@ const ServiceProviderOnboardingRoute = ({ children }: Props) => {
     return <Navigate to="/auth" replace />;
   }
 
+  // If profile is complete (and not rejected), onboarding is no longer needed.
   if (
     isServiceProviderProfileComplete(user) &&
     user?.verificationStatus !== "rejected"

@@ -30,6 +30,7 @@ export default function DisputesPage() {
   const fetchDisputeData = async () => {
     try {
       setLoading(true);
+      // Load both lists together so page renders with one spinner cycle.
       const [disputeResponse, jobsResponse] = await Promise.all([
         DisputeApi.fetchMyDisputes(),
         DisputeApi.fetchDisputableJobs(),
@@ -66,6 +67,7 @@ export default function DisputesPage() {
   const resolveJobLabel = (item: DisputeData) => {
     if (!item.jobId) return "-";
     if (typeof item.jobId === "string") {
+      // When only id is present, try to map it back to a known job title.
       const matchedJob = jobs.find((job) => job._id === item.jobId);
       return matchedJob?.title || item.jobId;
     }
@@ -97,6 +99,7 @@ export default function DisputesPage() {
       setPriority("medium");
       setJobId("");
       setShowDisputeForm(false);
+      // Refresh list so the newly created dispute appears immediately.
       fetchDisputeData();
     } catch (error: unknown) {
       const message =

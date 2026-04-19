@@ -80,7 +80,7 @@ export default function UserDashboard() {
       hoverColor: "hover:bg-(--secondary)",
     },
     {
-      to: "/offers",
+      to: "#",
       icon: FileText,
       title: "Offers",
       description: "Compare offers from providers",
@@ -145,6 +145,7 @@ export default function UserDashboard() {
   };
 
   const jobsByCategoryMap = jobs.reduce<Record<string, number>>((acc, job) => {
+    // Group jobs by category for the bar chart.
     const category = job.jobCategory || "Uncategorized";
     acc[category] = (acc[category] || 0) + 1;
     return acc;
@@ -177,6 +178,7 @@ export default function UserDashboard() {
           ReviewApi.fetchMyReceivedReviews(),
         ]);
 
+        // Jobs are required for this page, so fail early if that request fails.
         if (jobsResult.status !== "fulfilled") {
           throw jobsResult.reason;
         }
@@ -195,6 +197,7 @@ export default function UserDashboard() {
         ).length;
 
         const offersCount = fetchedJobs.reduce((accumulator, job) => {
+          // Count total offers across all jobs, safely handling missing arrays.
           return accumulator + (Array.isArray(job.offers) ? job.offers.length : 0);
         }, 0);
 
@@ -211,6 +214,7 @@ export default function UserDashboard() {
         });
 
         if (reviewsResult.status !== "fulfilled") {
+          // Keep dashboard usable even when only review count fails.
           console.warn("Failed to fetch reviews count for dashboard stats");
         }
       } catch (err) {

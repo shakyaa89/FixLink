@@ -85,6 +85,7 @@ export default function HomePage() {
   ];
 
   const handleGetStarted = () => {
+    // Guests go to auth first, logged-in users go straight to dashboard.
     if (user == null) {
       navigate("/auth");
       return;
@@ -96,6 +97,7 @@ export default function HomePage() {
   useEffect(() => {
     if (location.hash) {
       const id = location.hash.replace("#", "");
+      // Delay a bit so the target section is mounted before scrolling.
       setTimeout(() => {
         const el = document.getElementById(id);
         if (el) {

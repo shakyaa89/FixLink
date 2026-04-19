@@ -25,6 +25,7 @@ export default function Chatbot() {
     [user],
   );
 
+  // Sends user text to AI and appends the reply.
   const sendMessage = async () => {
     const trimmed = input.trim();
     if (!trimmed || loading) {

@@ -1,3 +1,4 @@
+// Review schema for ratings after completed jobs
 import mongoose from "mongoose";
 
 const reviewSchema = new mongoose.Schema(

@@ -10,19 +10,23 @@ import { useAuthStore } from "@/store/authStore";
 import { useEffect } from "react";
 import { isServiceProviderProfileComplete } from "@/utils/serviceProviderProfile";
 
+// Shows the landing screen.
 export default function Index() {
   const router = useRouter();
   const { user } = useAuthStore();
 
   useEffect(() => {
+    // If no user yet, keep this landing screen.
     if (!user) return;
 
+    // Send signed-in users straight to their role-specific home.
     if (user.role === "user") {
       router.replace("/user/dashboard");
       return;
     }
 
     if (user.role === "serviceProvider") {
+      // Providers who are incomplete/rejected must complete profile first.
       const isProviderComplete = isServiceProviderProfileComplete(user);
       router.replace(
         isProviderComplete && user.verificationStatus !== "rejected"

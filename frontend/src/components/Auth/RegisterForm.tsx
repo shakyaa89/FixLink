@@ -38,6 +38,7 @@ function RegisterForm() {
 
   const navigate = useNavigate();
 
+  // Uploads one selected profile image and returns its URL.
   const uploadToCloudinary = async (file: File) => {
     if (file.size > MAX_IMAGE_SIZE_BYTES) {
       throw new Error("Image must be 2MB or smaller");
@@ -63,6 +64,7 @@ function RegisterForm() {
   };
 
   // Register
+  // Validates user form, uploads image, then creates account.
   const handleRegisterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 

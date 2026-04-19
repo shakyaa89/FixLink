@@ -25,6 +25,7 @@ export default function AuthPage() {
           <div className="flex bg-(--secondary) rounded-xl p-1 mb-8">
             <button
               onClick={() => {
+                // Reset provider toggle when switching back to login tab.
                 setShowLogin(true);
                 setServiceProviderRegister(false);
               }}
@@ -52,6 +53,7 @@ export default function AuthPage() {
             <div className="flex items-center justify-center w-full ">
               <button
                 onClick={() => {
+                  // Keep user on register tab while switching form type.
                   setServiceProviderRegister(!serviceProviderRegister);
                   setShowLogin(false);
                   window.scrollTo(0, 0);

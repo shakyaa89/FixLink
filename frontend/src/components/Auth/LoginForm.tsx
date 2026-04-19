@@ -16,6 +16,7 @@ function LoginForm() {
 
   const navigate = useNavigate();
 
+  // Validates login input and redirects by user role.
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 

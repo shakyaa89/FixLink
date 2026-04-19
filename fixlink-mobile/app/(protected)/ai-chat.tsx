@@ -24,6 +24,7 @@ interface ChatMessage {
   content: string;
 }
 
+// Provides AI assistant chat for app users.
 export default function AiChatScreen() {
   const router = useRouter();
   const { user } = useAuthStore();
@@ -39,6 +40,7 @@ export default function AiChatScreen() {
   ]);
 
   const category = useMemo(
+    // Send provider category as optional context for better AI replies.
     () => (user?.providerCategory ? String(user.providerCategory) : ""),
     [user],
   );
@@ -58,6 +60,7 @@ export default function AiChatScreen() {
     };
   }, []);
 
+  // Scrolls message list to the latest item.
   const scrollToBottom = (animated = true) => {
     requestAnimationFrame(() => {
       scrollViewRef.current?.scrollToEnd({ animated });
@@ -68,12 +71,15 @@ export default function AiChatScreen() {
     scrollToBottom(messages.length > 1);
   }, [messages.length, loading]);
 
+  // Sends prompt to AI and appends the reply.
   const sendMessage = async () => {
+    // Ignore empty message and duplicate taps while loading.
     const trimmed = input.trim();
     if (!trimmed || loading) {
       return;
     }
 
+    // Render user message before API response.
     const nextMessages: ChatMessage[] = [
       ...messages,
       { role: "user", content: trimmed },

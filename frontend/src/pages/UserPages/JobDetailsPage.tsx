@@ -66,6 +66,7 @@ export default function JobDetailsPage() {
     try {
       setLoading(true);
       setError(null);
+      // Route guarantees param in normal flow; assert non-null for API call.
       const response = await JobApi.fetchJobByIdApi(jobId!);
       setJob(response.data.job);
     } catch (err) {
@@ -113,6 +114,7 @@ export default function JobDetailsPage() {
     try {
       if (offerId === "") return;
 
+      // Keep payload explicit in case API contract expands later.
       const payload = { offerId };
 
       const response = await OfferApi.acceptOffer(payload);
@@ -190,6 +192,7 @@ export default function JobDetailsPage() {
       return;
     }
 
+    // Build sanitized payload from edit state.
     const payload: UpdateJobData = {
       title: editTitle.trim(),
       description: editDescription.trim(),
@@ -208,6 +211,7 @@ export default function JobDetailsPage() {
         userPrice: payload.userPrice || 0,
       });
 
+      // Block save when AI moderation marks content as invalid.
       if (verifyJob?.data?.reply !== "VALID") {
         toast.error(verifyJob?.data?.reply || "Job did not pass AI verification");
         return;

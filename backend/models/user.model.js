@@ -1,3 +1,4 @@
+// User schema for customers, providers, and admins
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(

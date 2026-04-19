@@ -47,6 +47,7 @@ export default function JobDetailsProviderPage() {
     if (!currentUserId) return null;
     return (
       jobData.offers.find((offer) => {
+        // Offer provider can arrive as populated object or raw id.
         const offerProviderId =
           (offer.serviceProviderId as { _id?: string })?._id ||
           (offer.serviceProviderId as unknown as string);
@@ -89,6 +90,7 @@ export default function JobDetailsProviderPage() {
   async function handleSendOffer() {
     const offeredPriceNum = Number(offeredPrice);
 
+    // Keep offer within +/-20% of user's budget.
     const offerLowerLimit = job?.userPrice ?? 0 - (job?.userPrice ?? 0 * 20) / 100;
 
     const offerUpperLimit = job?.userPrice ?? 0 + (job?.userPrice ?? 0 * 20) / 100;
@@ -114,6 +116,7 @@ export default function JobDetailsProviderPage() {
       });
 
       if (jobId) {
+        // Re-fetch so current offer badges and status are up to date.
         const updatedJob = await JobApi.fetchJobByIdApi(jobId);
         setJob(updatedJob.data.job);
       }
@@ -140,6 +143,7 @@ export default function JobDetailsProviderPage() {
       await JobApi.completeJobApi(job._id);
       toast.success("Job marked as completed.");
       setShowCompleteConfirmDialog(false);
+      // Reload job details to reflect new completion status.
       await fetchJob();
     } catch (err: unknown) {
       console.error(err);

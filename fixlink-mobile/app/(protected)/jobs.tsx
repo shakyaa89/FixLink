@@ -14,6 +14,7 @@ import { JobApi, type JobData } from "@/api/Apis";
 import { useAuthStore } from "@/store/authStore";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+// Shows jobs list with data based on current user role.
 function Jobs() {
   const router = useRouter();
   const { user } = useAuthStore();
@@ -24,6 +25,7 @@ function Jobs() {
 
   const role = user?.role;
 
+  // Header copy changes based on signed-in role.
   const screenMeta = useMemo(() => {
     if (role === "serviceProvider") {
       return {
@@ -52,6 +54,7 @@ function Jobs() {
     };
   }, [role, user?.providerCategory]);
 
+  // Returns badge colors for each job status.
   const getStatusStyles = (status?: string) => {
     switch (status?.toLowerCase()) {
       case "open":
@@ -81,6 +84,7 @@ function Jobs() {
     try {
       setError(null);
 
+      // Fetch role-specific job list from the matching endpoint.
       let response;
       if (user.role === "serviceProvider") {
         const category = user.providerCategory || "";
@@ -107,7 +111,9 @@ function Jobs() {
     fetchJobs();
   }, [fetchJobs]);
 
+  // Runs when pull-to-refresh is used.
   const onRefresh = () => {
+    // Pull latest jobs when user does manual refresh.
     setRefreshing(true);
     fetchJobs();
   };

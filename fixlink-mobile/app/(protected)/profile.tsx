@@ -35,6 +35,7 @@ import { isServiceProviderProfileComplete } from "@/utils/serviceProviderProfile
 const CITIES = ["Kathmandu", "Lalitpur", "Bhaktapur"];
 const MAX_IMAGE_SIZE_BYTES = 2 * 1024 * 1024;
 
+// Shows and edits user profile details.
 export default function ProfileScreen() {
   const router = useRouter();
   const { user, logout, setUser } = useAuthStore();
@@ -50,8 +51,12 @@ export default function ProfileScreen() {
   const [addressInput, setAddressInput] = useState("");
   const [addressDescriptionInput, setAddressDescriptionInput] = useState("");
   const [addressUrlInput, setAddressUrlInput] = useState("");
+  const [currentPasswordInput, setCurrentPasswordInput] = useState("");
+  const [newPasswordInput, setNewPasswordInput] = useState("");
+  const [confirmPasswordInput, setConfirmPasswordInput] = useState("");
 
   useEffect(() => {
+    // Add data to editable fields whenever auth user data changes.
     setFullNameInput(user?.fullName || "");
     setEmailInput(user?.email || "");
     setPhoneNumberInput(user?.phoneNumber || "");
@@ -87,6 +92,7 @@ export default function ProfileScreen() {
   if (role === "admin") roleLabel = "Admin";
   if (role === "user") roleLabel = "User";
 
+  // Opens gallery and picks one profile image.
   const pickImage = async () => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
@@ -119,6 +125,7 @@ export default function ProfileScreen() {
     }
   };
 
+  // Uploads image to cloud and returns the URL.
   const uploadToCloudinary = async (asset: ImagePicker.ImagePickerAsset) => {
     if (
       typeof asset.fileSize === "number" &&
@@ -154,6 +161,7 @@ export default function ProfileScreen() {
     }
   };
 
+  // Resets edit form to current saved user values.
   const resetForm = () => {
     setFullNameInput(user?.fullName || "");
     setEmailInput(user?.email || "");
@@ -162,9 +170,13 @@ export default function ProfileScreen() {
     setAddressInput(user?.address || "");
     setAddressDescriptionInput(user?.addressDescription || "");
     setAddressUrlInput(user?.addressURL || user?.addressUrl || "");
+    setCurrentPasswordInput("");
+    setNewPasswordInput("");
+    setConfirmPasswordInput("");
     setSelectedImage(null);
   };
 
+  // Validates and saves profile changes.
   const handleSaveProfile = async () => {
     if (
       !fullNameInput.trim() ||
@@ -179,6 +191,27 @@ export default function ProfileScreen() {
         text1: "Please fill in all required fields",
       });
       return;
+    }
+
+    // Password update remains optional unless any password field is changed.
+    const hasPasswordInput = Boolean(
+      currentPasswordInput.trim() || newPasswordInput.trim() || confirmPasswordInput.trim()
+    );
+
+    if (hasPasswordInput) {
+      if (
+        !currentPasswordInput.trim() ||
+        !newPasswordInput.trim() ||
+        !confirmPasswordInput.trim()
+      ) {
+        Toast.show({ type: "error", text1: "Fill all password fields to change password" });
+        return;
+      }
+
+      if (newPasswordInput !== confirmPasswordInput) {
+        Toast.show({ type: "error", text1: "New password and confirm password must match" });
+        return;
+      }
     }
 
     try {
@@ -200,8 +233,19 @@ export default function ProfileScreen() {
         profilePicture: profilePictureUrl,
       });
 
+      if (hasPasswordInput) {
+        await AuthApi.changePassword({
+          currentPassword: currentPasswordInput,
+          newPassword: newPasswordInput,
+          confirmPassword: confirmPasswordInput,
+        });
+      }
+
       setUser(response.data.updatedUser || response.data.user || user);
       setSelectedImage(null);
+      setCurrentPasswordInput("");
+      setNewPasswordInput("");
+      setConfirmPasswordInput("");
       setIsEditing(false);
 
       Toast.show({
@@ -377,6 +421,42 @@ export default function ProfileScreen() {
                     <Upload size={16} color={colors.muted} />
                     <Text className="text-text font-medium">Choose image</Text>
                   </Pressable>
+                </View>
+
+                <View className="gap-2">
+                  <Text className="text-xs text-muted font-medium">Current Password (optional)</Text>
+                  <TextInput
+                    className="text-base text-text border border-border rounded-xl px-3 py-2.5 bg-primary"
+                    placeholder="Current password"
+                    placeholderTextColor={colors.muted}
+                    secureTextEntry
+                    value={currentPasswordInput}
+                    onChangeText={setCurrentPasswordInput}
+                  />
+                </View>
+
+                <View className="gap-2">
+                  <Text className="text-xs text-muted font-medium">New Password (optional)</Text>
+                  <TextInput
+                    className="text-base text-text border border-border rounded-xl px-3 py-2.5 bg-primary"
+                    placeholder="New password"
+                    placeholderTextColor={colors.muted}
+                    secureTextEntry
+                    value={newPasswordInput}
+                    onChangeText={setNewPasswordInput}
+                  />
+                </View>
+
+                <View className="gap-2">
+                  <Text className="text-xs text-muted font-medium">Confirm New Password (optional)</Text>
+                  <TextInput
+                    className="text-base text-text border border-border rounded-xl px-3 py-2.5 bg-primary"
+                    placeholder="Confirm new password"
+                    placeholderTextColor={colors.muted}
+                    secureTextEntry
+                    value={confirmPasswordInput}
+                    onChangeText={setConfirmPasswordInput}
+                  />
                 </View>
 
                 <Pressable

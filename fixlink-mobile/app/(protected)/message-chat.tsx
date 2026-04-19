@@ -18,6 +18,7 @@ import { useMessageStore } from "@/store/messageStore";
 import { useAuthStore } from "@/store/authStore";
 import { useEffect, useMemo, useRef, useState } from "react";
 
+// Shows one chat thread and handles realtime messaging.
 export default function MessageChatScreen() {
   const router = useRouter();
   const scrollViewRef = useRef<ScrollView>(null);
@@ -60,6 +61,7 @@ export default function MessageChatScreen() {
     };
   }, [user]);
 
+  // Sends one message and clears input box.
   const handleSend = async () => {
     if (!message.trim()) return;
     await sendMessage(message.trim());
@@ -67,6 +69,7 @@ export default function MessageChatScreen() {
   };
 
   useEffect(() => {
+    // Active chat context from route params.
     if (!contactId) return;
 
     openChat({
@@ -79,6 +82,7 @@ export default function MessageChatScreen() {
   }, [contactId, contactName, contactPicture, contactJobTitle, contactJobId, openChat]);
 
   useEffect(() => {
+    // Keep realtime socket active.
     if (!loggedInId) return;
     connectSocket(String(loggedInId));
 
@@ -103,6 +107,7 @@ export default function MessageChatScreen() {
   }, []);
 
   const scrollToBottom = (animated = true) => {
+    // Keeps newest message visible.
     requestAnimationFrame(() => {
       scrollViewRef.current?.scrollToEnd({ animated });
     });

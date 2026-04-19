@@ -51,11 +51,13 @@ const JOB_CATEGORIES = [
   "General Repairs",
 ];
 
+// Shows full job details and role-based actions.
 export default function JobDetailsPage() {
   const { jobId } = useLocalSearchParams<{ jobId: string }>();
   const router = useRouter();
   const { user } = useAuthStore();
 
+  // State variables 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [job, setJob] = useState<JobData>();
@@ -86,13 +88,18 @@ export default function JobDetailsPage() {
   const [completingJob, setCompletingJob] = useState(false);
 
   const currentUserId = user?._id || user?.id;
-
+  
+  // normalize possible object or id into a string id
+  // Converts id fields that may be objects into plain string ids.
   const getEntityId = (value: any) => {
     if (!value) return undefined;
     if (typeof value === "string") return value;
     return value?._id || value?.id;
   };
 
+  
+  // load job details by id and update loading/error states
+  // Loads the current job details from API.
   const fetchJob = async () => {
     if (!jobId) return;
     try {
@@ -108,10 +115,13 @@ export default function JobDetailsPage() {
     }
   };
 
+
   useEffect(() => {
     fetchJob();
   }, [jobId]);
 
+  // utility to pick tailwind-like classes for job status badges
+  // Returns style classes for each job status badge.
   const getStatusStyles = (status?: string) => {
     switch (status?.toLowerCase()) {
       case "open":
@@ -129,6 +139,7 @@ export default function JobDetailsPage() {
         return "bg-secondary border-border";
     }
   };
+
 
   const acceptedOffer = useMemo(
     () => job?.offers?.find((offer) => offer.status === "accepted"),
@@ -148,6 +159,8 @@ export default function JobDetailsPage() {
   const isAcceptedProvider =
     getEntityId(acceptedOffer?.serviceProviderId) === currentUserId;
 
+    // Call API to cancel a job and refresh view on success
+  // Cancels the job and reloads details.
   const handleCancelJob = async (id: string) => {
     try {
       setCancelingJob(true);
@@ -171,6 +184,9 @@ export default function JobDetailsPage() {
     }
   };
 
+
+  // Accept an offer and refresh job data
+  // Accepts one offer for this job.
   const handleOfferAccept = async (offerId: string) => {
     if (!offerId) return;
     try {
@@ -196,6 +212,8 @@ export default function JobDetailsPage() {
     }
   };
 
+  // Validate rating and post review then flag submitted
+  // Sends a review after checking rating range.
   const handleSubmitReview = async () => {
     if (!job?._id) return;
     if (reviewRating < 1 || reviewRating > 5) {
@@ -226,6 +244,8 @@ export default function JobDetailsPage() {
     }
   };
 
+
+  // Renders clickable star inputs for review rating.
   const renderReviewStars = (rating: number) => {
     return (
       <View className="flex-row gap-2">
@@ -242,6 +262,8 @@ export default function JobDetailsPage() {
     );
   };
 
+    // Validates offer price, enforces ±20% rule, then submits
+  // Creates provider offer if price is within allowed range.
   const handleCreateOffer = async () => {
     if (!job?._id) return;
     const offeredPriceNumber = Number(offeredPrice);
@@ -251,6 +273,7 @@ export default function JobDetailsPage() {
       return;
     }
 
+    // 20% limit
     const lowerLimit = job.userPrice - (job.userPrice * 20) / 100;
     const upperLimit = job.userPrice + (job.userPrice * 20) / 100;
 
@@ -284,6 +307,8 @@ export default function JobDetailsPage() {
     }
   };
 
+
+  // Marks the job as completed.
   const handleCompleteJob = async () => {
     if (!job?._id) return;
     try {
@@ -304,6 +329,7 @@ export default function JobDetailsPage() {
     }
   };
 
+  // Opens edit dialog and fills it with current job values.
   const openEditJobDialog = () => {
     if (!job) return;
 
@@ -316,6 +342,8 @@ export default function JobDetailsPage() {
     setShowEditJobDialog(true);
   };
 
+    // Validates edit form, runs AI verification, then updates job
+  // Saves edited job details after validation.
   const handleUpdateJob = async () => {
     if (!job?._id) return;
 
@@ -352,6 +380,7 @@ export default function JobDetailsPage() {
     try {
       setUpdatingJob(true);
 
+      // AI Job Check
       const verifyJob = await AiApi.verifyJob({
         title: payload.title || "",
         description: payload.description || "",
@@ -386,6 +415,8 @@ export default function JobDetailsPage() {
     }
   };
 
+  // Safely open external map URL if available
+  // Opens map link if the URL can be opened.
   const openLocation = async () => {
     if (!job?.locationURL) return;
     const canOpen = await Linking.canOpenURL(job.locationURL);

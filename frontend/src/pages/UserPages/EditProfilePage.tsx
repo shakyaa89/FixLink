@@ -30,8 +30,9 @@ export default function EditProfilePage() {
     const [email, setEmail] = useState(user.email);
     const [phoneNumber, setPhoneNumber] = useState(user.phoneNumber);
     const [city, setCity] = useState(user.city);
-    // const [password, setPassword] = useState("");
-    // const [confirmPassword, setConfirmPassword] = useState("");
+    const [currentPassword, setCurrentPassword] = useState("");
+    const [newPassword, setNewPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
     const [address, setAddress] = useState(user.address);
     const [addressDescription, setAddressDescription] = useState(user.addressDescription);
     const [addressUrl, setAddressUrl] = useState(user.addressURL || user.addressUrl || "");
@@ -66,6 +67,7 @@ export default function EditProfilePage() {
 
         try {
             setUpdating(true);
+            // Basic required fields validation before network calls.
             if (
                 !fullName ||
                 !email ||
@@ -76,6 +78,23 @@ export default function EditProfilePage() {
             ) {
                 toast.error("Please fill in all required fields");
                 return;
+            }
+
+            const hasPasswordInput = Boolean(
+                currentPassword.trim() || newPassword.trim() || confirmPassword.trim()
+            );
+
+            if (hasPasswordInput) {
+                // If one password field is used, require all three for safe change.
+                if (!currentPassword.trim() || !newPassword.trim() || !confirmPassword.trim()) {
+                    toast.error("Please fill all password fields to change password");
+                    return;
+                }
+
+                if (newPassword !== confirmPassword) {
+                    toast.error("New password and confirm password must match");
+                    return;
+                }
             }
 
             const profilePictureUrl = profilePicture ? await uploadToCloudinary(profilePicture) : user.profilePicture;
@@ -92,6 +111,18 @@ export default function EditProfilePage() {
             }
 
             const response = await AuthApi.updateUserProfileApi(updatePayload);
+
+            if (hasPasswordInput) {
+                // Change password only when user explicitly filled password fields.
+                await AuthApi.changePasswordApi({
+                    currentPassword,
+                    newPassword,
+                    confirmPassword,
+                });
+                setCurrentPassword("");
+                setNewPassword("");
+                setConfirmPassword("");
+            }
 
             toast.success(response.data.message);
 
@@ -320,6 +351,23 @@ export default function EditProfilePage() {
                                 </span>
                             </h2>
                             <div className="space-y-5">
+                                {/* Current Password */}
+                                <div>
+                                    <label className="block text-sm font-semibold text-(--text) mb-2">
+                                        Current Password
+                                    </label>
+                                    <div className="relative">
+                                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-(--muted)" />
+                                        <input
+                                            type="password"
+                                            value={currentPassword}
+                                            onChange={(e) => setCurrentPassword(e.target.value)}
+                                            placeholder="Enter current password"
+                                            className="w-full pl-12 pr-4 py-3 border-2 border-(--border) rounded-xl focus:border-(--accent) bg-(--secondary) text-(--text)"
+                                        />
+                                    </div>
+                                </div>
+
                                 {/* New Password */}
                                 <div>
                                     <label className="block text-sm font-semibold text-(--text) mb-2">
@@ -329,7 +377,8 @@ export default function EditProfilePage() {
                                         <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-(--muted)" />
                                         <input
                                             type="password"
-                                            // value={password}
+                                            value={newPassword}
+                                            onChange={(e) => setNewPassword(e.target.value)}
                                             placeholder="Enter new password"
                                             className="w-full pl-12 pr-4 py-3 border-2 border-(--border) rounded-xl focus:border-(--accent) bg-(--secondary) text-(--text)"
                                         />
@@ -345,7 +394,8 @@ export default function EditProfilePage() {
                                         <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-(--muted)" />
                                         <input
                                             type="password"
-                                            // value={confirmPassword}
+                                            value={confirmPassword}
+                                            onChange={(e) => setConfirmPassword(e.target.value)}
                                             placeholder="Confirm new password"
                                             className="w-full pl-12 pr-4 py-3 border-2 border-(--border) rounded-xl focus:border-(--accent) bg-(--secondary) text-(--text)"
                                         />

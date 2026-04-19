@@ -6,6 +6,7 @@ import colors from "@/app/_constants/theme";
 import { useAuthStore } from "@/store/authStore";
 
 export default function AdminMobileRestrictionScreen() {
+  // Admin tasks are handled only in the web app.
   const router = useRouter();
   const { logout } = useAuthStore();
 
@@ -25,6 +26,7 @@ export default function AdminMobileRestrictionScreen() {
           <Pressable
             className="mt-6 bg-danger rounded-xl px-5 py-3.5 flex-row items-center gap-2"
             onPress={async () => {
+              // Force logout so admins re-authenticate from the web app.
               await logout();
               router.replace("/");
             }}

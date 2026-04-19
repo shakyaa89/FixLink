@@ -1,3 +1,4 @@
+// Dispute schema for issue reports between users and providers
 import mongoose from "mongoose";
 
 const disputeSchema = new mongoose.Schema(

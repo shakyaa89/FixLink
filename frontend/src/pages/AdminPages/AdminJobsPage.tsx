@@ -23,6 +23,7 @@ export default function AdminJobsPage() {
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
 
   const stats = useMemo(() => {
+    // Build summary cards from the same list shown in table.
     const total = jobs.length;
     const open = jobs.filter((job) => job.jobStatus === "open").length;
     const inProgress = jobs.filter(
@@ -50,6 +51,7 @@ export default function AdminJobsPage() {
       setError(null);
       const response = await AdminApi.fetchJobs();
       const fetchedJobs = response.data.jobs || [];
+      // Keep local list as source for both table and stats cards.
       setJobs(fetchedJobs);
     } catch (err) {
       console.error("Failed to load jobs", err);
@@ -68,6 +70,7 @@ export default function AdminJobsPage() {
       setUpdatingId(jobId);
       setError(null);
       await AdminApi.updateJob(jobId, { jobStatus });
+      // Re-fetch so list reflects backend-calculated values consistently.
       await fetchJobs();
     } catch (err) {
       console.error("Failed to update job status", err);

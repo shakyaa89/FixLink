@@ -8,9 +8,12 @@ import Toast, { BaseToast, ToastConfigParams } from "react-native-toast-message"
 import { Text } from "@react-navigation/elements";
 import { Check, X } from "lucide-react-native";
 
+// Builds the main app shell.
 export default function RootLayout() {
+  // Read auth state.
   const { checking, checkAuth, user, authInitialized } = useAuthStore();
 
+  // Centralized toast styles for success and error alerts.
   const toastConfig: Record<string, (props: ToastConfigParams<any>) => JSX.Element> = {
     success: ({ text1 }) => (
       <View
@@ -78,6 +81,7 @@ export default function RootLayout() {
   };
 
   useEffect(() => {
+    // Run auth once on app startup.
     if (!authInitialized) {
       checkAuth();
     }
@@ -90,6 +94,7 @@ export default function RootLayout() {
       </View>);
   }
 
+  // Hide the mobile nav for admin-only flow.
   return (
     <View style={{ flex: 1 }}>
       <Stack screenOptions={{ headerShown: false }} />

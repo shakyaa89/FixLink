@@ -34,6 +34,7 @@ export default function CreateJobPage() {
 
     const files = Array.from(e.target.files);
 
+    // Enforce per-image limit before any upload work starts.
     const oversizedFiles = files.filter((file) => file.size > MAX_IMAGE_SIZE_BYTES);
     if (oversizedFiles.length > 0) {
       toast.error("Each image must be 2MB or smaller");
@@ -50,6 +51,7 @@ export default function CreateJobPage() {
 
     try {
       for (const file of files) {
+        // Re-check in upload loop to guard against stale file state.
         if (file.size > MAX_IMAGE_SIZE_BYTES) {
           throw new Error("Each image must be 2MB or smaller");
         }
@@ -100,6 +102,7 @@ export default function CreateJobPage() {
 
     try {
       setLoading(true);
+      // Validate job text/price with AI before saving to backend.
       const verificationPayload = { title, description, userPrice }
 
       const verifyJob = await AiApi.verifyJob(verificationPayload);
@@ -128,6 +131,7 @@ export default function CreateJobPage() {
         locationURL,
         images: imageUrls,
         scheduledFor:
+          // Send ISO string only for scheduled posts.
           postType === "scheduled" && scheduledFor
             ? new Date(scheduledFor).toISOString()
             : undefined,

@@ -1,3 +1,4 @@
+// Message schema for user chat records
 import mongoose from "mongoose";
 
 const messageSchema = new mongoose.Schema(

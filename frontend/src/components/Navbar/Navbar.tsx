@@ -24,10 +24,12 @@ export default function Navbar() {
           ? "/admin/dashboard"
           : "/";
 
+  // Logs out current user.
   const handleLogout = async () => {
     await logout();
   };
 
+  // Toggles light and dark theme.
   const handleThemeChange = () => {
     toggleTheme();
   };

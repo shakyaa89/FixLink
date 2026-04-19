@@ -25,6 +25,7 @@ interface Review {
   createdAt?: string;
 }
 
+// Shows reviews the user received and sent.
 export default function ReviewsScreen() {
   const router = useRouter();
   const { user } = useAuthStore();
@@ -36,9 +37,11 @@ export default function ReviewsScreen() {
     fetchReviews();
   }, []);
 
+  // Loads both review lists for this user.
   const fetchReviews = async () => {
     try {
       setLoading(true);
+      // Pull received and sent reviews separately for sectioned UI.
       const response = await ReviewApi.fetchMyReceivedReviews();
       if (response.data.reviews) {
         setReceivedReviews(response.data.reviews);
@@ -61,6 +64,7 @@ export default function ReviewsScreen() {
     }
   };
 
+  // Draws star icons for one rating value.
   const renderStars = (rating: number) => {
     return (
       <View className="flex-row gap-0.5">

@@ -1,3 +1,4 @@
+// Job schema for user service requests
 import mongoose from "mongoose";
 
 const jobSchema = mongoose.Schema(

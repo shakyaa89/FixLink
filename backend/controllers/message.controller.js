@@ -1,14 +1,18 @@
+// Message controller for chat and message history
 import Message from "../models/message.model.js";
 import User from "../models/user.model.js";
 import Job from "../models/job.model.js";
 import Offer from "../models/offer.model.js";
 import { getIO } from "../lib/socket.js";
 
+// Send message from one user to another
 export const sendMessage = async (req, res) => {
   try {
+    // Read sender from auth and payload from body.
     const senderId = req.user?._id;
     const { receiverId, content } = req.body;
 
+    // Block unauthenticated requests.
     if (!senderId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
@@ -31,12 +35,14 @@ export const sendMessage = async (req, res) => {
       return res.status(404).json({ message: "Receiver not found" });
     }
 
+    // Add chat message in database.
     const message = await Message.create({
       senderId,
       receiverId,
       content: content.trim(),
     });
 
+    // Normalize ids to strings for socket clients.
     const payload = message.toObject();
     payload._id = String(message._id);
     payload.senderId = String(message.senderId);
@@ -51,6 +57,7 @@ export const sendMessage = async (req, res) => {
       console.log("Socket emit failed", socketError);
     }
 
+    // Return stored message to caller.
     return res.status(201).json({ message: "Message sent", data: message });
   } catch (error) {
     console.log(error);
@@ -58,11 +65,14 @@ export const sendMessage = async (req, res) => {
   }
 };
 
+// Fetch chat messages between two users
 export const getMessagesWithUser = async (req, res) => {
   try {
+    // Read current user and other participant id.
     const loggedInUserId = req.user?._id;
     const otherUserId = req.params.userId;
 
+    // Block unauthenticated requests.
     if (!loggedInUserId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
@@ -71,6 +81,7 @@ export const getMessagesWithUser = async (req, res) => {
       return res.status(400).json({ message: "User id is required" });
     }
 
+    // Fetch both directions of the same chat thread.
     const messages = await Message.find({
       $or: [
         { senderId: loggedInUserId, receiverId: otherUserId },
@@ -80,6 +91,7 @@ export const getMessagesWithUser = async (req, res) => {
       .sort({ createdAt: 1 })
       .lean();
 
+    // Send messages in ascending time order.
     return res.status(200).json({ messages });
   } catch (error) {
     console.log(error);
@@ -87,11 +99,14 @@ export const getMessagesWithUser = async (req, res) => {
   }
 };
 
+// Fetch available message contacts for user
 export const getMessageContacts = async (req, res) => {
   try {
+    // Read user identity and role from auth context.
     const currentUserId = req.user?._id;
     const currentUserRole = req.user?.role || "user";
 
+    // Block unauthenticated requests.
     if (!currentUserId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
@@ -99,6 +114,7 @@ export const getMessageContacts = async (req, res) => {
     let contacts = [];
 
     if (currentUserRole === "serviceProvider") {
+      // For providers, contacts are owners of in-progress accepted jobs.
       const acceptedOffers = await Offer.find({
         serviceProviderId: currentUserId,
         status: "accepted",
@@ -126,6 +142,7 @@ export const getMessageContacts = async (req, res) => {
           jobTitle: offer.jobId.title,
         }));
     } else {
+      // For users, contacts are accepted providers on in-progress jobs.
       const inProgressJobs = await Job.find({
         userId: currentUserId,
         jobStatus: "in-progress",
@@ -163,6 +180,7 @@ export const getMessageContacts = async (req, res) => {
     const deduped = [];
     const seen = new Set();
 
+    // Same contact can appear via multiple active jobs.
     contacts.forEach((contact) => {
       if (!seen.has(contact._id)) {
         seen.add(contact._id);

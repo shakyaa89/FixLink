@@ -21,6 +21,7 @@ import colors from "@/app/_constants/theme";
 import { JobApi, type JobData } from "@/api/Apis";
 import { useAuthStore } from "@/store/authStore";
 
+// Shows service-provider stats and matched jobs.
 export default function ProviderDashboard() {
   const router = useRouter();
   const { user } = useAuthStore();
@@ -28,6 +29,7 @@ export default function ProviderDashboard() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
+  // Loads jobs for the provider's category.
   const fetchJobs = useCallback(async () => {
     if (!user || user.role !== "serviceProvider") return;
     try {
@@ -44,6 +46,7 @@ export default function ProviderDashboard() {
   }, [user]);
 
   useEffect(() => {
+    // Enforce provider-only access for this dashboard.
     if (!user) {
       router.replace("/public/login");
       return;
@@ -63,6 +66,7 @@ export default function ProviderDashboard() {
   }, [user, fetchJobs, router]);
 
   const stats = useMemo(() => {
+    // Build counters for dashboard cards.
     const total = jobs.length;
     const available = jobs.filter(
       (job) => job.jobStatus === "open" || job.jobStatus === "pending"

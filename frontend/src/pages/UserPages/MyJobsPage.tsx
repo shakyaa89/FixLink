@@ -65,12 +65,12 @@ export default function MyJobs() {
   useEffect(() => {
     let filtered = jobs;
 
-    // Filter by status
+    // Apply status filter first to shrink the result set quickly.
     if (statusFilter !== "all") {
       filtered = filtered.filter((job) => job.jobStatus === statusFilter);
     }
 
-    // Filter by search query
+    // Then apply text search on title, description, and location.
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(
@@ -234,6 +234,7 @@ export default function MyJobs() {
                         src={
                           job.images && job.images.length > 0
                             ? job.images[0]
+                            // Keep a stable fallback image for jobs with no uploads.
                             : "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=400"
                         }
                         alt={job.title || "job image"}

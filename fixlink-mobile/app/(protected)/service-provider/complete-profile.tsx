@@ -36,6 +36,7 @@ const PROVIDER_CATEGORIES = [
 
 const MAX_IMAGE_SIZE_BYTES = 2 * 1024 * 1024;
 
+// Collects provider verification details and submits profile.
 export default function CompleteProviderProfileScreen() {
   const router = useRouter();
   const { user, setUser } = useAuthStore();
@@ -53,6 +54,7 @@ export default function CompleteProviderProfileScreen() {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
 
+  // Picks one document image for the selected field.
   const pickImage = async (
     setter: (asset: ImagePicker.ImagePickerAsset | null) => void
   ) => {
@@ -82,6 +84,7 @@ export default function CompleteProviderProfileScreen() {
     setter(selectedAsset);
   };
 
+  // Uploads one image file and returns URL.
   const uploadToCloudinary = async (asset: ImagePicker.ImagePickerAsset) => {
     if (
       typeof asset.fileSize === "number" &&
@@ -111,6 +114,7 @@ export default function CompleteProviderProfileScreen() {
     return data.secure_url as string;
   };
 
+  // Validates all required fields and submits provider profile.
   const handleSubmit = async () => {
     if (!address) {
       Toast.show({ type: "error", text1: "Address is missing from your profile" });
@@ -126,6 +130,7 @@ export default function CompleteProviderProfileScreen() {
       setLoading(true);
       setUploading(true);
 
+      // Upload both required proof files before verification and profile update.
       const [verificationProofURL, idURL] = await Promise.all([
         uploadToCloudinary(verificationProofFile),
         uploadToCloudinary(idProofFile),
@@ -141,6 +146,7 @@ export default function CompleteProviderProfileScreen() {
       let verificationStatus: "pending" | "verified" | "rejected" = "pending";
       let rejectionReason = "";
 
+      // Map AI verification response profile status.
       if (verification?.data?.reply === "PROPER") {
         verificationStatus = "verified";
       } else {
