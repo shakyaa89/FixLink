@@ -85,7 +85,7 @@ export default function AdminMessagesPage() {
       setDeletingId(deleteTarget);
       setError(null);
       await AdminApi.deleteMessage(deleteTarget);
-      // Refresh list after delete to avoid stale message rows.
+      // Refresh list after delete.
       await fetchMessages();
       setDeleteTarget(null);
     } catch (err) {

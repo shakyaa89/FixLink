@@ -388,7 +388,7 @@ export default function HomePage() {
           <p className="text-xl text-(--primary)/80 mb-8">
             Find the perfect professional for your home service needs today
           </p>
-          <button className="font-medium rounded-lg duration-300 bg-(--secondary) text-(--text) hover:bg-(--primary) px-8 py-4 text-lg transition hover:scale-105">
+          <button onClick={handleGetStarted} className="font-medium rounded-lg duration-300 bg-(--secondary) text-(--text) hover:bg-(--primary) px-8 py-4 text-lg transition hover:scale-105">
             Register Now!
           </button>
         </div>

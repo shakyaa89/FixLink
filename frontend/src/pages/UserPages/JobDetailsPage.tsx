@@ -9,6 +9,7 @@ import {
   type UpdateJobData,
 } from "../../api/Apis";
 import { useParams, useNavigate } from "react-router-dom";
+import { CITIES, LOCATION_OPTIONS } from "../../utils/nepalLocations";
 import {
   Ban,
   Loader2,
@@ -54,6 +55,7 @@ export default function JobDetailsPage() {
   const [editDescription, setEditDescription] = useState("");
   const [editCategory, setEditCategory] = useState("");
   const [editPrice, setEditPrice] = useState("");
+  const [editCity, setEditCity] = useState("");
   const [editLocation, setEditLocation] = useState("");
   const [editLocationURL, setEditLocationURL] = useState("");
   const [reviewRating, setReviewRating] = useState(0);
@@ -66,7 +68,6 @@ export default function JobDetailsPage() {
     try {
       setLoading(true);
       setError(null);
-      // Route guarantees param in normal flow; assert non-null for API call.
       const response = await JobApi.fetchJobByIdApi(jobId!);
       setJob(response.data.job);
     } catch (err) {
@@ -114,7 +115,6 @@ export default function JobDetailsPage() {
     try {
       if (offerId === "") return;
 
-      // Keep payload explicit in case API contract expands later.
       const payload = { offerId };
 
       const response = await OfferApi.acceptOffer(payload);
@@ -162,11 +162,18 @@ export default function JobDetailsPage() {
 
   const openEditDialog = () => {
     if (!job) return;
+    const [cityPart = "", ...locationParts] = (job.location || "")
+      .split(",")
+      .map((value) => value.trim());
+    const parsedCity = CITIES.includes(cityPart) ? cityPart : "";
+    const parsedLocation = locationParts.join(", ");
+
     setEditTitle(job.title || "");
     setEditDescription(job.description || "");
     setEditCategory(job.jobCategory || "");
     setEditPrice(String(job.userPrice || ""));
-    setEditLocation(job.location || "");
+    setEditCity(parsedCity);
+    setEditLocation(parsedLocation);
     setEditLocationURL(job.locationURL || "");
     setShowEditDialog(true);
   };
@@ -180,6 +187,7 @@ export default function JobDetailsPage() {
       !editTitle.trim() ||
       !editDescription.trim() ||
       !editCategory ||
+      !editCity ||
       !editLocation.trim() ||
       Number.isNaN(parsedPrice)
     ) {
@@ -192,29 +200,36 @@ export default function JobDetailsPage() {
       return;
     }
 
-    // Build sanitized payload from edit state.
+    // Build payload from edit state.
     const payload: UpdateJobData = {
       title: editTitle.trim(),
       description: editDescription.trim(),
       jobCategory: editCategory,
       userPrice: parsedPrice,
-      location: editLocation.trim(),
+      location: `${editCity}, ${editLocation.trim()}`,
       locationURL: editLocationURL.trim(),
     };
+
+    const hasModerationFieldsChanged =
+      payload.title !== (job.title || "").trim() ||
+      payload.description !== (job.description || "").trim() ||
+      payload.userPrice !== Number(job.userPrice || 0);
 
     try {
       setUpdatingJob(true);
 
-      const verifyJob = await AiApi.verifyJob({
-        title: payload.title || "",
-        description: payload.description || "",
-        userPrice: payload.userPrice || 0,
-      });
+      if (hasModerationFieldsChanged) {
+        const verifyJob = await AiApi.verifyJob({
+          title: payload.title || "",
+          description: payload.description || "",
+          userPrice: payload.userPrice || 0,
+        });
 
-      // Block save when AI moderation marks content as invalid.
-      if (verifyJob?.data?.reply !== "VALID") {
-        toast.error(verifyJob?.data?.reply || "Job did not pass AI verification");
-        return;
+        // Block save when AI moderation marks content as invalid.
+        if (verifyJob?.data?.reply !== "VALID") {
+          toast.error(verifyJob?.data?.reply || "Job did not pass AI verification");
+          return;
+        }
       }
 
       const response = await JobApi.updateJobDetailsApi(job._id, payload);
@@ -297,7 +312,7 @@ export default function JobDetailsPage() {
                   {error || "Job not found or has been removed."}
                 </p>
                 <button
-                  onClick={() => navigate("/my-jobs")}
+                  onClick={() => navigate("/user/jobs")}
                   className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
                 >
                   <ArrowLeft className="w-4 h-4" />
@@ -314,6 +329,7 @@ export default function JobDetailsPage() {
   const acceptedOffer = job.offers?.find(
     (offer) => offer.status === "accepted",
   );
+  const editPlaceOptions = editCity ? LOCATION_OPTIONS[editCity] ?? [] : [];
   const canEditJob = job.jobStatus === "open" || job.jobStatus === "scheduled";
   const provider = acceptedOffer?.serviceProviderId as
     | { fullName?: string }
@@ -918,13 +934,39 @@ export default function JobDetailsPage() {
               </div>
 
               <div>
+                <label className="block text-sm font-medium text-(--text) mb-2">City</label>
+                <select
+                  value={editCity}
+                  onChange={(e) => {
+                    setEditCity(e.target.value);
+                    setEditLocation("");
+                  }}
+                  className="w-full border border-(--border) rounded-lg px-3 py-2 bg-(--primary) text-(--text)"
+                >
+                  <option value="">Select city</option>
+                  {CITIES.map((cityOption) => (
+                    <option key={cityOption} value={cityOption}>
+                      {cityOption}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
                 <label className="block text-sm font-medium text-(--text) mb-2">Location</label>
-                <input
+                <select
                   value={editLocation}
                   onChange={(e) => setEditLocation(e.target.value)}
-                  className="w-full border border-(--border) rounded-lg px-3 py-2 bg-(--primary) text-(--text)"
-                  placeholder="Kathmandu, Baneshwor"
-                />
+                  disabled={!editCity}
+                  className="w-full border border-(--border) rounded-lg px-3 py-2 bg-(--primary) text-(--text) disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  <option value="">{editCity ? "Select location" : "Select city first"}</option>
+                  {editPlaceOptions.map((placeOption) => (
+                    <option key={placeOption} value={placeOption}>
+                      {placeOption}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div>

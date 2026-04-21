@@ -2,7 +2,7 @@
 import express from "express";
 var router = express.Router();
 
-import { protectRoute } from "../middleware/auth.middleware.js";
+import { protectRoute, requireUser } from "../middleware/auth.middleware.js";
 import {
   cancelJob,
   completeJob,
@@ -17,7 +17,7 @@ import {
 import { protectServiceProviderRoute, requireVerifiedProvider } from "../middleware/serviceProvider.middleware.js";
 
 // User route to create an open job.
-router.post("/create", protectRoute, createJob);
+router.post("/create", protectRoute, requireUser, createJob);
 
 // User route to fetch own jobs.
 router.get("/fetch-user-jobs", protectRoute, getJobsbyUserId);
@@ -26,7 +26,7 @@ router.get("/fetch-user-jobs", protectRoute, getJobsbyUserId);
 router.get("/fetch-all-jobs", protectRoute, getJobs);
 
 // User route to create a scheduled job.
-router.post("/schedule", protectRoute, scheduleJob);
+router.post("/schedule", protectRoute, requireUser, scheduleJob);
 
 // User route to fetch one job by id.
 router.get("/fetch/:id", protectRoute, getJobById);

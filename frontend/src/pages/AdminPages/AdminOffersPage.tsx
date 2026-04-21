@@ -51,7 +51,7 @@ export default function AdminOffersPage() {
       setUpdatingId(offerId);
       setError(null);
       await AdminApi.updateOffer(offerId, { status });
-      // Refresh list to reflect latest offer status from backend.
+      // Refresh list to display latest offer status from backend.
       await fetchOffers();
     } catch (err) {
       console.error("Failed to update offer", err);

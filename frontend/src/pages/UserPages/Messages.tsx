@@ -51,14 +51,10 @@ export default function Messages() {
     // Open realtime connection once we know who is logged in.
     connectSocket(String(loggedInId));
     return () => {
-      // Always clean up socket on unmount/user switch.
+      // Always clean up socket on user switch.
       disconnectSocket();
     };
   }, [loggedInId, connectSocket, disconnectSocket]);
-
-  useEffect(() => {
-    console.log(activeChatUser);
-  }, [activeChatUser]);
 
   return (
     <div className="flex min-h-screen">

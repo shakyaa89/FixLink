@@ -218,7 +218,9 @@ export async function loginController(req, res) {
       return res.status(400).json({ message: "Invalid email format" });
     }
 
-    const user = await User.findOne({ email }).select("+password");
+    const lowerEmail = email.toLowerCase();
+
+    const user = await User.findOne({ email: lowerEmail }).select("+password");
 
     if (!user) {
       return res.status(401).json({ message: "Invalid credentials" });

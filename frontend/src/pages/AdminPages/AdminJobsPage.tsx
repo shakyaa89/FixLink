@@ -70,7 +70,7 @@ export default function AdminJobsPage() {
       setUpdatingId(jobId);
       setError(null);
       await AdminApi.updateJob(jobId, { jobStatus });
-      // Re-fetch so list reflects backend-calculated values consistently.
+      // Re-fetch so list displays values consistently.
       await fetchJobs();
     } catch (err) {
       console.error("Failed to update job status", err);

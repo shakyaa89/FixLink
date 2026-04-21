@@ -84,7 +84,7 @@ export default function AdminDisputesPage() {
       const response = await AdminApi.fetchDisputes();
       const fetchedDisputes = (response.data.disputes ||
         []) as AdminDisputeData[];
-      // Normalize API data once so UI rendering logic stays simple.
+      // Normalize API data once.
       setDisputes(
         fetchedDisputes.map((dispute) => ({
           ...dispute,
@@ -171,7 +171,7 @@ export default function AdminDisputesPage() {
       setDeletingId(deleteTarget.id);
       setError(null);
       await AdminApi.deleteDispute(deleteTarget.id);
-      // Refresh table after destructive action.
+      // Refresh table.
       await fetchDisputes();
       setDeleteTarget(null);
     } catch (err) {

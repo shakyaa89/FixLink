@@ -54,33 +54,13 @@ router.delete("/offers/:offerId", protectRoute, requireAdmin, deleteAdminOffer);
 
 // Dispute management routes.
 router.get("/disputes", protectRoute, requireAdmin, getAdminDisputes);
-router.put(
-  "/disputes/:disputeId",
-  protectRoute,
-  requireAdmin,
-  updateAdminDispute
-);
-router.delete(
-  "/disputes/:disputeId",
-  protectRoute,
-  requireAdmin,
-  deleteAdminDispute
-);
+router.put("/disputes/:disputeId", protectRoute, requireAdmin, updateAdminDispute);
+router.delete("/disputes/:disputeId", protectRoute, requireAdmin, deleteAdminDispute);
 
 // Review moderation routes.
 router.get("/reviews", protectRoute, requireAdmin, getAdminReviews);
-router.put(
-  "/reviews/:reviewId",
-  protectRoute,
-  requireAdmin,
-  updateAdminReview
-);
-router.delete(
-  "/reviews/:reviewId",
-  protectRoute,
-  requireAdmin,
-  deleteAdminReview
-);
+router.put("/reviews/:reviewId", protectRoute, requireAdmin, updateAdminReview);
+router.delete("/reviews/:reviewId", protectRoute, requireAdmin, deleteAdminReview);
 
 // Message moderation routes.
 router.get("/messages", protectRoute, requireAdmin, getAdminMessages);

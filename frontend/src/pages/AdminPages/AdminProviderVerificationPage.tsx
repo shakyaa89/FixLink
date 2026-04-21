@@ -22,7 +22,6 @@ export default function AdminProviderVerificationPage() {
       setError(null);
       const response = await AdminApi.fetchServiceProviders();
       const fetchedProviders = response.data.providers || [];
-      // Keep table data normalized even when API returns undefined.
       setProviders(fetchedProviders);
     } catch (err) {
       console.error("Failed to load providers", err);
@@ -44,7 +43,7 @@ export default function AdminProviderVerificationPage() {
         status,
         rejectionReason,
       );
-      // Refresh from backend so latest moderation state is shown.
+      // Refresh from backend so latest state is shown.
       fetchProviders();
     } catch (err) {
       console.error("Failed to update verification", err);

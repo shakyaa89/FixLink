@@ -59,3 +59,16 @@ export async function protectRoute(req, res, next) {
     return res.status(401).json({ message: "Token verification failed" });
   }
 }
+
+export function requireUser(req, res, next) {
+  // Read authenticated user from request.
+  const user = req.user;
+
+  // Allow only users with user role.
+  if (!user || user.role !== "user") {
+    return res.status(403).json({ message: "User access required" });
+  }
+
+  // Continue to next middleware/handler.
+  next();
+}

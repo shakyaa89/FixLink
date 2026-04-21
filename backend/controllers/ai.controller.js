@@ -150,7 +150,7 @@ export async function chatWithAi(req, res) {
   } catch (error) {
     if (error.response) {
       console.log("Gemini API error:", error.response.data);
-      return res.status(502).json({ message: "AI service error" });
+      return res.status(502).json({ message: "AI service error, try again later." });
     }
 
     console.log(error);
@@ -193,7 +193,7 @@ export async function verifyServiceProvider(req, res) {
     };
 
     // Ask Gemini to validate category vs. document text.
-    const response = await axios.post(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`, payload, {
+    const response = await axios.post(`https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`, payload, {
       headers: {
         "Content-Type": "application/json",
       },
@@ -207,7 +207,7 @@ export async function verifyServiceProvider(req, res) {
   } catch (error) {
     if (error.response) {
       console.log("AI verify provider error:", error.response.data);
-      return res.status(502).json({ message: "AI service error" });
+      return res.status(502).json({ message: "AI service error, try again later." });
     }
 
     console.log(error);
@@ -277,7 +277,7 @@ export async function verifyJob(req, res) {
     };
 
     // Ask Gemini to validate scope and minimum price.
-    const response = await axios.post(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`, payload, {
+    const response = await axios.post(`https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`, payload, {
       headers: {
         "Content-Type": "application/json",
       },
@@ -291,7 +291,7 @@ export async function verifyJob(req, res) {
   } catch (error) {
     if (error.response) {
       console.log("AI verify job error:", error.response.data);
-      return res.status(502).json({ message: "AI service error" });
+      return res.status(502).json({ message: "AI service error, try again later." });
     }
 
     console.log(error);

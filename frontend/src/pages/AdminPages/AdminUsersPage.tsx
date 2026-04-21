@@ -14,7 +14,7 @@ export default function AdminUsersPage() {
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; fullName: string } | null>(null);
 
   const stats = useMemo(() => {
-    // Derive dashboard counters from the same users list shown below.
+    // Dashboard counters from the same users list shown below.
     const total = users.length;
     const providers = users.filter(
       (user) => user.role === "serviceProvider",
@@ -38,7 +38,6 @@ export default function AdminUsersPage() {
       setError(null);
       const response = await AdminApi.fetchUsers();
       const fetchedUsers = response.data.users || [];
-      // Keep one source of truth for table and stat cards.
       setUsers(fetchedUsers);
     } catch (err) {
       console.error("Failed to load users", err);

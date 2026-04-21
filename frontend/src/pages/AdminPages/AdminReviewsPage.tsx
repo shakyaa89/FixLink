@@ -49,7 +49,7 @@ export default function AdminReviewsPage() {
       setUpdatingId(reviewId);
       setError(null);
       await AdminApi.updateReview(reviewId, { rating });
-      // Reload to reflect persisted rating and any backend recalculations.
+      // Reload to display rating and any backend changes.
       await fetchReviews();
     } catch (err) {
       console.error("Failed to update review", err);

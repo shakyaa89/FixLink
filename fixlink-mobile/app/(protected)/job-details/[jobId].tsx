@@ -31,6 +31,7 @@ import {
 } from "lucide-react-native";
 import Toast from "react-native-toast-message";
 import { AxiosError } from "axios";
+import { Picker } from "@react-native-picker/picker";
 import colors from "@/app/_constants/theme";
 import {
   AiApi,
@@ -40,6 +41,7 @@ import {
   type JobData,
   type UpdateJobData,
 } from "@/api/Apis";
+import { CITIES, LOCATION_OPTIONS } from "@/utils/nepalLocations";
 import { useAuthStore } from "@/store/authStore";
 
 const JOB_CATEGORIES = [
@@ -51,7 +53,6 @@ const JOB_CATEGORIES = [
   "General Repairs",
 ];
 
-// Shows full job details and role-based actions.
 export default function JobDetailsPage() {
   const { jobId } = useLocalSearchParams<{ jobId: string }>();
   const router = useRouter();
@@ -80,6 +81,7 @@ export default function JobDetailsPage() {
   const [editDescription, setEditDescription] = useState("");
   const [editCategory, setEditCategory] = useState("");
   const [editPrice, setEditPrice] = useState("");
+  const [editCity, setEditCity] = useState("");
   const [editLocation, setEditLocation] = useState("");
   const [editLocationURL, setEditLocationURL] = useState("");
 
@@ -121,7 +123,6 @@ export default function JobDetailsPage() {
   }, [jobId]);
 
   // utility to pick tailwind-like classes for job status badges
-  // Returns style classes for each job status badge.
   const getStatusStyles = (status?: string) => {
     switch (status?.toLowerCase()) {
       case "open":
@@ -146,6 +147,10 @@ export default function JobDetailsPage() {
     [job?.offers]
   );
 
+  const editPlaceOptions = useMemo(() => {
+    return editCity ? LOCATION_OPTIONS[editCity] ?? [] : [];
+  }, [editCity]);
+
   const providerOffer = useMemo(() => {
     if (!job?.offers || !currentUserId) return null;
     return (
@@ -160,7 +165,6 @@ export default function JobDetailsPage() {
     getEntityId(acceptedOffer?.serviceProviderId) === currentUserId;
 
     // Call API to cancel a job and refresh view on success
-  // Cancels the job and reloads details.
   const handleCancelJob = async (id: string) => {
     try {
       setCancelingJob(true);
@@ -186,7 +190,6 @@ export default function JobDetailsPage() {
 
 
   // Accept an offer and refresh job data
-  // Accepts one offer for this job.
   const handleOfferAccept = async (offerId: string) => {
     if (!offerId) return;
     try {
@@ -213,7 +216,6 @@ export default function JobDetailsPage() {
   };
 
   // Validate rating and post review then flag submitted
-  // Sends a review after checking rating range.
   const handleSubmitReview = async () => {
     if (!job?._id) return;
     if (reviewRating < 1 || reviewRating > 5) {
@@ -263,7 +265,6 @@ export default function JobDetailsPage() {
   };
 
     // Validates offer price, enforces ±20% rule, then submits
-  // Creates provider offer if price is within allowed range.
   const handleCreateOffer = async () => {
     if (!job?._id) return;
     const offeredPriceNumber = Number(offeredPrice);
@@ -332,18 +333,23 @@ export default function JobDetailsPage() {
   // Opens edit dialog and fills it with current job values.
   const openEditJobDialog = () => {
     if (!job) return;
+    const [cityPart = "", ...locationParts] = (job.location || "")
+      .split(",")
+      .map((value) => value.trim());
+    const parsedCity = CITIES.includes(cityPart) ? cityPart : "";
+    const parsedLocation = locationParts.join(", ");
 
     setEditTitle(job.title || "");
     setEditDescription(job.description || "");
     setEditCategory(job.jobCategory || "");
     setEditPrice(String(job.userPrice || ""));
-    setEditLocation(job.location || "");
+    setEditCity(parsedCity);
+    setEditLocation(parsedLocation);
     setEditLocationURL(job.locationURL || "");
     setShowEditJobDialog(true);
   };
 
     // Validates edit form, runs AI verification, then updates job
-  // Saves edited job details after validation.
   const handleUpdateJob = async () => {
     if (!job?._id) return;
 
@@ -353,6 +359,7 @@ export default function JobDetailsPage() {
       !editTitle.trim() ||
       !editDescription.trim() ||
       !editCategory ||
+      !editCity ||
       !editLocation.trim() ||
       Number.isNaN(parsedPrice)
     ) {
@@ -373,26 +380,33 @@ export default function JobDetailsPage() {
       description: editDescription.trim(),
       jobCategory: editCategory,
       userPrice: parsedPrice,
-      location: editLocation.trim(),
+      location: `${editCity}, ${editLocation.trim()}`,
       locationURL: editLocationURL.trim(),
     };
+
+    const hasModerationFieldsChanged =
+      payload.title !== (job.title || "").trim() ||
+      payload.description !== (job.description || "").trim() ||
+      payload.userPrice !== Number(job.userPrice || 0);
 
     try {
       setUpdatingJob(true);
 
-      // AI Job Check
-      const verifyJob = await AiApi.verifyJob({
-        title: payload.title || "",
-        description: payload.description || "",
-        userPrice: payload.userPrice || 0,
-      });
-
-      if (verifyJob?.data?.reply !== "VALID") {
-        Toast.show({
-          type: "error",
-          text1: verifyJob?.data?.reply || "Job did not pass AI verification",
+      if (hasModerationFieldsChanged) {
+        // AI Job Check
+        const verifyJob = await AiApi.verifyJob({
+          title: payload.title || "",
+          description: payload.description || "",
+          userPrice: payload.userPrice || 0,
         });
-        return;
+
+        if (verifyJob?.data?.reply !== "VALID") {
+          Toast.show({
+            type: "error",
+            text1: verifyJob?.data?.reply || "Job did not pass AI verification",
+          });
+          return;
+        }
       }
 
       const response = await JobApi.updateJobDetailsApi(job._id, payload);
@@ -416,7 +430,6 @@ export default function JobDetailsPage() {
   };
 
   // Safely open external map URL if available
-  // Opens map link if the URL can be opened.
   const openLocation = async () => {
     if (!job?.locationURL) return;
     const canOpen = await Linking.canOpenURL(job.locationURL);
@@ -1033,13 +1046,43 @@ export default function JobDetailsPage() {
                 />
 
                 <Text className="text-sm text-text font-semibold">Location</Text>
-                <TextInput
-                  value={editLocation}
-                  onChangeText={setEditLocation}
-                  placeholder="Kathmandu, Baneshwor"
-                  placeholderTextColor={colors.muted}
-                  className="border border-border rounded-xl px-3 py-3 text-text bg-secondary"
-                />
+                <View className="border border-border rounded-xl bg-secondary overflow-hidden">
+                  <Picker
+                    selectedValue={editCity}
+                    onValueChange={(value) => {
+                      setEditCity(value);
+                      setEditLocation("");
+                    }}
+                    style={{ color: colors.text }}
+                  >
+                    <Picker.Item label="Select city" value="" />
+                    {CITIES.map((cityOption) => (
+                      <Picker.Item key={cityOption} label={cityOption} value={cityOption} />
+                    ))}
+                  </Picker>
+                </View>
+
+                <Text className="text-sm text-text font-semibold">Area</Text>
+                <View className="border border-border rounded-xl bg-secondary overflow-hidden">
+                  <Picker
+                    enabled={!!editCity}
+                    selectedValue={editLocation}
+                    onValueChange={(value) => setEditLocation(value)}
+                    style={{ color: colors.text }}
+                  >
+                    <Picker.Item
+                      label={editCity ? "Select location" : "Select city first"}
+                      value=""
+                    />
+                    {editPlaceOptions.map((placeOption) => (
+                      <Picker.Item
+                        key={placeOption}
+                        label={placeOption}
+                        value={placeOption}
+                      />
+                    ))}
+                  </Picker>
+                </View>
 
                 <Text className="text-sm text-text font-semibold">Location URL (optional)</Text>
                 <TextInput
